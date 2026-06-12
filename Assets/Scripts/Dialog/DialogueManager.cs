@@ -7,9 +7,9 @@ public class DialogueManager : MonoBehaviour
     public DialogueDatabase database;
 
     [Header("Settings")]
-    public string currentLanguage = "ru"; // "ru" или "en"
+    public string currentLanguage = "ru"; // "ru" пїЅпїЅпїЅ "en"
 
-    // Сохранённые состояния уникальных реплик (ключ = lineID)
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ = lineID)
     private HashSet<string> usedUniqueLines = new HashSet<string>();
 
     private void Awake()
@@ -19,10 +19,13 @@ public class DialogueManager : MonoBehaviour
             database.BuildCache();
         }
 
+        // РЇР·С‹Рє РѕС‚ РїР»Р°РіРёРЅР° РЇРЅРґРµРєСЃ РРіСЂ (YG2, РјРѕРґСѓР»СЊ Localization); Р±РµР· РјРѕРґСѓР»СЏ вЂ” "ru"
+        currentLanguage = Loc.IsRu ? "ru" : "en";
+
         LoadUsedLines();
     }
 
-    // Загрузить использованные реплики из сохранения
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private void LoadUsedLines()
     {
         string saved = PlayerPrefs.GetString("Dialogue_UsedLines", "");
@@ -39,7 +42,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Сохранить использованные реплики
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private void SaveUsedLines()
     {
         string saved = string.Join("|", usedUniqueLines);
@@ -47,13 +50,13 @@ public class DialogueManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // Проверить, использовалась ли уникальная реплика
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public bool WasLineUsed(string lineID)
     {
         return usedUniqueLines.Contains(lineID);
     }
 
-    // Отметить реплику как использованную
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public void MarkLineAsUsed(string lineID)
     {
         if (!usedUniqueLines.Contains(lineID))
@@ -63,7 +66,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Получить текст реплики с учётом всех условий
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public string GetLineText(string lineID, string characterID, bool conditionMet = false)
     {
         if (database == null) return "";
@@ -76,26 +79,26 @@ public class DialogueManager : MonoBehaviour
             return "";
         }
 
-        // Проверка привязки к персонажу
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (entry.characterID != characterID)
         {
             Debug.LogWarning($"Line {lineID} not for character {characterID}");
             return "";
         }
 
-        // Уникальная реплика уже использовалась
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (entry.isUnique && WasLineUsed(lineID))
         {
             return "";
         }
 
-        // Уникальная реплика, но условие не выполнено
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (entry.isUnique && !conditionMet)
         {
             return "";
         }
 
-        // Отмечаем как использованную
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (entry.isUnique && conditionMet)
         {
             MarkLineAsUsed(lineID);
@@ -104,7 +107,7 @@ public class DialogueManager : MonoBehaviour
         return currentLanguage == "ru" ? entry.russian : entry.english;
     }
 
-    // Получить случайную уникальную реплику персонажа (которая ещё не использовалась)
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
     public string GetRandomUniqueLine(string characterID, bool conditionMet = true)
     {
         var entries = database.GetByCharacter(characterID);
@@ -126,7 +129,7 @@ public class DialogueManager : MonoBehaviour
         return currentLanguage == "ru" ? randomEntry.russian : randomEntry.english;
     }
 
-    // Получить случайную общую (не уникальную) реплику персонажа
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public string GetRandomCommonLine(string characterID)
     {
         var entries = database.GetByCharacter(characterID);
@@ -146,7 +149,7 @@ public class DialogueManager : MonoBehaviour
         return currentLanguage == "ru" ? randomEntry.russian : randomEntry.english;
     }
 
-    // Получить реплику с фолбэком: сначала уникальная (если условие), потом общая
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ), пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     public string GetLineWithFallback(string lineID, string characterID, bool conditionMet = false)
     {
         string text = GetLineText(lineID, characterID, conditionMet);
@@ -156,7 +159,7 @@ public class DialogueManager : MonoBehaviour
             return text;
         }
 
-        // Фолбэк: случайная общая реплика персонажа
+        // пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         return GetRandomCommonLine(characterID);
     }
 }

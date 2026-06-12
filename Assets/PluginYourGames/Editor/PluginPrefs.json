@@ -1,5 +1,10 @@
 {
-    "stringPrefs": [],
+    "stringPrefs": [
+        {
+            "key": "SelectModuleToggle_YG2",
+            "value": "InterstitialAdv;RewardedAdv;Authorization;EnvirData;Storage;PlayerStats;Leaderboards;Localization;Payments;Metrica;BannerAdv;Fullscreen"
+        }
+    ],
     "intPrefs": [
         {
             "key": "FirstStartup_YG2",

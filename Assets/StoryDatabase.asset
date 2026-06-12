@@ -24,28 +24,38 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0414\u043E\u0431\u0440\u043E \u043F\u043E\u0436\u0430\u043B\u043E\u0432\u0430\u0442\u044C
           \u0432 \xAB\u041C\u0435\u0436\u0434\u0443\u043C\u0438\u0440\u044C\u0435\xBB.
           \u0427\u0442\u043E \u0434\u043B\u044F \u0432\u0430\u0441?"
+        textEn: Welcome to the Inbetween. What can I get you?
         triggerSpeech: 1
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u0422\u0440\u0430\u0432\u044F\u043D\u043E\u0439 \u0447\u0430\u0439.
           \u042F \u0438\u0437 \u041F\u044B\u043B\u044C\u043D\u044B\u0445 \u041F\u0440\u0435\u0434\u0435\u043B\u043E\u0432.
           \u0417\u0434\u0435\u0441\u044C \u043F\u0430\u0445\u043D\u0435\u0442 \u0442\u043E\u0441\u043A\u043E\u0439."
+        textEn: Herbal tea. I come from the Dusty Reaches. It smells of sorrow here.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u0422\u0440\u0430\u0432\u044F\u043D\u043E\u0439 \u0447\u0430\u0439,
           \u043F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430."
+        textEn: Herbal tea, please.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u041C\u043E\u0439 \u043C\u0443\u0436 \u041A\u0430\u0439 \u043F\u0440\u043E\u043F\u0430\u043B.
           \u0412\u044B \u043D\u0435 \u0432\u0438\u0434\u0435\u043B\u0438 \u043C\u0443\u0436\u0447\u0438\u043D\u0443
           \u0441 \u043C\u0435\u0434\u0430\u043B\u044C\u043E\u043D\u043E\u043C \u0438\u0437
           \u0442\u0440\u0451\u0445 \u043A\u0440\u0443\u0433\u043E\u0432?"
+        textEn: My husband Kai is missing. Have you seen a man with a three-circle
+          medallion?
         triggerSpeech: 1
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u0422\u0440\u0438 \u043A\u0440\u0443\u0433\u0430... \u042D\u0442\u043E
           \u0437\u043D\u0430\u043A \u041E\u0440\u0434\u0435\u043D\u0430. \u041E\u043D\u0438
           \u0445\u043E\u0434\u044F\u0442 \u0443 \u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u043E\u0433\u043E
@@ -53,14 +63,20 @@ MonoBehaviour:
           \u0441 \u0432\u043E\u043F\u0440\u043E\u0441\u0430\u043C\u0438. (\u041E\u0441\u0442\u0430\u0432\u043B\u044F\u0435\u0442
           \u0447\u0430\u0439 \u043D\u0435\u0434\u043E\u043F\u0438\u0442\u044B\u043C,
           \u0443\u0445\u043E\u0434\u0438\u0442)"
+        textEn: Three circles... That is the sign of the Order. They roam near the
+          Mirror Gorge. Be careful with your questions. (Leaves the tea unfinished
+          and walks out)
         triggerSpeech: 1
     dayEndText: "\u041F\u0435\u0440\u0432\u044B\u0439 \u0434\u0435\u043D\u044C \u043F\u043E\u0437\u0430\u0434\u0438.
       \u0422\u044B \u0443\u0437\u043D\u0430\u043B\u0430 \u043E \u0437\u043D\u0430\u043A\u0435
       \u041E\u0440\u0434\u0435\u043D\u0430 \u2014 \u0442\u0440\u0438 \u043A\u0440\u0443\u0433\u0430.
       \u041A\u0430\u0439 \u043D\u043E\u0441\u0438\u043B \u0442\u0430\u043A\u043E\u0439
       \u043C\u0435\u0434\u0430\u043B\u044C\u043E\u043D..."
+    dayEndTextEn: "The first day is over. You learned of the Order's sign \u2014
+      three circles. Kai wore a medallion like that..."
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 10
   - dayNumber: 2
@@ -74,25 +90,34 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435.
           \u0427\u0442\u043E \u0431\u0443\u0434\u0435\u0442\u0435?"
+        textEn: Hello. What will you have?
         triggerSpeech: 1
       - speakerName: "\u0412\u043E\u0434\u044F\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u0436"
+        speakerNameEn: Water Warden
         text: "\u0412\u043E\u0434\u0443. \u042F \u0441\u0442\u0440\u0430\u0436 \u0432\u043E\u0434\u043D\u044B\u0445
           \u0433\u0440\u0430\u043D\u0438\u0446."
+        textEn: Water. I am a warden of the water borders.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0412\u043E\u0434\u044F\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u0436"
+        speakerNameEn: Water Warden
         text: "\u0422\u043E\u043B\u044C\u043A\u043E \u0432\u043E\u0434\u0443. \u0427\u0438\u0441\u0442\u0443\u044E
           \u0432\u043E\u0434\u0443."
+        textEn: Only water. Pure water.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0412\u044B \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
           \u0441\u043B\u044B\u0448\u0430\u043B\u0438 \u043E \u043F\u0440\u043E\u043F\u0430\u0432\u0448\u0438\u0445
           \u0443 \u0423\u0449\u0435\u043B\u044C\u044F?"
+        textEn: Have you heard anything about people going missing near the Gorge?
         triggerSpeech: 1
       - speakerName: "\u0412\u043E\u0434\u044F\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u0436"
+        speakerNameEn: Water Warden
         text: "\u0412\u043E\u0434\u0430 \u043F\u043E\u043C\u043D\u0438\u0442 \u0432\u0441\u0451.
           \u041C\u0435\u0441\u044F\u0446 \u043D\u0430\u0437\u0430\u0434 \u0442\u0430\u043C
           \u0431\u044B\u043B \u0441\u043F\u043E\u0440. \u0427\u0435\u043B\u043E\u0432\u0435\u043A
@@ -105,13 +130,20 @@ MonoBehaviour:
           \u0415\u0441\u043B\u0438 \u043D\u0430\u0439\u0434\u0451\u0448\u044C \u0435\u0433\u043E
           \u0432\u0435\u0449\u044C, \u0432\u043E\u0434\u0430 \u043F\u043E\u043A\u0430\u0436\u0435\u0442
           \u0431\u043E\u043B\u044C\u0448\u0435."
+        textEn: Water remembers everything. A month ago there was an argument there.
+          A man with three circles on his chest argued with those who bore the same
+          circles on their palms. They took him away. (Drinks slowly.) If you find
+          something of his, the water will show you more.
         triggerSpeech: 1
     dayEndText: "\u0412\u043E\u0434\u0430 \u043F\u043E\u043C\u043D\u0438\u0442 \u0432\u0441\u0451.
       \u041C\u0435\u0441\u044F\u0446 \u043D\u0430\u0437\u0430\u0434 \u041A\u0430\u044F
       \u0443\u0432\u0435\u043B\u0438 \u0443 \u0423\u0449\u0435\u043B\u044C\u044F.
       \u041D\u0443\u0436\u043D\u0430 \u0435\u0433\u043E \u0432\u0435\u0449\u044C."
+    dayEndTextEn: Water remembers everything. A month ago Kai was taken away near
+      the Gorge. You need something of his.
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 10
   - dayNumber: 3
@@ -125,25 +157,34 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u041A\u043E\u0444\u0435?"
+        textEn: Coffee?
         triggerSpeech: 1
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "\u041A\u043E\u0444\u0435. \u042F \u0432\u0438\u0436\u0443, \u0442\u044B
           \u0438\u0449\u0435\u0448\u044C. \u042D\u0442\u043E \u0434\u043E\u0440\u043E\u0433\u043E
           \u043E\u0431\u0445\u043E\u0434\u0438\u0442\u0441\u044F."
+        textEn: Coffee. I can see you are searching. That comes at a price.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "\u041A\u043E\u0444\u0435. \u041E\u0431\u044B\u0447\u043D\u044B\u0439
           \u043A\u043E\u0444\u0435."
+        textEn: Coffee. Just regular coffee.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0427\u0442\u043E \u0432\u044B \u0437\u043D\u0430\u0435\u0442\u0435
           \u043E\u0431 \u041E\u0440\u0434\u0435\u043D\u0435 \u0422\u0440\u0451\u0445
           \u041A\u0440\u0443\u0433\u043E\u0432?"
+        textEn: What do you know about the Order of Three Circles?
         triggerSpeech: 1
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "\u041E\u043D\u0438 \u043C\u043E\u0438 \u043B\u0443\u0447\u0448\u0438\u0435
           \u043A\u043B\u0438\u0435\u043D\u0442\u044B. \u041F\u043E\u043A\u0443\u043F\u0430\u044E\u0442
           \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044E \u043E \xAB\u0442\u043E\u043D\u043A\u0438\u0445
@@ -154,11 +195,18 @@ MonoBehaviour:
           \u043E\u0431\u0440\u0430\u0442\u043D\u044B\u043C. \u0425\u043E\u0442\u0435\u043B
           \u0438\u0445 \u0443\u043A\u0440\u0435\u043F\u0438\u0442\u044C. \u042D\u0442\u043E
           \u0441\u0434\u0435\u043B\u0430\u043B\u043E \u0435\u0433\u043E \u0432\u0440\u0430\u0433\u043E\u043C."
+        textEn: "They are my best customers. They buy information about the 'thin
+          places' \u2014 where the borders between worlds can be torn. Your husband...
+          he was interested in the opposite. He wanted to strengthen them. That made
+          him an enemy."
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0413\u0434\u0435 \u043E\u043D \u0441\u0435\u0439\u0447\u0430\u0441?"
+        textEn: Where is he now?
         triggerSpeech: 1
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "\u0418\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u0441\u0442\u043E\u0438\u0442.
           \u041F\u0440\u0438\u043D\u0435\u0441\u0438 \u0437\u0430\u0432\u0442\u0440\u0430
           \u0441\u0430\u043C\u043E\u0435 \u044F\u0440\u043A\u043E\u0435 \u0432\u043E\u0441\u043F\u043E\u043C\u0438\u043D\u0430\u043D\u0438\u0435
@@ -166,18 +214,24 @@ MonoBehaviour:
           (\u0421\u0442\u0430\u0432\u0438\u0442 \u043D\u0430 \u0441\u0442\u043E\u0439\u043A\u0443
           \u043C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439 \u0445\u0440\u0443\u0441\u0442\u0430\u043B\u044C\u043D\u044B\u0439
           \u0444\u043B\u0430\u043A\u043E\u043D)"
+        textEn: Information has a price. Tomorrow, bring me your brightest memory
+          of him in this vial. (Places a small crystal vial on the counter)
         triggerSpeech: 1
     dayEndText: "\u041E\u0440\u0434\u0435\u043D \u0434\u0435\u0440\u0436\u0438\u0442
       \u0441\u0432\u043E\u0438\u0445 \u043F\u043B\u0435\u043D\u043D\u0438\u043A\u043E\u0432
       \u0432 \xAB\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u043E\u0439 \u0422\u0435\u043C\u043D\u0438\u0446\u0435\xBB.
       \u041D\u0443\u0436\u0435\u043D \u043F\u0440\u043E\u0432\u043E\u0434\u043D\u0438\u043A
       \u0432\u043E \u0441\u043D\u0430\u0445 \u2014 \u0421\u043D\u043E\u0432\u0438\u0434\u0438\u0446\u0430."
+    dayEndTextEn: "The Order keeps its prisoners in the Mirror Dungeon. You need
+      a guide through dreams \u2014 the Dreamweaver."
     hasVignette: 1
     vignetteText: "\u041D\u043E\u0447\u044C\u044E \u0442\u0435\u0431\u0435 \u0441\u043D\u0438\u043B\u043E\u0441\u044C
       \u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u043E\u0435 \u0423\u0449\u0435\u043B\u044C\u0435.
       \u0422\u0440\u0438 \u043A\u0440\u0443\u0433\u0430, \u0433\u043E\u0440\u044F\u0449\u0438\u0435
       \u0432 \u0442\u0435\u043C\u043D\u043E\u0442\u0435. \u0422\u044B \u043F\u0440\u043E\u0441\u044B\u043F\u0430\u0435\u0448\u044C\u0441\u044F
       \u0441 \u0434\u0440\u043E\u0436\u044C\u044E \u0432 \u0440\u0443\u043A\u0430\u0445."
+    vignetteTextEn: At night you dreamed of the Mirror Gorge. Three circles burning
+      in the dark. You wake up with trembling hands.
     vignetteEffect: 1
     coinsPerCorrectOrder: 15
   - dayNumber: 4
@@ -191,25 +245,33 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u0421\u0442\u0430\u0432\u0438\u0442 \u0444\u043B\u0430\u043A\u043E\u043D,
           \u043F\u043E\u043B\u043D\u044B\u0439 \u0441\u0435\u0440\u0435\u0431\u0440\u0438\u0441\u0442\u043E\u0433\u043E
           \u0441\u0432\u0435\u0442\u0430.) \u042F \u043F\u0440\u0438\u043D\u0435\u0441\u043B\u0430
           \u0432\u043E\u0441\u043F\u043E\u043C\u0438\u043D\u0430\u043D\u0438\u0435."
+        textEn: (Sets down a vial full of silvery light.) I brought the memory.
         triggerSpeech: 1
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "(\u0411\u0435\u0440\u0451\u0442 \u0444\u043B\u0430\u043A\u043E\u043D,
           \u0432\u0437\u0432\u0435\u0448\u0438\u0432\u0430\u0435\u0442 \u043D\u0430
           \u0440\u0443\u043A\u0435.) \u0418\u0441\u043A\u0440\u0435\u043D\u043D\u0435.
           \u0425\u043E\u0440\u043E\u0448\u043E. \u041F\u043E\u043A\u0430 \u0442\u044B
           \u0433\u043E\u0442\u043E\u0432\u0438\u0448\u044C \u2014 \u0440\u0430\u0441\u0441\u043A\u0430\u0436\u0443."
+        textEn: (Takes the vial, weighs it in his hand.) Sincere. Good. I'll talk
+          while you brew.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "\u0422\u043E\u0442 \u0436\u0435 \u043A\u043E\u0444\u0435, \u0447\u0442\u043E
           \u0438 \u0432\u0447\u0435\u0440\u0430."
+        textEn: The same coffee as yesterday.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "\u041E\u0440\u0434\u0435\u043D \u0434\u0435\u0440\u0436\u0438\u0442
           \u0441\u0432\u043E\u0438\u0445 \u043F\u043B\u0435\u043D\u043D\u0438\u043A\u043E\u0432
           \u0432 \xAB\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u043E\u0439
@@ -221,12 +283,18 @@ MonoBehaviour:
           \u043F\u0440\u043E\u0432\u043E\u0434\u043D\u0438\u043A, \u043A\u043E\u0442\u043E\u0440\u044B\u0439
           \u0437\u043D\u0430\u0435\u0442 \u0434\u043E\u0440\u043E\u0433\u0443 \u0432\u043E
           \u0441\u043D\u0430\u0445. \u0418\u0449\u0438 \u0421\u043D\u043E\u0432\u0438\u0434\u0438\u0446\u0443."
+        textEn: "The Order keeps its prisoners in the Mirror Dungeon. It is not a
+          place but a state \u2014 a pocket of reality near the Gorge. To enter,
+          you need a guide who knows the way through dreams. Seek the Dreamweaver."
         triggerSpeech: 1
       - speakerName: "\u0422\u0435\u043D\u0435\u0432\u043E\u0439 \u0442\u043E\u0440\u0433\u043E\u0432\u0435\u0446"
+        speakerNameEn: Shadow Merchant
         text: "(\u0414\u0430\u0451\u0442 \u0441\u043C\u044F\u0442\u0443\u044E \u043A\u0430\u0440\u0442\u0443
           \u0441 \u043E\u0442\u043C\u0435\u0442\u043A\u043E\u0439: \xAB\u0421\u043D\u043E\u0432\u0438\u0434\u0438\u0446\u0430
           \u2014 \u0420\u044B\u043D\u043E\u043A \u0422\u0435\u043D\u0435\u0439, \u0437\u0430
           \u0447\u0430\u0441\u0430\u043C\u0438\xBB)"
+        textEn: "(Hands over a crumpled map with a mark: 'Dreamweaver \u2014 Shadow
+          Market, behind the clock')"
         triggerSpeech: 1
     dayEndText: "\xAB\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u0430\u044F
       \u0422\u0435\u043C\u043D\u0438\u0446\u0430\xBB \u2014 \u043A\u0430\u0440\u043C\u0430\u043D
@@ -235,8 +303,11 @@ MonoBehaviour:
       \u0432\u043E \u0441\u043D\u0430\u0445: \u0421\u043D\u043E\u0432\u0438\u0434\u0438\u0446\u0430
       \u2014 \u0420\u044B\u043D\u043E\u043A \u0422\u0435\u043D\u0435\u0439, \u0437\u0430
       \u0447\u0430\u0441\u0430\u043C\u0438."
+    dayEndTextEn: "The Mirror Dungeon is a pocket of reality near the Gorge. You
+      need a dream guide: the Dreamweaver \u2014 Shadow Market, behind the clock."
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 15
   - dayNumber: 5
@@ -250,25 +321,35 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u042D\u0441\u043F\u0440\u0435\u0441\u0441\u043E?"
+        textEn: Espresso?
         triggerSpeech: 1
       - speakerName: "\u041E\u0433\u043D\u0435\u043D\u043D\u044B\u0439 \u0430\u043B\u0445\u0438\u043C\u0438\u043A"
+        speakerNameEn: Fire Alchemist
         text: "\u0414\u0430, \u043A\u0440\u0435\u043F\u043A\u0438\u0439. \u041E\u0440\u0434\u0435\u043D
           \u0441\u0436\u0451\u0433 \u043C\u043E\u044E \u043C\u0430\u0441\u0442\u0435\u0440\u0441\u043A\u0443\u044E.
           \u041E\u043D\u0438 \u043A\u0440\u0430\u0434\u0443\u0442 \u0430\u0440\u0442\u0435\u0444\u0430\u043A\u0442\u044B,
           \u0441\u0432\u044F\u0437\u0430\u043D\u043D\u044B\u0435 \u0441\u043E \u0441\u0442\u0438\u0445\u0438\u044F\u043C\u0438,
           \u0434\u043B\u044F \u0441\u0432\u043E\u0435\u0433\u043E \u0440\u0438\u0442\u0443\u0430\u043B\u0430."
+        textEn: Yes, strong. The Order burned down my workshop. They steal artifacts
+          bound to the elements for their ritual.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u041E\u0433\u043D\u0435\u043D\u043D\u044B\u0439 \u0430\u043B\u0445\u0438\u043C\u0438\u043A"
+        speakerNameEn: Fire Alchemist
         text: "\u041A\u0440\u0435\u043F\u043A\u0438\u0439 \u044D\u0441\u043F\u0440\u0435\u0441\u0441\u043E.
           \u041C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439 \u0441\u0442\u0430\u043A\u0430\u043D."
+        textEn: A strong espresso. Small cup.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u041A\u0430\u043A\u043E\u0433\u043E \u0440\u0438\u0442\u0443\u0430\u043B\u0430?"
+        textEn: What ritual?
         triggerSpeech: 1
       - speakerName: "\u041E\u0433\u043D\u0435\u043D\u043D\u044B\u0439 \u0430\u043B\u0445\u0438\u043C\u0438\u043A"
+        speakerNameEn: Fire Alchemist
         text: "\xAB\u0420\u0430\u0437\u0440\u044B\u0432\u0430 \u041F\u043E\u043A\u0440\u043E\u0432\u0430\xBB.
           \u0412 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0435 \u043B\u0443\u043D\u043D\u043E\u0435
           \u0437\u0430\u0442\u043C\u0435\u043D\u0438\u0435. \u0422\u0432\u043E\u0439
@@ -280,6 +361,9 @@ MonoBehaviour:
           \u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C \u043D\u0430 \u043D\u0438\u0445.
           \u0411\u0443\u0434\u044C \u0433\u043E\u0442\u043E\u0432\u0430 \u043A \u043E\u0431\u043E\u0438\u043C
           \u0432\u0430\u0440\u0438\u0430\u043D\u0442\u0430\u043C."
+        textEn: "The Veil Rending. At the next lunar eclipse. Your husband must have
+          learned the details. He was taken so he couldn't interfere \u2014 OR to
+          be forced to work for them. Be ready for either."
         triggerSpeech: 1
     dayEndText: "\xAB\u0420\u0430\u0437\u0440\u044B\u0432 \u041F\u043E\u043A\u0440\u043E\u0432\u0430\xBB
       \u2014 \u0440\u0438\u0442\u0443\u0430\u043B \u0432 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0435
@@ -288,8 +372,11 @@ MonoBehaviour:
       \u043E\u043D \u043D\u0435 \u043F\u043E\u043C\u0435\u0448\u0430\u043B \u0418\u041B\u0418
       \u0447\u0442\u043E\u0431\u044B \u0437\u0430\u0441\u0442\u0430\u0432\u0438\u0442\u044C
       \u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C \u043D\u0430 \u043D\u0438\u0445."
+    dayEndTextEn: "The Veil Rending \u2014 a ritual at the next lunar eclipse. Kai
+      was taken either to keep him from interfering OR to force him to work for them."
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 15
   - dayNumber: 6
@@ -303,25 +390,35 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0427\u0451\u0440\u043D\u044B\u0439 \u043A\u043E\u0444\u0435?"
+        textEn: Black coffee?
         triggerSpeech: 1
       - speakerName: "\u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044C \u043A\u043D\u0438\u0433"
+        speakerNameEn: Book Keeper
         text: "\u0414\u0430. \u0412 \u0430\u0440\u0445\u0438\u0432\u0430\u0445 \u043F\u0440\u043E\u043F\u0430\u043B\u0430
           \u043A\u043D\u0438\u0433\u0430 \xAB\u0421\u043A\u0440\u0438\u0436\u0430\u043B\u0438
           \u0413\u0440\u0430\u043D\u0438\u0446\xBB. \u0415\u0451 \u0443\u043A\u0440\u0430\u043B\u0438
           \u043B\u044E\u0434\u0438 \u0441 \u043A\u043B\u0435\u0439\u043C\u043E\u043C
           \u0442\u0440\u0451\u0445 \u043A\u0440\u0443\u0433\u043E\u0432."
+        textEn: "Yes. A book has vanished from the archives \u2014 the Border Tablets.
+          It was stolen by people branded with three circles."
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044C \u043A\u043D\u0438\u0433"
+        speakerNameEn: Book Keeper
         text: "\u0427\u0451\u0440\u043D\u044B\u0439 \u043A\u043E\u0444\u0435, \u0431\u0435\u0437
           \u043D\u0438\u0447\u0435\u0433\u043E."
+        textEn: Black coffee, nothing in it.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0417\u0430\u0447\u0435\u043C \u043E\u043D\u0430 \u0438\u043C?"
+        textEn: Why do they want it?
         triggerSpeech: 1
       - speakerName: "\u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044C \u043A\u043D\u0438\u0433"
+        speakerNameEn: Book Keeper
         text: "\u0412 \u043D\u0435\u0439 \u043E\u043F\u0438\u0441\u0430\u043D\u044B
           \u043D\u0435 \u0442\u043E\u043B\u044C\u043A\u043E \u0442\u043E\u0447\u043A\u0438
           \u0440\u0430\u0437\u0440\u044B\u0432\u0430, \u043D\u043E \u0438 \xAB\u042F\u043A\u043E\u0440\u044F\xBB
@@ -333,6 +430,9 @@ MonoBehaviour:
           \u043D\u0430\u0439\u0434\u0451\u0448\u044C \u0445\u043E\u0442\u044C \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0443
           \u2014 \u044F \u043E\u0431\u043C\u0435\u043D\u044F\u044E \u043D\u0430 \u043F\u043E\u043B\u0435\u0437\u043D\u043E\u0435
           \u0437\u043D\u0430\u043D\u0438\u0435."
+        textEn: "It describes not only the rupture points but also the Anchors \u2014
+          artifacts that can stabilize the borders forever. The Order will most likely
+          destroy it. If you find even a page \u2014 I will trade it for useful knowledge."
         triggerSpeech: 1
     dayEndText: "\xAB\u0421\u043A\u0440\u0438\u0436\u0430\u043B\u0438 \u0413\u0440\u0430\u043D\u0438\u0446\xBB
       \u0443\u043A\u0440\u0430\u0434\u0435\u043D\u044B. \u0412 \u043A\u043D\u0438\u0433\u0435
@@ -340,6 +440,9 @@ MonoBehaviour:
       \u0440\u0430\u0437\u0440\u044B\u0432\u0430, \u043D\u043E \u0438 \xAB\u042F\u043A\u043E\u0440\u044F\xBB
       \u2014 \u0430\u0440\u0442\u0435\u0444\u0430\u043A\u0442\u044B, \u0441\u0442\u0430\u0431\u0438\u043B\u0438\u0437\u0438\u0440\u0443\u044E\u0449\u0438\u0435
       \u0433\u0440\u0430\u043D\u0438\u0446\u044B \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430."
+    dayEndTextEn: "The Border Tablets have been stolen. The book describes not only
+      rupture points but also the Anchors \u2014 artifacts that stabilize the borders
+      forever."
     hasVignette: 1
     vignetteText: "\u041F\u043E\u0437\u0434\u043D\u043E \u043D\u043E\u0447\u044C\u044E
       \u0442\u044B \u0441\u043B\u044B\u0448\u0438\u0448\u044C \u0437\u0432\u0443\u043A
@@ -348,6 +451,8 @@ MonoBehaviour:
       \u043A\u0430\u043C\u0435\u043D\u044C \u0441 \u0442\u0440\u0435\u043C\u044F
       \u0432\u044B\u0433\u0440\u0430\u0432\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u043C\u0438
       \u043A\u0440\u0443\u0433\u0430\u043C\u0438."
+    vignetteTextEn: Late at night you hear a sound at the door. No one is there.
+      Only a small stone engraved with three circles.
     vignetteEffect: 1
     coinsPerCorrectOrder: 15
   - dayNumber: 7
@@ -361,11 +466,14 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435.
           \u0427\u0442\u043E-\u0442\u043E \u043D\u043E\u0432\u043E\u0435?"
+        textEn: Hello. Something new today?
         triggerSpeech: 1
       - speakerName: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u044B\u0439
           \u0432\u043E\u0440"
+        speakerNameEn: Mirror Thief
         text: "\u041C\u043E\u043A\u043A\u043E. \u042F \u0441\u043B\u044B\u0448\u0430\u043B,
           \u0442\u044B \u0438\u0449\u0435\u0448\u044C \u0441\u043F\u043E\u0441\u043E\u0431
           \u0443\u0432\u0438\u0434\u0435\u0442\u044C \u043D\u0435\u0432\u0438\u0434\u0438\u043C\u043E\u0435.
@@ -376,20 +484,28 @@ MonoBehaviour:
           \u043F\u0435\u043B\u0435\u043D\u043E\u0439. \u041D\u043E \u0442\u043E\u043B\u044C\u043A\u043E
           \u0440\u0430\u0437. \u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439
           \u0441 \u0443\u043C\u043E\u043C."
+        textEn: Mocha. I heard you seek a way to see the unseen. (Takes out a small
+          cracked mirror.) This shows what is hidden behind the veil. But only once.
+          Use it wisely.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u044B\u0439
           \u0432\u043E\u0440"
+        speakerNameEn: Mirror Thief
         text: "\u041C\u043E\u043A\u043A\u043E. \u0418\u043C\u0435\u043D\u043D\u043E
           \u043C\u043E\u043A\u043A\u043E."
+        textEn: Mocha. Mocha exactly.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0427\u0442\u043E \u0432\u044B \u0445\u043E\u0442\u0438\u0442\u0435
           \u0432\u0437\u0430\u043C\u0435\u043D?"
+        textEn: What do you want in return?
         triggerSpeech: 1
       - speakerName: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u044B\u0439
           \u0432\u043E\u0440"
+        speakerNameEn: Mirror Thief
         text: "\u041D\u0438\u0447\u0435\u0433\u043E. \u041F\u0440\u043E\u0441\u0442\u043E...
           \u0435\u0441\u043B\u0438 \u0443\u0432\u0438\u0434\u0438\u0448\u044C \u0441\u0440\u0435\u0434\u0438
           \u043D\u0438\u0445 \u0436\u0435\u043D\u0449\u0438\u043D\u0443 \u0441 \u0448\u0440\u0430\u043C\u043E\u043C
@@ -397,6 +513,8 @@ MonoBehaviour:
           \u043D\u0430 \u0448\u0435\u0435 \u2014 \u0441\u043A\u0430\u0436\u0438,
           \u0447\u0442\u043E \xAB\u044D\u0445\u043E \u043F\u0440\u043E\u0441\u0442\u0438\u043B\u043E
           \u0435\u0451\xBB. (\u0411\u044B\u0441\u0442\u0440\u043E \u0443\u0445\u043E\u0434\u0438\u0442)"
+        textEn: "Nothing. Just... if you see among them a woman with a lightning-shaped
+          scar on her neck \u2014 tell her 'the echo has forgiven her'. (Leaves quickly)"
         triggerSpeech: 1
     dayEndText: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u044B\u0439 \u0432\u043E\u0440
       \u0434\u0430\u043B \u0442\u0435\u0431\u0435 \u0442\u0440\u0435\u0441\u043D\u0443\u0432\u0448\u0435\u0435
@@ -404,8 +522,11 @@ MonoBehaviour:
       \u0436\u0435\u043D\u0449\u0438\u043D\u0443 \u0441 \u0448\u0440\u0430\u043C\u043E\u043C-\u043C\u043E\u043B\u043D\u0438\u0435\u0439
       \u2014 \u0441\u043A\u0430\u0436\u0438 \xAB\u044D\u0445\u043E \u043F\u0440\u043E\u0441\u0442\u0438\u043B\u043E
       \u0435\u0451\xBB."
+    dayEndTextEn: "The Mirror Thief gave you a cracked mirror. If you see a woman
+      with a lightning-shaped scar \u2014 tell her 'the echo has forgiven her'."
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 20
   - dayNumber: 8
@@ -419,27 +540,36 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u0421\u043D\u043E\u0432\u0430 \u0442\u0440\u0430\u0432\u044F\u043D\u043E\u0439,
           \u043D\u043E \u0441\u0435\u0433\u043E\u0434\u043D\u044F \u043C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439
           \u0438 \u0447\u0443\u0442\u044C \u0441\u043B\u0430\u0449\u0435. \u0414\u0435\u043D\u044C
           \u0442\u044F\u0436\u0451\u043B\u044B\u0439."
+        textEn: Herbal again, but today a small one and a little sweeter. It's been
+          a hard day.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u041C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439 \u0441\u0442\u0430\u043A\u0430\u043D.
           \u0418 \u043D\u0435\u043C\u043D\u043E\u0433\u043E \u0441\u0430\u0445\u0430\u0440\u0430."
+        textEn: A small cup. And a bit of sugar.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u0422\u044B \u0432\u044B\u0433\u043B\u044F\u0434\u0438\u0448\u044C
           \u0443\u0441\u0442\u0430\u043B\u043E\u0439. \u0417\u0435\u0440\u043A\u0430\u043B\u0430
           \u043E\u043F\u0430\u0441\u043D\u044B. \u041D\u0435\u043A\u043E\u0442\u043E\u0440\u044B\u0435
           \u0441\u043C\u043E\u0442\u0440\u044F\u0442 \u0432 \u043E\u0431\u0435 \u0441\u0442\u043E\u0440\u043E\u043D\u044B."
+        textEn: You look tired. Mirrors are dangerous. Some of them look both ways.
         triggerSpeech: 1
     dayEndText: "\u041A\u0430\u0439 \u0436\u0438\u0432! \u0415\u0433\u043E \u0434\u0435\u0440\u0436\u0438\u0442
       \u0436\u0435\u043D\u0449\u0438\u043D\u0430 \u0441\u043E \u0448\u0440\u0430\u043C\u043E\u043C-\u043C\u043E\u043B\u043D\u0438\u0435\u0439.
       \u041E\u043D\u0438 \u0432\u0438\u0434\u0435\u043B\u0438 \u0442\u0435\u0431\u044F
       \u0447\u0435\u0440\u0435\u0437 \u0437\u0435\u0440\u043A\u0430\u043B\u043E."
+    dayEndTextEn: Kai is alive! He is held by the woman with the lightning scar.
+      They saw you through the mirror.
     hasVignette: 1
     vignetteText: "\u041C\u0438\u0440\u0430 \u0441\u043C\u043E\u0442\u0440\u0438\u0442
       \u0432 \u0442\u0440\u0435\u0441\u043D\u0443\u0432\u0448\u0435\u0435 \u0437\u0435\u0440\u043A\u0430\u043B\u043E,
@@ -456,6 +586,11 @@ MonoBehaviour:
       \u0432 \u0433\u043E\u0441\u0442\u0438.\xBB \u0417\u0435\u0440\u043A\u0430\u043B\u044C\u0446\u0435
       \u0447\u0435\u0440\u043D\u0435\u0435\u0442 \u0438 \u0440\u0430\u0441\u0441\u044B\u043F\u0430\u0435\u0442\u0441\u044F
       \u0432 \u043F\u044B\u043B\u044C."
+    vignetteTextEn: "Mira looks into the cracked mirror, thinking of Kai. In the
+      crack \u2014 he is bound in a stone room. Before him stands a hooded figure.
+      A woman with a lightning scar. Suddenly a stranger stares back from the mirror:
+      'You are curious. Stop watching, or we will pay you a visit.' The mirror turns
+      black and crumbles to dust."
     vignetteEffect: 2
     coinsPerCorrectOrder: 20
   - dayNumber: 9
@@ -469,9 +604,12 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u0412\u043E\u043B\u043D\u0443\u044F\u0441\u044C.) \u0410\u043C\u0435\u0440\u0438\u043A\u0430\u043D\u043E?"
+        textEn: (Nervously.) Americano?
         triggerSpeech: 1
       - speakerName: "\u0412\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u0439 \u043A\u0443\u0440\u044C\u0435\u0440"
+        speakerNameEn: Time Courier
         text: "\u0414\u0430. \u0423 \u043C\u0435\u043D\u044F \u0434\u043B\u044F \u0442\u0435\u0431\u044F...
           \u0441\u0442\u0440\u0430\u043D\u043D\u0430\u044F \u043F\u043E\u0441\u044B\u043B\u043A\u0430.
           (\u0414\u043E\u0441\u0442\u0430\u0451\u0442 \u043E\u0431\u0433\u043E\u0440\u0435\u0432\u0448\u0438\u0439
@@ -479,14 +617,19 @@ MonoBehaviour:
           \u0447\u0435\u0440\u0435\u0437 \u0440\u0430\u0437\u0440\u044B\u0432 \u0432\u043E
           \u0432\u0440\u0435\u043C\u0435\u043D\u0438. \u0410\u0434\u0440\u0435\u0441\u043E\u0432\u0430\u043D\u043E
           \u0442\u0435\u0431\u0435."
+        textEn: Yes. I have a... strange delivery for you. (Takes out a scorched
+          envelope.) It was passed through a rift in time. Addressed to you.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0412\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u0439 \u043A\u0443\u0440\u044C\u0435\u0440"
+        speakerNameEn: Time Courier
         text: "\u0410\u043C\u0435\u0440\u0438\u043A\u0430\u043D\u043E. \u0423 \u043C\u0435\u043D\u044F
           \u043C\u0430\u043B\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438."
+        textEn: Americano. I'm short on time.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u0427\u0438\u0442\u0430\u0435\u0442.) \xAB\u041C\u0438\u0440\u0430.
           \u042F \u0436\u0438\u0432. \u041E\u043D\u0438 \u0445\u043E\u0442\u044F\u0442
           \u043C\u043E\u0439 \u0434\u0430\u0440. \u041D\u0435 \u0432\u0435\u0440\u044C
@@ -495,16 +638,24 @@ MonoBehaviour:
           \u0432 \u043C\u0435\u043B\u043E\u0434\u0438\u0438, \u043A\u043E\u0442\u043E\u0440\u0443\u044E
           \u043F\u0435\u043B \u0442\u0435\u0431\u0435 \u043E\u0442\u0435\u0446. \u042F
           \u043B\u044E\u0431\u043B\u044E \u0442\u0435\u0431\u044F.\xBB"
+        textEn: (Reads.) 'Mira. I am alive. They want my gift. Don't trust the first
+          one who offers help. Seek the key in the melody your father used to sing
+          to you. I love you.'
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u041E\u0442\u043A\u0443\u0434\u0430 \u044D\u0442\u043E? \u041A\u043E\u0433\u0434\u0430?"
+        textEn: Where did this come from? When?
         triggerSpeech: 1
       - speakerName: "\u0412\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u0439 \u043A\u0443\u0440\u044C\u0435\u0440"
+        speakerNameEn: Time Courier
         text: "\u041A\u043E\u043D\u0432\u0435\u0440\u0442 \u043F\u0430\u0445\u043D\u0435\u0442
           \u043F\u0435\u043F\u043B\u043E\u043C \u0438... \u0441\u0442\u0440\u0430\u0445\u043E\u043C.
           \u0411\u0443\u0434\u044C \u043E\u0441\u0442\u043E\u0440\u043E\u0436\u043D\u0435\u0435.
           \u041E\u043D\u0438 \u043C\u043E\u0433\u0443\u0442 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C
           \u0432\u0440\u0435\u043C\u044F \u043F\u0440\u043E\u0442\u0438\u0432 \u0442\u0435\u0431\u044F."
+        textEn: The envelope smells of ash and... fear. Be careful. They can use
+          time against you.
         triggerSpeech: 1
     dayEndText: "\u041F\u0438\u0441\u044C\u043C\u043E \u043E\u0442 \u041A\u0430\u044F
       \u0447\u0435\u0440\u0435\u0437 \u0440\u0430\u0437\u0440\u044B\u0432 \u0432\u043E
@@ -514,8 +665,12 @@ MonoBehaviour:
       \u0418\u0449\u0438 \u043A\u043B\u044E\u0447 \u0432 \u043C\u0435\u043B\u043E\u0434\u0438\u0438,
       \u043A\u043E\u0442\u043E\u0440\u0443\u044E \u043F\u0435\u043B \u0442\u0435\u0431\u0435
       \u043E\u0442\u0435\u0446.\xBB"
+    dayEndTextEn: A letter from Kai through a rift in time. He is alive. 'Don't trust
+      the first one who offers help. Seek the key in the melody your father used
+      to sing to you.'
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 20
   - dayNumber: 10
@@ -529,29 +684,39 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0427\u0442\u043E-\u0442\u043E \u0442\u0451\u043F\u043B\u043E\u0435?"
+        textEn: Something warm?
         triggerSpeech: 1
       - speakerName: "\u0417\u0432\u0451\u0437\u0434\u043D\u044B\u0439 \u043F\u0430\u0441\u0442\u0443\u0445"
+        speakerNameEn: Star Shepherd
         text: "\u041A\u0430\u043A\u0430\u043E, \u043F\u043E\u0436\u0430\u043B\u0443\u0439.
           \u0417\u0432\u0451\u0437\u0434\u044B \u0448\u0435\u043F\u0447\u0443\u0442
           \u043E \u043D\u0430\u0434\u0432\u0438\u0433\u0430\u044E\u0449\u0435\u043C\u0441\u044F
           \u0440\u0430\u0437\u0440\u044B\u0432\u0435. \u041B\u0443\u043D\u0430 \u0441\u043A\u043E\u0440\u043E
           \u0441\u0442\u0430\u043D\u0435\u0442 \u043A\u0440\u0430\u0441\u043D\u043E\u0439
           \u2014 \u044D\u0442\u043E \u0437\u043D\u0430\u043A."
+        textEn: "Cocoa, perhaps. The stars whisper of a coming rupture. The moon
+          will soon turn red \u2014 it is a sign."
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0417\u0432\u0451\u0437\u0434\u043D\u044B\u0439 \u043F\u0430\u0441\u0442\u0443\u0445"
+        speakerNameEn: Star Shepherd
         text: "\u0413\u043E\u0440\u044F\u0447\u0438\u0439 \u0448\u043E\u043A\u043E\u043B\u0430\u0434.
           \u041F\u043E\u0431\u043E\u043B\u044C\u0448\u0435 \u0441\u043B\u0430\u0434\u043A\u043E\u0433\u043E
           \u2014 \u0437\u0432\u0451\u0437\u0434\u044B \u043F\u043B\u043E\u0445\u0438\u0445
           \u0432\u0435\u0441\u0442\u0435\u0439 \u0442\u0440\u0435\u0431\u0443\u044E\u0442
           \u044D\u0442\u043E\u0433\u043E."
+        textEn: "Hot chocolate. Extra sweet \u2014 stars of bad news demand it."
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0420\u0438\u0442\u0443\u0430\u043B \u041E\u0440\u0434\u0435\u043D\u0430?"
+        textEn: The Order's ritual?
         triggerSpeech: 1
       - speakerName: "\u0417\u0432\u0451\u0437\u0434\u043D\u044B\u0439 \u043F\u0430\u0441\u0442\u0443\u0445"
+        speakerNameEn: Star Shepherd
         text: "\u0414\u0430. \u0418\u0445 \u0430\u043B\u0442\u0430\u0440\u044C \u043D\u0430\u0445\u043E\u0434\u0438\u0442\u0441\u044F
           \u0432 \u043C\u0435\u0441\u0442\u0435, \u0433\u0434\u0435 \u0441\u0445\u043E\u0434\u044F\u0442\u0441\u044F
           \u0442\u0440\u0438 \u0442\u0435\u043D\u0438. \u0418\u0449\u0438 \u0442\u0430\u043C,
@@ -559,6 +724,8 @@ MonoBehaviour:
           \u043E\u0442 \u0427\u0451\u0440\u043D\u043E\u0433\u043E \u0424\u043E\u043D\u0430\u0440\u044F.
           \u041E\u043D \u0441\u0432\u0435\u0442\u0438\u0442 \u0442\u043E\u043B\u044C\u043A\u043E
           \u0432 \u0431\u0435\u0437\u043B\u0443\u043D\u043D\u0443\u044E \u043D\u043E\u0447\u044C."
+        textEn: Yes. Their altar lies where three shadows meet. Look where the light
+          of the Black Lantern falls. It shines only on a moonless night.
         triggerSpeech: 1
     dayEndText: "\u0410\u043B\u0442\u0430\u0440\u044C \u041E\u0440\u0434\u0435\u043D\u0430
       \u2014 \u043C\u0435\u0441\u0442\u043E \u0442\u0440\u0451\u0445 \u0442\u0435\u043D\u0435\u0439.
@@ -567,12 +734,16 @@ MonoBehaviour:
       \u0424\u043E\u043D\u0430\u0440\u044F. \u041E\u043D \u0441\u0432\u0435\u0442\u0438\u0442
       \u0442\u043E\u043B\u044C\u043A\u043E \u0432 \u0431\u0435\u0437\u043B\u0443\u043D\u043D\u0443\u044E
       \u043D\u043E\u0447\u044C."
+    dayEndTextEn: The Order's altar is the place of three shadows. Look where the
+      light of the Black Lantern falls. It shines only on a moonless night.
     hasVignette: 1
     vignetteText: "\u0417\u0432\u0451\u0437\u0434\u044B \u043A\u0440\u0430\u0441\u043D\u044B\u0435
       \u044D\u0442\u043E\u0439 \u043D\u043E\u0447\u044C\u044E. \u041B\u0443\u043D\u0430
       \u0441\u043A\u043E\u0440\u043E \u0441\u0442\u0430\u043D\u0435\u0442 \u0430\u043B\u043E\u0439.
       \u0420\u0438\u0442\u0443\u0430\u043B \xAB\u0420\u0430\u0437\u0440\u044B\u0432\u0430
       \u041F\u043E\u043A\u0440\u043E\u0432\u0430\xBB \u0432\u0441\u0451 \u0431\u043B\u0438\u0436\u0435."
+    vignetteTextEn: The stars are red tonight. The moon will soon turn crimson. The
+      Veil Rending ritual draws nearer.
     vignetteEffect: 3
     coinsPerCorrectOrder: 20
   - dayNumber: 11
@@ -586,13 +757,18 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041D\u0435\u0437\u043D\u0430\u043A\u043E\u043C\u043A\u0430"
+        speakerNameEn: Stranger
         text: "\u0417\u0435\u043B\u0451\u043D\u044B\u0439 \u0447\u0430\u0439. \u0412\u044B
           \u2014 \u0445\u043E\u0437\u044F\u0439\u043A\u0430?"
+        textEn: Green tea. Are you the owner?
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0414\u0430. \u042F \u041C\u0438\u0440\u0430."
+        textEn: Yes. I am Mira.
         triggerSpeech: 1
       - speakerName: "\u041D\u0435\u0437\u043D\u0430\u043A\u043E\u043C\u043A\u0430"
+        speakerNameEn: Stranger
         text: "\u042F \u0441\u043B\u044B\u0448\u0430\u043B\u0430, \u0432\u044B \u0437\u0430\u0434\u0430\u0451\u0442\u0435
           \u0432\u043E\u043F\u0440\u043E\u0441\u044B \u043E\u0431 \u041E\u0440\u0434\u0435\u043D\u0435.
           \u042D\u0442\u043E \u043D\u0435\u0431\u0435\u0437\u043E\u043F\u0430\u0441\u043D\u043E.
@@ -601,34 +777,49 @@ MonoBehaviour:
           \u043D\u0430 \u0441\u0442\u043E\u0439\u043A\u0443 \u0437\u043E\u043B\u043E\u0442\u0443\u044E
           \u043C\u043E\u043D\u0435\u0442\u0443.) \u041D\u0430 \u044D\u0442\u043E
           \u043C\u043E\u0436\u043D\u043E \u043A\u0443\u043F\u0438\u0442\u044C \u0437\u0430\u0431\u0432\u0435\u043D\u0438\u0435."
+        textEn: I hear you've been asking questions about the Order. That is not
+          safe. Sometimes it is better to let the past go. (Places a gold coin on
+          the counter.) This can buy oblivion.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u041D\u0435\u0437\u043D\u0430\u043A\u043E\u043C\u043A\u0430"
+        speakerNameEn: Stranger
         text: "\u0417\u0435\u043B\u0451\u043D\u044B\u0439 \u0447\u0430\u0439. (\u041B\u0435\u0434\u044F\u043D\u043E\u0439
           \u0432\u0437\u0433\u043B\u044F\u0434)"
+        textEn: Green tea. (An icy stare)
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u042F \u043D\u0435 \u043F\u0440\u043E\u0434\u0430\u044E \u043F\u0430\u043C\u044F\u0442\u044C."
+        textEn: I don't sell memory.
         triggerSpeech: 1
       - speakerName: "\u041D\u0435\u0437\u043D\u0430\u043A\u043E\u043C\u043A\u0430"
+        speakerNameEn: Stranger
         text: "\u0416\u0430\u043B\u044C. (\u0423\u0445\u043E\u0434\u0438\u0442, \u043E\u0441\u0442\u0430\u0432\u0438\u0432
           \u043C\u043E\u043D\u0435\u0442\u0443)"
+        textEn: A pity. (Leaves, the coin still on the counter)
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u041A\u0430\u0441\u0430\u0435\u0442\u0441\u044F \u043C\u043E\u043D\u0435\u0442\u044B
           \u2014 \u043E\u043D\u0430 \u043B\u0435\u0434\u044F\u043D\u0430\u044F. \u041D\u0430
           \u043E\u0431\u0440\u0430\u0442\u043D\u043E\u0439 \u0441\u0442\u043E\u0440\u043E\u043D\u0435
           \u0432\u044B\u0433\u0440\u0430\u0432\u0438\u0440\u043E\u0432\u0430\u043D\u044B
           \u0442\u0440\u0438 \u043A\u0440\u0443\u0433\u0430.)"
+        textEn: "(Touches the coin \u2014 it is ice-cold. Three circles are engraved
+          on its back.)"
         triggerSpeech: 1
     dayEndText: "\u041D\u0435\u0437\u043D\u0430\u043A\u043E\u043C\u043A\u0430 \u0441\u043E
       \u0448\u0440\u0430\u043C\u043E\u043C-\u043C\u043E\u043B\u043D\u0438\u0435\u0439
       \u043F\u0440\u0435\u0434\u043B\u0430\u0433\u0430\u043B\u0430 \u0437\u0430\u0431\u0432\u0435\u043D\u0438\u0435.
       \u041C\u043E\u043D\u0435\u0442\u0430 \u043B\u0435\u0434\u044F\u043D\u0430\u044F,
       \u0442\u0440\u0438 \u043A\u0440\u0443\u0433\u0430 \u043D\u0430 \u043E\u0431\u043E\u0440\u043E\u0442\u0435."
+    dayEndTextEn: The stranger with the lightning scar offered oblivion. The coin
+      is ice-cold, three circles on its back.
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 20
   - dayNumber: 12
@@ -642,10 +833,13 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0412\u044B \u0437\u043D\u0430\u0435\u0442\u0435, \u0447\u0442\u043E
           \u0442\u0430\u043A\u043E\u0435 \u0427\u0451\u0440\u043D\u044B\u0439 \u0424\u043E\u043D\u0430\u0440\u044C?"
+        textEn: Do you know what the Black Lantern is?
         triggerSpeech: 1
       - speakerName: "\u0422\u0443\u043C\u0430\u043D\u043D\u044B\u0439 \u043E\u0445\u043E\u0442\u043D\u0438\u043A"
+        speakerNameEn: Fog Hunter
         text: "\u042D\u0442\u043E \u043D\u0435 \u0444\u043E\u043D\u0430\u0440\u044C,
           \u0430 \u0430\u0440\u0442\u0435\u0444\u0430\u043A\u0442. \u041E\u043D \u043E\u0441\u0432\u0435\u0449\u0430\u0435\u0442
           \u043F\u0443\u0442\u044C \u043A \u043C\u0435\u0441\u0442\u0430\u043C \u0441\u0438\u043B\u044B
@@ -653,32 +847,43 @@ MonoBehaviour:
           \u0443 \u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044F \u041A\u043D\u0438\u0433.
           \u041D\u043E \u0435\u0433\u043E, \u043A\u0430\u0436\u0435\u0442\u0441\u044F,
           \u0443\u043A\u0440\u0430\u043B\u0438."
+        textEn: It is not a lantern but an artifact. It lights the way to the Order's
+          places of power. The Book Keeper kept it. But it seems to have been stolen.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0422\u0443\u043C\u0430\u043D\u043D\u044B\u0439 \u043E\u0445\u043E\u0442\u043D\u0438\u043A"
+        speakerNameEn: Fog Hunter
         text: "\u041C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439 \u044D\u0441\u043F\u0440\u0435\u0441\u0441\u043E.
           \u041A\u0440\u0435\u043F\u043A\u0438\u0439."
+        textEn: A small espresso. Strong.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044C \u043A\u043D\u0438\u0433"
+        speakerNameEn: Book Keeper
         text: "(\u041A\u0438\u0432\u043D\u0443\u0432 \u0441 \u0434\u0440\u0443\u0433\u043E\u0433\u043E
           \u0441\u0442\u043E\u043B\u0438\u043A\u0430.) \u0412\u0435\u0440\u043D\u043E.
           \u041D\u0435\u0434\u0435\u043B\u044E \u043D\u0430\u0437\u0430\u0434. \u0412\u043C\u0435\u0441\u0442\u0435
           \u0441 \u0442\u043E\u0439 \u0441\u0430\u043C\u043E\u0439 \u043A\u043D\u0438\u0433\u043E\u0439.
           \u042F \u043F\u043E\u0434\u043E\u0437\u0440\u0435\u0432\u0430\u044E \u0432\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0435\u0435
           \u043F\u0440\u0435\u0434\u0430\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u043E."
+        textEn: (Nodding from another table.) True. A week ago. Together with that
+          very book. I suspect a betrayal from within.
         triggerSpeech: 1
     dayEndText: "\u0427\u0451\u0440\u043D\u044B\u0439 \u0424\u043E\u043D\u0430\u0440\u044C
       \u0443\u043A\u0440\u0430\u0434\u0435\u043D. \u0412\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0435\u0435
       \u043F\u0440\u0435\u0434\u0430\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u043E
       \u0432 \u0440\u044F\u0434\u0430\u0445 \u0441\u043E\u044E\u0437\u043D\u0438\u043A\u043E\u0432
       \u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044F."
+    dayEndTextEn: The Black Lantern has been stolen. A betrayal from within the Keeper's
+      allies.
     hasVignette: 1
     vignetteText: "\u041D\u043E\u0447\u044C\u044E \u043A\u0442\u043E-\u0442\u043E
       \u043F\u044B\u0442\u0430\u043B\u0441\u044F \u0432\u0437\u043B\u043E\u043C\u0430\u0442\u044C
       \u0434\u0432\u0435\u0440\u044C \xAB\u041C\u0435\u0436\u0434\u0443\u043C\u0438\u0440\u044C\u044F\xBB.
       \u0417\u0430\u043C\u043E\u043A \u0432\u044B\u0434\u0435\u0440\u0436\u0430\u043B
       \u2014 \u043D\u043E \u044D\u0442\u043E \u0431\u044B\u043B\u043E \u043F\u0440\u0435\u0434\u0443\u043F\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435\u043C."
+    vignetteTextEn: "At night someone tried to break into the Inbetween. The lock
+      held \u2014 but it was a warning."
     vignetteEffect: 1
     coinsPerCorrectOrder: 25
   - dayNumber: 13
@@ -692,21 +897,27 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u0413\u043E\u0442\u043E\u0432\u0438\u0442 \xAB\u041A\u043E\u0444\u0435
           \u041F\u0440\u0430\u0432\u0434\u044B\xBB \u2014 \u0440\u0435\u0434\u043A\u0438\u0439
           \u0441\u043E\u0440\u0442, \u0437\u0430\u0441\u0442\u0430\u0432\u043B\u044F\u044E\u0449\u0438\u0439
           \u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0438\u0441\u043A\u0440\u0435\u043D\u043D\u0435.)
           \u0421\u0435\u0433\u043E\u0434\u043D\u044F \u043E\u0441\u043E\u0431\u044B\u0439
           \u043D\u0430\u043F\u0438\u0442\u043E\u043A."
+        textEn: "(Brews the Truth Brew \u2014 a rare blend that makes one speak sincerely.)
+          A special drink today."
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u041F\u0430\u0440\u043E\u0432\u043E\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440"
+        speakerNameEn: Steam Engineer
         text: "\xAB\u041A\u043E\u0444\u0435 \u041F\u0440\u0430\u0432\u0434\u044B\xBB
           \u2014 \u043E\u0441\u043E\u0431\u044B\u0439 \u0441\u043E\u0440\u0442. \u041C\u0430\u043B\u0435\u043D\u044C\u043A\u0430\u044F
           \u043F\u043E\u0440\u0446\u0438\u044F."
+        textEn: "The Truth Brew \u2014 a special blend. A small serving."
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041F\u0430\u0440\u043E\u0432\u043E\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440"
+        speakerNameEn: Steam Engineer
         text: "(\u041F\u044C\u0451\u0442.) \u0418\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u044B\u0439
           \u0432\u043A\u0443\u0441... \u0413\u043E\u0432\u043E\u0440\u0438\u0442,
           \u0442\u044B \u0432 \u0431\u0435\u0434\u0435. \u042F \u043C\u043E\u0433
@@ -716,23 +927,34 @@ MonoBehaviour:
           \u041E\u0440\u0434\u0435\u043D\u0430. \u041D\u043E \u043C\u043D\u0435 \u043D\u0443\u0436\u043D\u0430
           \u0448\u0435\u0441\u0442\u0435\u0440\u0451\u043D\u043A\u0430 \u0438\u0437
           \u0438\u0445 \u043C\u0435\u0445\u0430\u043D\u0438\u0437\u043C\u0430."
+        textEn: (Drinks.) Interesting taste... It says you are in trouble. I could
+          build a device to muffle the Order's protective wards. But I need a gear
+          from their mechanism.
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0413\u0434\u0435 \u0435\u0451 \u0432\u0437\u044F\u0442\u044C?"
+        textEn: Where do I get one?
         triggerSpeech: 1
       - speakerName: "\u041F\u0430\u0440\u043E\u0432\u043E\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440"
+        speakerNameEn: Steam Engineer
         text: "\u0423 \u043D\u0438\u0445 \u0432\u0435\u0437\u0434\u0435 \u0435\u0441\u0442\u044C
           \u0441\u043C\u043E\u0442\u0440\u043E\u0432\u044B\u0435 \xAB\u0433\u043B\u0430\u0437\u0430\xBB
           \u0438\u0437 \u0431\u0440\u043E\u043D\u0437\u044B \u0438 \u0445\u0440\u0443\u0441\u0442\u0430\u043B\u044F.
           \u041F\u0440\u0438\u043D\u0435\u0441\u0438 \u043E\u0434\u043D\u043E."
+        textEn: They have watching 'eyes' of bronze and crystal everywhere. Bring
+          me one.
         triggerSpeech: 1
     dayEndText: "\u041F\u0430\u0440\u043E\u0432\u043E\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440
       \u043C\u043E\u0436\u0435\u0442 \u0437\u0430\u0433\u043B\u0443\u0448\u0438\u0442\u044C
       \u0447\u0430\u0440\u044B \u041E\u0440\u0434\u0435\u043D\u0430. \u0415\u043C\u0443
       \u043D\u0443\u0436\u043D\u0430 \u0448\u0435\u0441\u0442\u0435\u0440\u043D\u044F
       \u0438\u0437 \u0431\u0440\u043E\u043D\u0437\u043E\u0432\u043E\u0433\u043E \xAB\u0433\u043B\u0430\u0437\u0430\xBB."
+    dayEndTextEn: The Steam Engineer can muffle the Order's wards. He needs a gear
+      from a bronze 'eye'.
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 25
   - dayNumber: 14
@@ -746,16 +968,21 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041B\u0443\u043D\u043D\u044B\u0439 \u043A\u0443\u0437\u043D\u0435\u0446"
+        speakerNameEn: Moon Smith
         text: "(\u0421\u0438\u0434\u0438\u0442 \u0432 \u0443\u0433\u043B\u0443, \u043C\u043E\u043B\u0447\u0438\u0442)"
+        textEn: (Sits in the corner, silent)
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u041B\u0443\u043D\u043D\u044B\u0439 \u043A\u0443\u0437\u043D\u0435\u0446"
+        speakerNameEn: Moon Smith
         text: "...\u0422\u0440\u0430\u0432\u044F\u043D\u043E\u0439 \u0447\u0430\u0439.
           \u0411\u043E\u043B\u044C\u0448\u043E\u0439. \u0421\u043B\u0435\u0433\u043A\u0430
           \u0441\u043B\u0430\u0434\u043A\u0438\u0439."
+        textEn: ...Herbal tea. Large. Lightly sweet.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u041A \u043B\u0443\u043D\u043D\u043E\u043C\u0443 \u043A\u0443\u0437\u043D\u0435\u0446\u0443,
           \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u043E\u0431\u044B\u0447\u043D\u043E
           \u043C\u043E\u043B\u0447\u0438\u0442 \u0432 \u0443\u0433\u043B\u0443.)
@@ -763,8 +990,11 @@ MonoBehaviour:
           \u043C\u0435\u0442\u0430\u043B\u043B\u043E\u043C. \u041D\u0435 \u0434\u0435\u043B\u0430\u043B\u0438
           \u043B\u0438 \u0432\u044B \u0442\u0430\u043A\u0438\u0445 \u0448\u0435\u0441\u0442\u0435\u0440\u0451\u043D?
           (\u041F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u0442 \u0440\u0438\u0441\u0443\u043D\u043E\u043A.)"
+        textEn: (To the Moon Smith, who usually sits silent in the corner.) You work
+          with metal. Have you ever made gears like this? (Shows a drawing.)
         triggerSpeech: 1
       - speakerName: "\u041B\u0443\u043D\u043D\u044B\u0439 \u043A\u0443\u0437\u043D\u0435\u0446"
+        speakerNameEn: Moon Smith
         text: "\u0414\u0430. \u041F\u043E \u0437\u0430\u043A\u0430\u0437\u0443 \u0436\u0435\u043D\u0449\u0438\u043D\u044B
           \u0441 \u0448\u0440\u0430\u043C\u043E\u043C. \u042F \u043A\u043E\u0432\u0430\u043B
           \u043C\u043D\u043E\u0433\u043E \u0434\u043B\u044F \u041E\u0440\u0434\u0435\u043D\u0430.
@@ -777,14 +1007,21 @@ MonoBehaviour:
           \u0442\u043E\u043C\u0443, \u043A\u043E\u043C\u0443 \u043D\u0435 \u0434\u043E\u0432\u0435\u0440\u044F\u0435\u0448\u044C.
           \u0415\u0441\u043B\u0438 \u043E\u043D \u0441\u043E\u043B\u0436\u0451\u0442
           \u2014 \u043D\u0430\u043F\u0438\u0442\u043E\u043A \u043F\u043E\u0442\u0435\u043C\u043D\u0435\u0435\u0442."
+        textEn: "Yes. Commissioned by a woman with a scar. I forged much for the
+          Order. I didn't know what for, back then. Now I regret it. Take this grain
+          of moon silver. It draws out lies. Put it in the drink of someone you don't
+          trust. If they lie \u2014 the drink will darken."
         triggerSpeech: 1
     dayEndText: "\u041B\u0443\u043D\u043D\u043E\u0435 \u0441\u0435\u0440\u0435\u0431\u0440\u043E
       \u0432\u044B\u044F\u0432\u043B\u044F\u0435\u0442 \u043B\u043E\u0436\u044C.
       \u0415\u0441\u043B\u0438 \u043F\u043E\u0434\u043E\u0437\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439
       \u0433\u043E\u0441\u0442\u044C \u0441\u043E\u043B\u0436\u0451\u0442 \u2014
       \u0435\u0433\u043E \u043D\u0430\u043F\u0438\u0442\u043E\u043A \u043F\u043E\u0442\u0435\u043C\u043D\u0435\u0435\u0442."
+    dayEndTextEn: "Moon silver reveals lies. If a suspicious guest lies \u2014 their
+      drink will darken."
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 25
   - dayNumber: 15
@@ -798,14 +1035,18 @@ MonoBehaviour:
         topping: 2
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u041A \u041A\u0440\u0438\u0441\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u043E\u0439
           \u043F\u0435\u0432\u0438\u0446\u0435.) \u0412\u044B \u0447\u0443\u0432\u0441\u0442\u0432\u0443\u0435\u0442\u0435
           \u0432\u0438\u0431\u0440\u0430\u0446\u0438\u0438 \u043C\u0438\u0440\u043E\u0432.
           \u0413\u0434\u0435 \u043D\u0430\u0445\u043E\u0434\u0438\u0442\u0441\u044F
           \xAB\u043C\u0435\u0441\u0442\u043E \u0442\u0440\u0451\u0445 \u0442\u0435\u043D\u0435\u0439\xBB?"
+        textEn: (To the Crystal Singer.) You feel the vibrations of the worlds. Where
+          is the 'place of three shadows'?
         triggerSpeech: 1
       - speakerName: "\u041A\u0440\u0438\u0441\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0430\u044F
           \u043F\u0435\u0432\u0438\u0446\u0430"
+        speakerNameEn: Crystal Singer
         text: "\u042F \u0441\u043B\u044B\u0448\u0430\u043B\u0430, \u043A\u0430\u043A
           \u043E \u043D\u0451\u043C \u043F\u043E\u044E\u0442 \u043A\u0430\u043C\u043D\u0438.
           \u042D\u0442\u043E \u0441\u0442\u0430\u0440\u0430\u044F \u043E\u0431\u0441\u0435\u0440\u0432\u0430\u0442\u043E\u0440\u0438\u044F
@@ -815,27 +1056,37 @@ MonoBehaviour:
           \u0437\u0430\u0431\u044B\u0442\u043E\u0439 \u043C\u0435\u043B\u043E\u0434\u0438\u0438.
           \u0422\u043E\u0439, \u0447\u0442\u043E \u043F\u0435\u0440\u0435\u0434\u0430\u0451\u0442\u0441\u044F
           \u0432 \u0441\u0435\u043C\u044C\u0435."
+        textEn: I have heard the stones sing of it. It is the old observatory on
+          the Border Cliff. But its door opens only to the sound of a forgotten melody.
+          One passed down within a family.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u041A\u0440\u0438\u0441\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0430\u044F
           \u043F\u0435\u0432\u0438\u0446\u0430"
+        speakerNameEn: Crystal Singer
         text: "\u041B\u0430\u0442\u0442\u0435 \u0441 \u043A\u043E\u0440\u0438\u0446\u0435\u0439.
           \u041A\u0430\u043C\u043D\u0438 \u043B\u044E\u0431\u044F\u0442 \u0442\u0435\u043F\u043B\u043E
           \u0438 \u043F\u0440\u044F\u043D\u043E\u0441\u0442\u0438."
+        textEn: A latte with cinnamon. Stones love warmth and spice.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u0412\u0441\u043F\u043E\u043C\u0438\u043D\u0430\u0435\u0442 \u043A\u043E\u043B\u044B\u0431\u0435\u043B\u044C\u043D\u0443\u044E,
           \u043A\u043E\u0442\u043E\u0440\u0443\u044E \u043F\u0435\u043B \u043E\u0442\u0435\u0446.
           \u041D\u0430\u043F\u0435\u0432\u0430\u0435\u0442 \u0435\u0451.)"
+        textEn: (Remembers the lullaby her father used to sing. Hums it.)
         triggerSpeech: 1
       - speakerName: "\u041A\u0440\u0438\u0441\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0430\u044F
           \u043F\u0435\u0432\u0438\u0446\u0430"
+        speakerNameEn: Crystal Singer
         text: "\u0414\u0430... \u044D\u0442\u043E \u043E\u043D\u0430. \xAB\u041F\u0435\u0441\u043D\u044F
           \u042F\u043A\u043E\u0440\u044F\xBB. \u041E\u0440\u0434\u0435\u043D \u0431\u043E\u0438\u0442\u0441\u044F
           \u0435\u0451. \u0422\u0432\u043E\u0439 \u043C\u0443\u0436, \u043D\u0430\u0432\u0435\u0440\u043D\u043E\u0435,
           \u0437\u043D\u0430\u043B \u0435\u0451. \u0417\u0430\u043F\u043E\u043C\u043D\u0438
           \u0445\u043E\u0440\u043E\u0448\u0435\u043D\u044C\u043A\u043E."
+        textEn: Yes... that is it. The Anchor Song. The Order fears it. Your husband
+          must have known it. Remember it well.
         triggerSpeech: 1
     dayEndText: "\xAB\u041F\u0435\u0441\u043D\u044F \u042F\u043A\u043E\u0440\u044F\xBB
       \u2014 \u044D\u0442\u043E \u043A\u043E\u043B\u044B\u0431\u0435\u043B\u044C\u043D\u0430\u044F
@@ -844,6 +1095,8 @@ MonoBehaviour:
       \u043D\u0430 \u0413\u0440\u0430\u043D\u0438\u0447\u043D\u043E\u043C \u0423\u0442\u0451\u0441\u0435
       \u043E\u0442\u043A\u0440\u044B\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E
       \u043F\u043E\u0434 \u043D\u0435\u0451."
+    dayEndTextEn: The Anchor Song is your father's lullaby. The Order fears it. The
+      observatory door on the Border Cliff opens only to it.
     hasVignette: 1
     vignetteText: "\u041C\u0438\u0440\u0430 \u043D\u0430\u043F\u0435\u0432\u0430\u0435\u0442
       \u043A\u043E\u043B\u044B\u0431\u0435\u043B\u044C\u043D\u0443\u044E. \u0421\u0442\u0451\u043A\u043B\u0430
@@ -851,6 +1104,8 @@ MonoBehaviour:
       \u0412 \u043C\u0435\u043B\u043E\u0434\u0438\u0438 \u0447\u0442\u043E-\u0442\u043E
       \u0436\u0438\u0432\u043E\u0435 \u2014 \u0433\u043B\u0443\u0431\u043E\u043A\u043E\u0435,
       \u0438\u0437 \u0441\u0430\u043C\u043E\u0439 \u0437\u0435\u043C\u043B\u0438."
+    vignetteTextEn: "Mira hums a lullaby. The glass in the coffee house rings. There
+      is something alive in the melody \u2014 deep, from the earth itself."
     vignetteEffect: 3
     coinsPerCorrectOrder: 25
   - dayNumber: 16
@@ -864,6 +1119,7 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "(\u0412\u0445\u043E\u0434\u0438\u0442, \u043D\u043E \u0432\u0435\u0434\u0451\u0442
           \u0441\u0435\u0431\u044F \u0438\u043D\u0430\u0447\u0435. \u0413\u043B\u0430\u0437\u0430
           \u0431\u0435\u0441\u0446\u0432\u0435\u0442\u043D\u044B.) \u0422\u0440\u0430\u0432\u044F\u043D\u043E\u0439
@@ -873,34 +1129,48 @@ MonoBehaviour:
           \u043A \u0421\u0442\u0430\u0440\u043E\u043C\u0443 \u0414\u0443\u0431\u0443
           \u043D\u0430 \u043E\u043A\u0440\u0430\u0438\u043D\u0435 \u0433\u043E\u0440\u043E\u0434\u0430
           \u0432 \u043F\u043E\u043B\u043D\u043E\u0447\u044C. \u041E\u0434\u0438\u043D."
+        textEn: (Enters, but acts differently. His eyes are colorless.) Herbal tea.
+          I bring word. Your husband wants you to come to the Old Oak on the edge
+          of town at midnight. Alone.
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u041F\u043E\u0434\u043E\u0437\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u043E.)
           \u041F\u043E\u0447\u0435\u043C\u0443 \u043D\u0435 \u0447\u0435\u0440\u0435\u0437
           \u0437\u0435\u0440\u043A\u0430\u043B\u043E \u0438\u043B\u0438 \u0441\u043D\u043E\u0432\u0438\u0434\u0438\u0446\u0443?"
+        textEn: (Suspicious.) Why not through the mirror or the Dreamweaver?
         triggerSpeech: 1
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "(\u0413\u043E\u043B\u043E\u0441 \u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0441\u044F
           \u043C\u0435\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0438\u043C.)
           \u041E\u043D \u0436\u0434\u0451\u0442. (\u0423\u0445\u043E\u0434\u0438\u0442)"
+        textEn: (His voice turns metallic.) He is waiting. (Leaves)
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u0422\u0440\u0430\u0432\u044F\u043D\u043E\u0439 \u0447\u0430\u0439.
           (\u041F\u0443\u0441\u0442\u043E \u0441\u043C\u043E\u0442\u0440\u0438\u0442)"
+        textEn: Herbal tea. (Stares blankly)
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u041A\u043B\u0430\u0434\u0451\u0442 \u043F\u0435\u0441\u0447\u0438\u043D\u043A\u0443
           \u043B\u0443\u043D\u043D\u043E\u0433\u043E \u0441\u0435\u0440\u0435\u0431\u0440\u0430
           \u0432 \u0435\u0433\u043E \u043D\u0435\u0434\u043E\u043F\u0438\u0442\u044B\u0439
           \u0447\u0430\u0439. \u0427\u0430\u0439 \u0447\u0435\u0440\u043D\u0435\u0435\u0442
           \u0438 \u0438\u0441\u043F\u0430\u0440\u044F\u0435\u0442\u0441\u044F.)"
+        textEn: (Drops the grain of moon silver into his unfinished tea. The tea
+          turns black and evaporates.)
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u041B\u043E\u0432\u0443\u0448\u043A\u0430. \u041E\u0440\u0434\u0435\u043D
           \u043F\u044B\u0442\u0430\u0435\u0442\u0441\u044F \u0437\u0430\u043C\u0430\u043D\u0438\u0442\u044C
           \u043C\u0435\u043D\u044F."
+        textEn: A trap. The Order is trying to lure me out.
         triggerSpeech: 1
     dayEndText: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A \u0431\u044B\u043B
       \u043F\u043E\u0434 \u043A\u043E\u043D\u0442\u0440\u043E\u043B\u0435\u043C \u041E\u0440\u0434\u0435\u043D\u0430.
@@ -908,8 +1178,11 @@ MonoBehaviour:
       \u043B\u0443\u043D\u043D\u043E\u0433\u043E \u0441\u0435\u0440\u0435\u0431\u0440\u0430
       \u2014 \u043B\u043E\u0436\u044C. \u0422\u0435\u0431\u044F \u043F\u044B\u0442\u0430\u044E\u0442\u0441\u044F
       \u0432\u044B\u043C\u0430\u043D\u0438\u0442\u044C."
+    dayEndTextEn: "The Wanderer was under the Order's control. The tea turned black
+      from the moon silver \u2014 a lie. They are trying to lure you out."
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 30
   - dayNumber: 17
@@ -923,50 +1196,69 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u041E\u0440\u0434\u0435\u043D \u043F\u044B\u0442\u0430\u0435\u0442\u0441\u044F
           \u043C\u0435\u043D\u044F \u0432\u044B\u043C\u0430\u043D\u0438\u0442\u044C.
           \u041D\u043E \u0443 \u043C\u0435\u043D\u044F \u0435\u0441\u0442\u044C \u043F\u0435\u0441\u043D\u044F
           \u0438 \u043F\u043B\u0430\u043D. \u041F\u043E\u043C\u043E\u0433\u0438\u0442\u0435
           \u043C\u043D\u0435 \u0443\u0441\u0442\u0440\u043E\u0438\u0442\u044C \u043B\u043E\u0432\u0443\u0448\u043A\u0443."
+        textEn: The Order is trying to lure me out. But I have the song and a plan.
+          Help me set a trap.
         triggerSpeech: 1
       - speakerName: "\u0422\u0443\u043C\u0430\u043D\u043D\u044B\u0439 \u043E\u0445\u043E\u0442\u043D\u0438\u043A"
+        speakerNameEn: Fog Hunter
         text: "\u042F \u0441\u043A\u0440\u043E\u044E \u043C\u0435\u0441\u0442\u043E
           \u0442\u0443\u043C\u0430\u043D\u043E\u043C \u0438\u043B\u043B\u044E\u0437\u0438\u0439."
+        textEn: I will hide the place in a fog of illusions.
         triggerSpeech: 1
       - speakerName: "\u041F\u0430\u0440\u043E\u0432\u043E\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440"
+        speakerNameEn: Steam Engineer
         text: "\u042F \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u044E \u0437\u0432\u0443\u043A\u043E\u0432\u044B\u0435
           \u0440\u0435\u043F\u0435\u043B\u043B\u0435\u043D\u0442\u044B \u043E\u0442
           \u0438\u0445 \u0430\u0440\u0442\u0435\u0444\u0430\u043A\u0442\u043E\u0432."
+        textEn: I will set up sonic repellents against their artifacts.
         triggerSpeech: 1
       - speakerName: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u044B\u0439
           \u0432\u043E\u0440"
+        speakerNameEn: Mirror Thief
         text: "\u042F \u043F\u043E\u0441\u0442\u0430\u0432\u043B\u044E \u0437\u0435\u0440\u043A\u0430\u043B\u0430-\u043B\u043E\u0432\u0443\u0448\u043A\u0438.
           \u041E\u043D\u0438 \u0443\u0432\u0438\u0434\u044F\u0442 \u0441\u0435\u0431\u044F."
+        textEn: I will place trap mirrors. They will see themselves.
         triggerSpeech: 1
       - speakerName: "\u0412\u043E\u0434\u044F\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u0436"
+        speakerNameEn: Water Warden
         text: "\u0412\u043E\u0434\u0430 \u043F\u043E\u043A\u0430\u0436\u0435\u0442,
           \u0435\u0441\u043B\u0438 \u043A\u0442\u043E-\u0442\u043E \u043F\u0440\u0438\u0431\u043B\u0438\u0437\u0438\u0442\u0441\u044F
           \u0441 \u0434\u0443\u0440\u043D\u044B\u043C\u0438 \u043D\u0430\u043C\u0435\u0440\u0435\u043D\u0438\u044F\u043C\u0438."
+        textEn: The water will reveal anyone approaching with ill intent.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0422\u0443\u043C\u0430\u043D\u043D\u044B\u0439 \u043E\u0445\u043E\u0442\u043D\u0438\u043A"
+        speakerNameEn: Fog Hunter
         text: "\u041C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439 \u044D\u0441\u043F\u0440\u0435\u0441\u0441\u043E.
           \u041D\u0430\u043C \u043D\u0443\u0436\u043D\u044B \u0441\u0438\u043B\u044B."
+        textEn: A small espresso. We need our strength.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u0420\u0430\u0437\u043D\u043E\u0441\u0438\u0442 \u043A\u043E\u0444\u0435
           \u0432\u0441\u0435\u043C \u0441\u043E\u044E\u0437\u043D\u0438\u043A\u0430\u043C.)
           \u0417\u0430\u0432\u0442\u0440\u0430 \u0432 \u043F\u043E\u043B\u043D\u043E\u0447\u044C.
           \u0417\u0434\u0435\u0441\u044C, \u0432 \u043A\u043E\u0444\u0435\u0439\u043D\u0435."
+        textEn: (Serves coffee to all the allies.) Tomorrow at midnight. Here, in
+          the coffee house.
         triggerSpeech: 1
     dayEndText: "\u0421\u043E\u044E\u0437\u043D\u0438\u043A\u0438 \u0433\u043E\u0442\u043E\u0432\u044B.
       \u0422\u0443\u043C\u0430\u043D, \u0437\u0435\u0440\u043A\u0430\u043B\u0430,
       \u0437\u0432\u0443\u043A \u0438 \u0432\u043E\u0434\u0430 \u2014 \u043B\u043E\u0432\u0443\u0448\u043A\u0430
       \u0440\u0430\u0441\u0441\u0442\u0430\u0432\u043B\u0435\u043D\u0430. \u0417\u0430\u0432\u0442\u0440\u0430
       \u2014 \u043F\u043E\u043B\u043D\u043E\u0447\u044C."
+    dayEndTextEn: "The allies are ready. Fog, mirrors, sound and water \u2014 the
+      trap is set. Tomorrow \u2014 midnight."
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 30
   - dayNumber: 18
@@ -980,19 +1272,25 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041B\u0438\u0440\u0430"
+        speakerNameEn: Lira
         text: "\u041C\u0438\u0440\u0430. \u0422\u044B \u043D\u0435 \u043F\u043E\u0441\u043B\u0443\u0448\u0430\u043B\u0430\u0441\u044C.
           \u0422\u0435\u043F\u0435\u0440\u044C \u043C\u044B \u0437\u0430\u0431\u0435\u0440\u0451\u043C
           \u0438 \u0442\u0435\u0431\u044F. \u0422\u0432\u043E\u0439 \u0434\u0430\u0440
           \u043F\u0440\u0435\u0434\u0432\u0438\u0434\u0435\u043D\u0438\u044F \u0432
           \u043D\u0430\u043F\u0438\u0442\u043A\u0430\u0445 \u0442\u043E\u0436\u0435
           \u043F\u043E\u043B\u0435\u0437\u0435\u043D."
+        textEn: Mira. You did not listen. Now we will take you too. Your gift of
+          foresight in drinks is also useful.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u041B\u0438\u0440\u0430"
+        speakerNameEn: Lira
         text: "(\u041C\u043E\u043B\u0447\u0430 \u0436\u0434\u0451\u0442)"
+        textEn: (Waits in silence)
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u041C\u043E\u0439 \u0434\u0430\u0440 \u0442\u043E\u043B\u044C\u043A\u043E
           \u043F\u043E\u0434\u0441\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u0442,
           \u043A\u0430\u043A\u043E\u0439 \u043A\u043E\u0444\u0435 \u0432\u0430\u043C
@@ -1000,36 +1298,52 @@ MonoBehaviour:
           \u043F\u043E\u0434\u043E\u0439\u0434\u0451\u0442 \xAB\u041A\u043E\u0444\u0435
           \u041F\u0440\u0430\u0432\u0434\u044B\xBB. (\u0421\u0442\u0430\u0432\u0438\u0442
           \u0431\u043E\u043B\u044C\u0448\u043E\u0439 \u0441\u0435\u0440\u0432\u0438\u0437)"
+        textEn: My gift only tells me which coffee suits you. And what suits you
+          is the Truth Brew. (Sets down a large serving)
         triggerSpeech: 1
       - speakerName: "\u041B\u0438\u0440\u0430"
+        speakerNameEn: Lira
         text: "\u0414\u043E\u0432\u043E\u043B\u044C\u043D\u043E! (\u0420\u0430\u0437\u0431\u0438\u0432\u0430\u0435\u0442
           \u0437\u0435\u0440\u043A\u0430\u043B\u043E \u0440\u0443\u043A\u043E\u0439)"
+        textEn: Enough! (Smashes a mirror with her hand)
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u041D\u0430\u043F\u0435\u0432\u0430\u0435\u0442 \xAB\u041F\u0435\u0441\u043D\u044E
           \u042F\u043A\u043E\u0440\u044F\xBB. \u0421\u0442\u0435\u043A\u043B\u044F\u043D\u043D\u0430\u044F
           \u043F\u043E\u0441\u0443\u0434\u0430 \u0440\u0435\u0437\u043E\u043D\u0438\u0440\u0443\u0435\u0442.
           \u041B\u044E\u0434\u0438 \u041E\u0440\u0434\u0435\u043D\u0430 \u043A\u043E\u0440\u0447\u0430\u0442\u0441\u044F
           \u043E\u0442 \u0431\u043E\u043B\u0438.)"
+        textEn: (Hums the Anchor Song. The glassware resonates. The Order's men writhe
+          in pain.)
         triggerSpeech: 1
       - speakerName: "\u041B\u0438\u0440\u0430"
+        speakerNameEn: Lira
         text: "(\u0421\u0434\u0430\u0432\u043B\u0435\u043D\u043D\u043E.) \u0422\u044B...
           \u043D\u0435 \u0437\u043D\u0430\u0435\u0448\u044C, \u0447\u0442\u043E \u0434\u0435\u043B\u0430\u0435\u0448\u044C..."
+        textEn: (Strained.) You... don't know what you're doing...
         triggerSpeech: 1
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0417\u043D\u0430\u044E. \u0413\u0434\u0435 \u041A\u0430\u0439?"
+        textEn: I do. Where is Kai?
         triggerSpeech: 1
       - speakerName: "\u041B\u0438\u0440\u0430"
+        speakerNameEn: Lira
         text: "\u0412... \u0432 \u0441\u0442\u0430\u0440\u043E\u0439 \u0432\u043E\u0434\u043E\u043D\u0430\u043F\u043E\u0440\u043D\u043E\u0439
           \u0431\u0430\u0448\u043D\u0435. \u041D\u0430 \u0413\u0440\u0430\u043D\u0438\u0447\u043D\u043E\u043C
           \u0423\u0442\u0451\u0441\u0435. \u041A\u043B\u044E\u0447... \u0443 \u043C\u0435\u043D\u044F.
           (\u041F\u0430\u0434\u0430\u0435\u0442)"
+        textEn: In... in the old water tower. On the Border Cliff. The key... I have
+          it. (Falls)
         triggerSpeech: 1
     dayEndText: "\u041E\u0440\u0434\u0435\u043D \u043E\u0431\u0435\u0437\u0432\u0440\u0435\u0436\u0435\u043D.
       \u041A\u043B\u044E\u0447-\u0430\u043C\u0443\u043B\u0435\u0442 \u043F\u043E\u043B\u0443\u0447\u0435\u043D.
       \u041A\u0430\u0439 \u2014 \u0432 \u0432\u043E\u0434\u043E\u043D\u0430\u043F\u043E\u0440\u043D\u043E\u0439
       \u0431\u0430\u0448\u043D\u0435 \u043D\u0430 \u0413\u0440\u0430\u043D\u0438\u0447\u043D\u043E\u043C
       \u0423\u0442\u0451\u0441\u0435."
+    dayEndTextEn: The Order is defeated. The key amulet is yours. Kai is in the water
+      tower on the Border Cliff.
     hasVignette: 1
     vignetteText: "\u041F\u043E\u043B\u043D\u043E\u0447\u044C. \u0413\u0430\u0441\u043D\u0435\u0442
       \u0441\u0432\u0435\u0442. \u0412 \u0434\u0432\u0435\u0440\u044F\u0445 \u2014
@@ -1044,6 +1358,10 @@ MonoBehaviour:
       \u0432\u043E\u0434\u043E\u043D\u0430\u043F\u043E\u0440\u043D\u043E\u0439 \u0431\u0430\u0448\u043D\u0435.
       \u041D\u0430 \u0413\u0440\u0430\u043D\u0438\u0447\u043D\u043E\u043C \u0423\u0442\u0451\u0441\u0435.
       \u041A\u043B\u044E\u0447 \u0443 \u043C\u0435\u043D\u044F.\xBB"
+    vignetteTextEn: Midnight. The lights go out. Three figures in the doorway. Lira
+      with the lightning scar. The allies trigger the traps. Mira hums the Anchor
+      Song. The glassware resonates. The Order's men writhe. Lira falls. 'In the
+      old water tower. On the Border Cliff. I have the key.'
     vignetteEffect: 4
     coinsPerCorrectOrder: 0
   - dayNumber: 19
@@ -1057,28 +1375,37 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "(\u041F\u0440\u0438\u0445\u043E\u0434\u0438\u0442. \u0413\u043B\u0430\u0437\u0430
           \u0441\u043D\u043E\u0432\u0430 \u044F\u0441\u043D\u044B\u0435.) \u041F\u0440\u043E\u0441\u0442\u0438.
           \u041C\u043D\u043E\u0439 \u0443\u043F\u0440\u0430\u0432\u043B\u044F\u043B\u0438.
           \u042F \u043F\u0440\u043E\u0432\u0435\u0434\u0443 \u0442\u0435\u0431\u044F
           \u0431\u0435\u0437\u043E\u043F\u0430\u0441\u043D\u043E\u0439 \u0442\u0440\u043E\u043F\u043E\u0439
           \u043A \u0431\u0430\u0448\u043D\u0435."
+        textEn: (Arrives. His eyes are clear again.) Forgive me. I was being controlled.
+          I will lead you to the tower by a safe path.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u041D\u0430\u043C \u043D\u0443\u0436\u043D\u043E \u0438\u0434\u0442\u0438.
           \u041D\u043E \u0441\u043D\u0430\u0447\u0430\u043B\u0430... \u0447\u0430\u0439."
+        textEn: We need to go. But first... tea.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A"
+        speakerNameEn: Wanderer
         text: "\u0414\u043E\u0440\u043E\u0433\u0430 \u0441\u0432\u043E\u0431\u043E\u0434\u043D\u0430.
           \u041F\u043E\u0440\u0430 \u0437\u0430 \u041A\u0430\u0435\u043C."
+        textEn: The road is clear. Time to go get Kai.
         triggerSpeech: 1
     dayEndText: "\u041A\u0430\u0439 \u0441\u0432\u043E\u0431\u043E\u0434\u0435\u043D!
       \u041D\u0443\u0436\u043D\u043E \u043E\u0431\u0440\u0430\u0442\u0438\u0442\u044C
       \u0440\u0438\u0442\u0443\u0430\u043B \u2014 \u0432 \u043E\u0431\u0441\u0435\u0440\u0432\u0430\u0442\u043E\u0440\u0438\u0438.
       \u0417\u0430\u0432\u0442\u0440\u0430 \u2014 \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0439
       \u0434\u0435\u043D\u044C."
+    dayEndTextEn: "Kai is free! The ritual must be reversed \u2014 at the observatory.
+      Tomorrow is the final day."
     hasVignette: 1
     vignetteText: "\u041C\u0438\u0440\u0430 \u043D\u0430\u0445\u043E\u0434\u0438\u0442
       \u0431\u0430\u0448\u043D\u044E. \u041F\u043E\u0451\u0442 \xAB\u041F\u0435\u0441\u043D\u044E
@@ -1093,6 +1420,10 @@ MonoBehaviour:
       \u0432\u0441\u043F\u044F\u0442\u044C. \u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439
       \u0430\u043C\u0443\u043B\u0435\u0442 \u0438 \u043F\u0435\u0441\u043D\u044E
       \u0432 \u043C\u0435\u0441\u0442\u0435 \u0442\u0440\u0451\u0445 \u0442\u0435\u043D\u0435\u0439.\xBB"
+    vignetteTextEn: Mira finds the tower. She sings the Anchor Song. The lock opens.
+      Kai is inside, bound in magic chains. 'Mira... I knew you would find the melody.'
+      The key amulet turns the chains to dust. 'The ritual can be reversed. Use the
+      amulet and the song at the place of three shadows.'
     vignetteEffect: 5
     coinsPerCorrectOrder: 0
   - dayNumber: 20
@@ -1106,10 +1437,13 @@ MonoBehaviour:
         topping: 0
       greetingLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "\u0414\u043E\u0431\u0440\u043E \u043F\u043E\u0436\u0430\u043B\u043E\u0432\u0430\u0442\u044C!
           \u0427\u0442\u043E \u0434\u043B\u044F \u0432\u0430\u0441?"
+        textEn: Welcome! What can I get you?
         triggerSpeech: 1
       - speakerName: "\u041A\u0430\u0439"
+        speakerNameEn: Kai
         text: "(\u0421\u0442\u043E\u0438\u0442 \u0437\u0430 \u0441\u0442\u043E\u0439\u043A\u043E\u0439,
           \u043F\u043E\u043C\u043E\u0433\u0430\u0435\u0442. \u041D\u0430 \u043D\u0451\u043C
           \u0444\u0430\u0440\u0442\u0443\u043A, \u043C\u0435\u0434\u0430\u043B\u044C\u043E\u043D\u0430
@@ -1118,50 +1452,72 @@ MonoBehaviour:
           \u041A\u0440\u0435\u043F\u043A\u0438\u0439, \u0441\u043B\u0430\u0434\u043A\u0438\u0439
           \u0438 \u0434\u0430\u044E\u0449\u0438\u0439 \u0447\u0443\u0432\u0441\u0442\u0432\u043E
           \u0437\u0430\u0449\u0438\u0449\u0451\u043D\u043D\u043E\u0441\u0442\u0438."
+        textEn: (Stands behind the counter, helping. He wears an apron; the medallion
+          is gone.) Today's signature drink is the Anchor. Strong, sweet, and it
+          makes you feel safe.
         triggerSpeech: 1
       - speakerName: "\u0412\u043E\u0434\u044F\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u0436"
+        speakerNameEn: Water Warden
         text: "\u0413\u0440\u0430\u043D\u0438\u0446\u044B \u0443\u0441\u043F\u043E\u043A\u043E\u0438\u043B\u0438\u0441\u044C.
           \u0412\u043E\u0434\u0430 \u0441\u043D\u043E\u0432\u0430 \u0447\u0438\u0441\u0442\u0430."
+        textEn: The borders have calmed. The water is pure again.
         triggerSpeech: 1
       - speakerName: "\u0425\u0440\u0430\u043D\u0438\u0442\u0435\u043B\u044C \u043A\u043D\u0438\u0433"
+        speakerNameEn: Book Keeper
         text: "\u041A\u043D\u0438\u0433\u0438 \u0432\u043E\u0437\u0432\u0440\u0430\u0449\u0430\u044E\u0442\u0441\u044F.
           \u0417\u043D\u0430\u043D\u0438\u0435 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E."
+        textEn: The books are returning. Knowledge is preserved.
         triggerSpeech: 1
       - speakerName: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u044B\u0439
           \u0432\u043E\u0440"
+        speakerNameEn: Mirror Thief
         text: "\u041E\u0442\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u0441\u0442\u0430\u043B\u0438
           \u0447\u0435\u0441\u0442\u043D\u0435\u0435. (\u041A\u0438\u0432\u043D\u0443\u0432
           \u041B\u0438\u0440\u0435.) \u041D\u0435\u043A\u043E\u0442\u043E\u0440\u044B\u0435
           \u043D\u0430\u0448\u043B\u0438 \u043F\u043E\u043A\u043E\u0439."
+        textEn: Reflections have become more honest. (Nods to Lira.) Some have found
+          peace.
         triggerSpeech: 1
       wrongOrderLines:
       - speakerName: "\u041A\u0430\u0439"
+        speakerNameEn: Kai
         text: "\u042D\u0441\u043F\u0440\u0435\u0441\u0441\u043E. \u041C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439.
           \u042F \u043F\u043E\u043C\u043D\u044E, \u0442\u044B \u0443\u043C\u0435\u0435\u0448\u044C
           \u0435\u0433\u043E \u0433\u043E\u0442\u043E\u0432\u0438\u0442\u044C."
+        textEn: Espresso. Small. I remember you know how to make it.
         triggerSpeech: 1
       storyRevealLines:
       - speakerName: "\u041C\u0438\u0440\u0430"
+        speakerNameEn: Mira
         text: "(\u041F\u043E\u0434\u043D\u0438\u043C\u0430\u0435\u0442 \u0447\u0430\u0448\u043A\u0443.)
           \u0417\u0430 \xAB\u041C\u0435\u0436\u0434\u0443\u043C\u0438\u0440\u044C\u0435\xBB.
           \u0417\u0430 \u0434\u043E\u043C."
+        textEn: (Raises her cup.) To the Inbetween. To home.
         triggerSpeech: 1
       - speakerName: "\u0412\u0441\u0435"
+        speakerNameEn: Everyone
         text: "\u0417\u0430 \u0434\u043E\u043C!"
+        textEn: To home!
         triggerSpeech: 1
       - speakerName: ...
+        speakerNameEn: ...
         text: "(\u0412 \u0447\u0430\u0448\u043A\u0430\u0445 \u0443 \u0432\u0441\u0435\u0445
           \u043D\u0430 \u0441\u0435\u043A\u0443\u043D\u0434\u0443 \u043E\u0442\u0440\u0430\u0436\u0430\u0435\u0442\u0441\u044F
           \u0441\u043F\u043E\u043A\u043E\u0439\u043D\u044B\u0439 \u043F\u0435\u0439\u0437\u0430\u0436
           \u0438\u0445 \u0440\u043E\u0434\u043D\u043E\u0433\u043E \u043C\u0438\u0440\u0430.
           \u041F\u043E\u0442\u043E\u043C \u0432\u0441\u0451 \u0432\u043E\u0437\u0432\u0440\u0430\u0449\u0430\u0435\u0442\u0441\u044F
           \u0432 \u043D\u043E\u0440\u043C\u0443.)"
+        textEn: (For a second, every cup reflects the calm landscape of its owner's
+          home world. Then everything returns to normal.)
         triggerSpeech: 1
     dayEndText: "\xAB\u042F\u043A\u043E\u0440\u044C\xBB \u043F\u0440\u0438\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D.
       \u0413\u0440\u0430\u043D\u0438\u0446\u044B \u0437\u0430\u043F\u0435\u0447\u0430\u0442\u0430\u043D\u044B
       \u043D\u0430\u0432\u0441\u0435\u0433\u0434\u0430. \xAB\u041C\u0435\u0436\u0434\u0443\u043C\u0438\u0440\u044C\u0435\xBB
       \u2014 \u0441\u043D\u043E\u0432\u0430 \u0434\u043E\u043C."
+    dayEndTextEn: The Anchor has been brewed. The borders are sealed forever. The
+      Inbetween is home again.
     hasVignette: 0
     vignetteText: 
+    vignetteTextEn: 
     vignetteEffect: 0
     coinsPerCorrectOrder: 50

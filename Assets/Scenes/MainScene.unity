@@ -1664,7 +1664,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 626687124}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b0a15d8e5c1c1b347b4a3259344cd9ab, type: 3}
   m_Name: 
@@ -1708,7 +1708,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 641604885}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22124f6dfb1f6d546bf1460f673445f4, type: 3}
   m_Name: 
@@ -1752,7 +1752,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 711366976}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0f754adb40f3aa4cb2e2fff24e11fe7, type: 3}
   m_Name: 
@@ -2032,7 +2032,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 855966302}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa05491108ec3eb468b25971145e9d25, type: 3}
   m_Name: 
@@ -2263,7 +2263,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 974616776}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78e2d0bc9c53eca46addecfc2dcdf689, type: 3}
   m_Name: 
@@ -2735,66 +2735,66 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stages:
-  - stageName: awaiting visitor
-    isEnabled: 0
+  - stageName: 0 guest enters
+    isEnabled: 1
     cameraTarget: {fileID: 538604703}
     cameraMoveDuration: 1
     disableCharacter: 0
     stageScript: {fileID: 974616777}
     autoCompleteIfNoScript: 0
-  - stageName: ready to prepare
-    isEnabled: 0
-    cameraTarget: {fileID: 0}
+  - stageName: 1 greeting (counter)
+    isEnabled: 1
+    cameraTarget: {fileID: 954448081}
     cameraMoveDuration: 1
     disableCharacter: 0
     stageScript: {fileID: 711366978}
     autoCompleteIfNoScript: 0
-  - stageName: cofe basis
-    isEnabled: 0
+  - stageName: 2 ingredients (cofe basis)
+    isEnabled: 1
     cameraTarget: {fileID: 85908208}
     cameraMoveDuration: 1
     disableCharacter: 1
     stageScript: {fileID: 2087122286}
     autoCompleteIfNoScript: 0
-  - stageName: cofe machine
-    isEnabled: 0
+  - stageName: 3 cofe machine
+    isEnabled: 1
     cameraTarget: {fileID: 1454674197}
     cameraMoveDuration: 1
     disableCharacter: 1
     stageScript: {fileID: 2109084460}
     autoCompleteIfNoScript: 0
-  - stageName: cofe adons
-    isEnabled: 0
+  - stageName: 4 toppings (cofe adons)
+    isEnabled: 1
     cameraTarget: {fileID: 951339521}
     cameraMoveDuration: 1
     disableCharacter: 1
     stageScript: {fileID: 855966304}
     autoCompleteIfNoScript: 0
-  - stageName: effect
-    isEnabled: 0
-    cameraTarget: {fileID: 1763016925}
+  - stageName: 5 serve (counter)
+    isEnabled: 1
+    cameraTarget: {fileID: 538604703}
     cameraMoveDuration: 1
-    disableCharacter: 1
+    disableCharacter: 0
     stageScript: {fileID: 641604887}
-    autoCompleteIfNoScript: 1
-  - stageName: Person awail+camera smooze
-    isEnabled: 0
-    cameraTarget: {fileID: 0}
+    autoCompleteIfNoScript: 0
+  - stageName: 6 reaction / story
+    isEnabled: 1
+    cameraTarget: {fileID: 954448081}
     cameraMoveDuration: 1
     disableCharacter: 0
     stageScript: {fileID: 626687126}
     autoCompleteIfNoScript: 0
-  - stageName: dialog + marking coffe
-    isEnabled: 0
-    cameraTarget: {fileID: 954448081}
+  - stageName: 7 guest leaves
+    isEnabled: 1
+    cameraTarget: {fileID: 1763016925}
     cameraMoveDuration: 1
     disableCharacter: 0
     stageScript: {fileID: 1801658536}
-    autoCompleteIfNoScript: 1
+    autoCompleteIfNoScript: 0
   autoStartStageZero: 1
   playerCharacter: {fileID: 1788007424}
   mainCamera: {fileID: 1488171672}
-  manualControl: 1
+  manualControl: 0
   debugStageIndex: 0
   onReadyForCustomer:
     m_PersistentCalls:
@@ -3827,7 +3827,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1801658534}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0ff56a876a0a2647be082125ae9fb1b, type: 3}
   m_Name: 
@@ -4753,7 +4753,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2087122284}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c31def36ebb6b348a2c2be0b64f1fe2, type: 3}
   m_Name: 
@@ -4797,7 +4797,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2109084458}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9899666332d4d454999ec6157f7857ff, type: 3}
   m_Name: 

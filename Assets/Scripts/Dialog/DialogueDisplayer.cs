@@ -135,7 +135,7 @@ public class DialogueDisplayer : MonoBehaviour
 
         foreach (var line in lines)
         {
-            yield return StartCoroutine(ShowLineRoutine(line.speakerName, line.text, line.triggerSpeech));
+            yield return StartCoroutine(ShowLineRoutine(line.GetSpeaker(), line.GetText(), line.triggerSpeech));
         }
 
         HideDialogue();
@@ -196,7 +196,7 @@ public class DialogueDisplayer : MonoBehaviour
     {
         if (dayIntroPanel == null || dayIntroText == null) return;
 
-        dayIntroText.text = $"ДЕНЬ {dayNumber}";
+        dayIntroText.text = Loc.T($"ДЕНЬ {dayNumber}", $"DAY {dayNumber}");
         StartCoroutine(ShowDayIntroRoutine());
     }
 
