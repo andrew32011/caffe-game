@@ -1,13 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+/// Stage5: Игрок возвращается к стойке — подача кофе.
 using UnityEngine;
-
 public class Stage5 : MonoBehaviour
 {
-    private ProcessVisitor processVisitor;
-    void Start()
-    {
-        //processVisitor = GameObject.FindObjectOfType<ProcessVisitor>();
-        //processVisitor.StartMoving();
-    }
+    private void OnEnable() { Debug.Log("Stage5: Подача кофе гостю."); }
 }

@@ -1,13 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
+/// <summary>
+/// Stage7: Гость уходит — запускает обратный маршрут ProcessVisitor
+/// (зеркально Stage0, который запускает приход гостя).
+/// Сцена: MainScene
+/// Зависимости: ProcessVisitor
+/// SDK: Нет
+/// </summary>
 using UnityEngine;
 
 public class Stage7 : MonoBehaviour
 {
-    private ProcessVisitor processVisitor;
-    void Start()
+    private ProcessVisitor _processVisitor;
+
+    private void OnEnable()
     {
-        //processVisitor = GameObject.FindObjectOfType<ProcessVisitor>();
-        //processVisitor.StartMoving();
+        _processVisitor = FindObjectOfType<ProcessVisitor>();
+        if (_processVisitor != null)
+            _processVisitor.StartMovingBackwards();
+        else
+            Debug.LogWarning("Stage7: ProcessVisitor не найден.");
     }
 }

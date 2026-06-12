@@ -1,13 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
+/// <summary>
+/// Stage0: Гость идёт к стойке (движение ProcessVisitor).
+/// Сцена: MainScene
+/// Зависимости: ProcessVisitor
+/// SDK: Нет
+/// </summary>
 using UnityEngine;
 
 public class Stage0 : MonoBehaviour
 {
-    private ProcessVisitor processVisitor;
-    void Start()
+    private ProcessVisitor _processVisitor;
+
+    private void OnEnable()
     {
-        processVisitor = GameObject.FindObjectOfType<ProcessVisitor>();
-        processVisitor.StartMoving();
+        _processVisitor = FindObjectOfType<ProcessVisitor>();
+        if (_processVisitor != null)
+            _processVisitor.StartMoving();
+        else
+            Debug.LogWarning("Stage0: ProcessVisitor не найден.");
     }
 }

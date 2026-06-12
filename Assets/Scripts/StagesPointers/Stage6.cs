@@ -1,13 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+/// Stage6: Реакция гостя и сюжетный диалог.
 using UnityEngine;
-
 public class Stage6 : MonoBehaviour
 {
-    private ProcessVisitor processVisitor;
-    void Start()
-    {
-        //processVisitor = GameObject.FindObjectOfType<ProcessVisitor>();
-        //processVisitor.StartMoving();
-    }
+    private void OnEnable() { Debug.Log("Stage6: Реакция гостя."); }
 }

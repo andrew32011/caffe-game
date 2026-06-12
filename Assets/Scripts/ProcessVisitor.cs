@@ -18,6 +18,9 @@ public class ProcessVisitor : MonoBehaviour
     private bool isMoving = false;
     private Transform currentTarget = null;
 
+    // Для внешних скриптов: идёт ли гость сейчас (анимация, ожидание прихода)
+    public bool IsMoving => isMoving;
+
     private int moveDirection = 1; // 1 = вперёд, -1 = назад
     private bool pingPongLoop = true; // true = туда-обратно, false = просто зацикливать
 
@@ -56,6 +59,7 @@ public class ProcessVisitor : MonoBehaviour
         if (targetObject == null || routePoints.Count == 0) return;
 
         currentPointIndex = 0;
+        moveDirection = 1; // Сброс направления (после StartMovingBackwards остаётся -1)
         SetNextTarget();
         isMoving = true;
     }

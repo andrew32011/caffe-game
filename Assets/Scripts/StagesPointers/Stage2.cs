@@ -1,13 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
+/// <summary>
+/// Stage2: Игрок у полки с ингредиентами.
+/// </summary>
 using UnityEngine;
 
 public class Stage2 : MonoBehaviour
 {
-    private ProcessVisitor processVisitor;
-    void Start()
+    private void OnEnable()
     {
-        //processVisitor = GameObject.FindObjectOfType<ProcessVisitor>();
-        //processVisitor.StartMoving();
+        Debug.Log("Stage2: Зона ингредиентов.");
     }
 }

@@ -9,15 +9,15 @@ public class StageData
     public string stageName = "Stage";
     public bool isEnabled = true;
 
-    // Камера
-    public Transform cameraTarget; // Может быть null
+    // пїЅпїЅпїЅпїЅпїЅпїЅ
+    public Transform cameraTarget; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ null
     public float cameraMoveDuration = 0.5f;
 
-    // Персонаж
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public bool disableCharacter = false;
 
-    // Логика стейджа
-    public MonoBehaviour stageScript; // Может быть null
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    public MonoBehaviour stageScript; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ null
     public bool autoCompleteIfNoScript = true;
 }
 
@@ -26,30 +26,38 @@ public class Stages : MonoBehaviour
     [Header("Stages")]
     public List<StageData> stages = new List<StageData>();
 
+    [Header("Flow")]
+    [Tooltip("РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїРµСЂРµР№С‚Рё РЅР° СЌС‚Р°Рї 0 РїСЂРё СЃС‚Р°СЂС‚Рµ СЃС†РµРЅС‹. Р’С‹РєР»СЋС‡РёС‚СЊ, РµСЃР»Рё СЌС‚Р°РїР°РјРё СѓРїСЂР°РІР»СЏРµС‚ DayController.")]
+    public bool autoStartStageZero = true;
+
     [Header("References")]
     public Transform playerCharacter;
     public Camera mainCamera;
 
     [Header("Debug")]
-    public bool manualControl = false; // Галка для ручного переключения в редакторе
+    public bool manualControl = false; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public int debugStageIndex = 0;
 
     [Header("Events")]
-    public UnityEvent onReadyForCustomer; // Стейдж 0
-    public UnityEvent onReadyForEffects;  // Последний стейдж
+    public UnityEvent onReadyForCustomer; // пїЅпїЅпїЅпїЅпїЅпїЅ 0
+    public UnityEvent onReadyForEffects;  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
     private int currentStage = -1;
     private bool isTransitioning = false;
 
+    // Р’РЅРµС€РЅРёРµ СЃРєСЂРёРїС‚С‹ (DayController) РјРѕРіСѓС‚ СЃР»РµРґРёС‚СЊ Р·Р° СЃРјРµРЅРѕР№ СЌС‚Р°РїРѕРІ
+    public System.Action<int> OnStageEntered;
+    public bool IsTransitioning => isTransitioning;
+
     void Start()
     {
-        // Начинаем со стейджа 0 (ожидание посетителя)
-        StartCoroutine(GoToStage(0));
+        if (autoStartStageZero)
+            StartCoroutine(GoToStage(0));
     }
 
     void Update()
     {
-        // Ручное переключение стейджей только в редакторе
+        // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 #if UNITY_EDITOR
         if (manualControl && !isTransitioning && stages.Count > 0)
         {
@@ -62,25 +70,32 @@ public class Stages : MonoBehaviour
 #endif
     }
 
-    // Вызов из внешнего скрипта: стейдж завершён
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public void CompleteStage()
     {
         if (isTransitioning) return;
 
         int nextStage = currentStage + 1;
-        if (nextStage >= stages.Count) nextStage = 0; // Зацикливаем
+        if (nextStage >= stages.Count) nextStage = 0; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
         StartCoroutine(GoToStage(nextStage));
     }
 
-    // Переход к конкретному стейджу
+    // РџСЂСЏРјРѕР№ РїРµСЂРµС…РѕРґ РЅР° РїСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ СЌС‚Р°Рї (РґР»СЏ DayController / CoffeeCraftingSystem)
+    public void JumpToStage(int index)
+    {
+        if (isTransitioning) return;
+        StartCoroutine(GoToStage(index));
+    }
+
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private IEnumerator GoToStage(int targetStage)
     {
         if (isTransitioning || targetStage < 0 || targetStage >= stages.Count) yield break;
 
         isTransitioning = true;
 
-        // Если был предыдущий стейдж — включаем персонажа обратно
+        // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (currentStage >= 0 && currentStage < stages.Count)
         {
             StageData prevStage = stages[currentStage];
@@ -89,7 +104,7 @@ public class Stages : MonoBehaviour
                 playerCharacter.gameObject.SetActive(true);
             }
 
-            // Деактивируем скрипт предыдущего стейджа
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (prevStage.stageScript != null)
             {
                 prevStage.stageScript.enabled = false;
@@ -99,13 +114,13 @@ public class Stages : MonoBehaviour
         currentStage = targetStage;
         StageData stage = stages[currentStage];
 
-        // Дизейблим персонажа если нужно
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         if (stage.disableCharacter && playerCharacter != null)
         {
             playerCharacter.gameObject.SetActive(false);
         }
 
-        // Перемещаем камеру если есть цель
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         if (stage.cameraTarget != null && mainCamera != null)
         {
             Vector3 startPos = mainCamera.transform.position;
@@ -123,24 +138,24 @@ public class Stages : MonoBehaviour
                 yield return null;
             }
 
-            // Гарантированная установка точных значений
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             mainCamera.transform.position = endPos;
             mainCamera.transform.rotation = endRot;
         }
 
-        // Активируем скрипт стейджа
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (stage.stageScript != null && stage.isEnabled)
         {
             stage.stageScript.enabled = true;
         }
         else if (stage.autoCompleteIfNoScript && stage.isEnabled)
         {
-            // Автозавершение через короткую задержку
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             yield return new WaitForSeconds(0.2f);
             CompleteStage();
         }
 
-        // События для первого и последнего стейджа
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (currentStage == 0)
         {
             onReadyForCustomer.Invoke();
@@ -150,10 +165,11 @@ public class Stages : MonoBehaviour
             onReadyForEffects.Invoke();
         }
 
+        OnStageEntered?.Invoke(currentStage);
         isTransitioning = false;
     }
 
-    // Получить текущий стейдж
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     public int GetCurrentStageIndex()
     {
         return currentStage;

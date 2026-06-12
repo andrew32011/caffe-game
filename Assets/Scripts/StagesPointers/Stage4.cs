@@ -1,13 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+/// Stage4: Игрок у зоны топпингов.
 using UnityEngine;
-
 public class Stage4 : MonoBehaviour
 {
-    private ProcessVisitor processVisitor;
-    void Start()
-    {
-        //processVisitor = GameObject.FindObjectOfType<ProcessVisitor>();
-        //processVisitor.StartMoving();
-    }
+    private void OnEnable() { Debug.Log("Stage4: Зона топпингов."); }
 }

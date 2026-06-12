@@ -2747,50 +2747,51 @@ MonoBehaviour:
     cameraTarget: {fileID: 0}
     cameraMoveDuration: 1
     disableCharacter: 0
-    stageScript: {fileID: 0}
+    stageScript: {fileID: 711366978}
     autoCompleteIfNoScript: 0
   - stageName: cofe basis
     isEnabled: 0
     cameraTarget: {fileID: 85908208}
     cameraMoveDuration: 1
     disableCharacter: 1
-    stageScript: {fileID: 0}
+    stageScript: {fileID: 2087122286}
     autoCompleteIfNoScript: 0
   - stageName: cofe machine
     isEnabled: 0
     cameraTarget: {fileID: 1454674197}
     cameraMoveDuration: 1
     disableCharacter: 1
-    stageScript: {fileID: 0}
+    stageScript: {fileID: 2109084460}
     autoCompleteIfNoScript: 0
   - stageName: cofe adons
     isEnabled: 0
     cameraTarget: {fileID: 951339521}
     cameraMoveDuration: 1
     disableCharacter: 1
-    stageScript: {fileID: 0}
+    stageScript: {fileID: 855966304}
     autoCompleteIfNoScript: 0
   - stageName: effect
     isEnabled: 0
     cameraTarget: {fileID: 1763016925}
     cameraMoveDuration: 1
     disableCharacter: 1
-    stageScript: {fileID: 0}
+    stageScript: {fileID: 641604887}
     autoCompleteIfNoScript: 1
   - stageName: Person awail+camera smooze
     isEnabled: 0
     cameraTarget: {fileID: 0}
     cameraMoveDuration: 1
     disableCharacter: 0
-    stageScript: {fileID: 0}
+    stageScript: {fileID: 626687126}
     autoCompleteIfNoScript: 0
   - stageName: dialog + marking coffe
     isEnabled: 0
     cameraTarget: {fileID: 954448081}
     cameraMoveDuration: 1
     disableCharacter: 0
-    stageScript: {fileID: 0}
+    stageScript: {fileID: 1801658536}
     autoCompleteIfNoScript: 1
+  autoStartStageZero: 1
   playerCharacter: {fileID: 1788007424}
   mainCamera: {fileID: 1488171672}
   manualControl: 1
@@ -3893,6 +3894,74 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7526713275803502677, guid: 3a245daa6cb83334d8a55a5e90125b88, type: 3}
   m_PrefabInstance: {fileID: 1824197276}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1836873926
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1836873929}
+  - component: {fileID: 1836873928}
+  - component: {fileID: 1836873927}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1836873927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1836873926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &1836873928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1836873926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &1836873929
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1836873926}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1877992423
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4792,3 +4861,4 @@ SceneRoots:
   - {fileID: 1204059728}
   - {fileID: 5876929}
   - {fileID: 1632679025}
+  - {fileID: 1836873929}

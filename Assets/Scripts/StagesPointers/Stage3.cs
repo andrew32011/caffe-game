@@ -1,13 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+/// Stage3: Игрок у кофемашины — выбор объёма, сладости, заварка.
 using UnityEngine;
-
 public class Stage3 : MonoBehaviour
 {
-    private ProcessVisitor processVisitor;
-    void Start()
-    {
-        //processVisitor = GameObject.FindObjectOfType<ProcessVisitor>();
-        //processVisitor.StartMoving();
-    }
+    private void OnEnable() { Debug.Log("Stage3: Зона кофемашины."); }
 }
