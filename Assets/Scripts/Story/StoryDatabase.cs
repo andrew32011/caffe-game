@@ -922,7 +922,8 @@ public class StoryDatabase : ScriptableObject
                 day.customers.Add(new DayCustomerEntry
                 {
                     characterType = CharacterType.Traveler,
-                    stickmanIndex = rng.Next(0, 9),
+                    // Разные модели подряд (пункт 3): чередуем индекс по позиции и дню
+                    stickmanIndex = (day.customers.Count * 4 + day.dayNumber) % 9,
                     order = order,
                     greetingLines = L(
                         (reg.ru, "Доброго дня! Налей мне что-нибудь по вкусу.",

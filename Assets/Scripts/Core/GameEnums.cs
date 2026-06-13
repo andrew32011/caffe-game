@@ -186,5 +186,5 @@ public class GameSaveData
 {
     public int currentDay    = 0; // 0 = обучение ещё не пройдено
     public bool tutorialDone = false;
-    public int totalCoins    = 0;
+    public int totalCoins    = 100; // стартовый капитал кофейни (хватает на первые ингредиенты)
 }

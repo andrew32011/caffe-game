@@ -22,6 +22,8 @@ public class IngredientItem : MonoBehaviour
     public int ingredientIndex;
     [Tooltip("Какой топпинг даёт этот предмет (для kind = Topping).")]
     public Topping topping;
+    [Tooltip("Отображаемое имя (берётся из имени объекта; показывается в UI).")]
+    public string displayName = "";
 
     [Header("Подсветка / пульсация")]
     public float pulseAmplitude = 0.12f;

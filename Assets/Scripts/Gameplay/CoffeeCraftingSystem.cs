@@ -49,6 +49,11 @@ public class CoffeeCraftingSystem : MonoBehaviour
     [Header("Экономика (пункт 5)")]
     [SerializeField] private int _ingredientCost = 8;
     [SerializeField] private int _toppingCost    = 3;
+    [Tooltip("Панель «нет денег» с кнопкой рекламы за монеты (включается при нехватке).")]
+    [SerializeField] private GameObject _noMoneyPanel;
+
+    [Header("Главный герой (деактивируется на время готовки, пункт 8)")]
+    [SerializeField] private GameObject _heroObject;
 
     [Header("Допуск совпадения ползунков (0..1)")]
     [SerializeField] private float _tolerance = 0.15f;
@@ -94,21 +99,63 @@ public class CoffeeCraftingSystem : MonoBehaviour
     {
         _target = order;
         if (_orderDisplayText != null)
-            _orderDisplayText.text = Loc.T("Заказ: ", "Order: ") + (order != null ? order.GetDisplayName() : "");
+            _orderDisplayText.text = order != null ? DescribeTarget() : "";
     }
+
+    // Понятное описание желания клиента из имеющихся у нас названий (пункты 1,6)
+    private string DescribeTarget()
+    {
+        string baseName = IngredientName(TargetIngredientIndex());
+        string temp = TempWord(TempTarget());
+        string vol  = VolWord(_target.volume);
+        string top  = _target.topping != Topping.None ? " + " + ToppingName(_target.topping) : "";
+        return Loc.T("Хочет: ", "Wants: ") + baseName + " · " + temp + " · " + vol + top;
+    }
+
+    private string IngredientName(int index)
+    {
+        var it = FindIngredient(index);
+        if (it != null && !string.IsNullOrEmpty(it.displayName)) return it.displayName;
+        return Loc.T("основа ", "base ") + (index + 1);
+    }
+
+    private string ToppingName(Topping t)
+    {
+        var it = FindTopping(t);
+        if (it != null && !string.IsNullOrEmpty(it.displayName)) return it.displayName;
+        return t.ToString();
+    }
+
+    private string TempWord(float v) =>
+        v < 0.35f ? Loc.T("холодный", "cold")
+        : v < 0.7f ? Loc.T("тёплый", "warm")
+        : Loc.T("горячий", "hot");
+
+    private string VolWord(Volume v) =>
+        v == Volume.Small  ? Loc.T("маленький", "small")
+        : v == Volume.Large ? Loc.T("большой", "large")
+        : Loc.T("средний", "medium");
 
     public void Show()
     {
         ResetState();
         _cup?.ResetCup();              // пункт 1: чистим содержимое кружки под нового клиента
         _stage = Stage.Ingredients;
+        GameInput.Locked = false;      // пункт 5: разблокируем клики для нового клиента
+        SetHeroActive(false);          // пункт 8: прячем ГГ на время готовки
         if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(true);
         HideButton(_serveButton);
         HideButton(_confirmButton);
         if (_selectedText != null) _selectedText.gameObject.SetActive(false);
+        if (_noMoneyPanel != null) _noMoneyPanel.SetActive(false);
         _machine?.HidePanel();
         UpdateSatisfactionUI();        // полоса в нейтраль (50%)
         _stages?.JumpToStage(_ingredientsStageIndex);
+    }
+
+    private void SetHeroActive(bool on)
+    {
+        if (_heroObject != null) _heroObject.SetActive(on);
     }
 
     public void Hide()
@@ -158,7 +205,10 @@ public class CoffeeCraftingSystem : MonoBehaviour
             if (_selectedText != null)
             {
                 _selectedText.gameObject.SetActive(true);
-                _selectedText.text = Loc.T("Выбрано: основа ", "Selected: base ") + (item.ingredientIndex + 1);
+                string nm = !string.IsNullOrEmpty(item.displayName)
+                    ? item.displayName
+                    : Loc.T("основа ", "base ") + (item.ingredientIndex + 1);
+                _selectedText.text = Loc.T("Выбрано: ", "Selected: ") + nm;
             }
             ShowButton(_confirmButton);
         }
@@ -180,6 +230,13 @@ public class CoffeeCraftingSystem : MonoBehaviour
     private void OnConfirmIngredient()
     {
         if (_stage != Stage.Ingredients || _pending == null) return;
+
+        // Пункт 5: не хватает денег на основу — показываем экран рекламы за монеты
+        if (GameManager.Instance != null && GameManager.Instance.TotalCoins < _ingredientCost)
+        {
+            if (_noMoneyPanel != null) _noMoneyPanel.SetActive(true);
+            return;
+        }
 
         var vessel = _pending;
         vessel.SetPulsing(false);
@@ -254,6 +311,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _stage = Stage.Done;
         _stages?.JumpToStage(_counterStageIndex);
         if (_cup != null) yield return StartCoroutine(_cup.MoveTo(CupController.Zone.Counter));
+        SetHeroActive(true);   // пункт 8: ГГ снова виден за стойкой
         _orderReady = true;
     }
 

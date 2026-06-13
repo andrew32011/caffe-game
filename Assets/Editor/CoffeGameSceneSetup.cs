@@ -180,8 +180,10 @@ public static class CoffeGameSceneSetup
         commentText.color = new Color(1f, 0.95f, 0.6f);
         commentText.gameObject.SetActive(false);
 
-        // ── Деньги кофейни (сверху слева, пункт 5) ──────────────────────────
-        var coinsText = Text("CoinsText", ct, "Касса: 0", 28, TextAlignmentOptions.TopLeft, new Vector2(0.02f, 0.9f), new Vector2(0.25f, 0.98f));
+        // ── Деньги кофейни (сверху слева, пункт 5) с иконкой монеты (пункт 7) ─
+        var coinIcon = IconImage("CoinIcon", ct, "Assets/Mini UI/Icons/Bronze Coin.png",
+            new Vector2(0.02f, 0.9f), new Vector2(0.05f, 0.96f));
+        var coinsText = Text("CoinsText", ct, "Касса: 0", 28, TextAlignmentOptions.Left, new Vector2(0.055f, 0.9f), new Vector2(0.28f, 0.96f));
         coinsText.color = new Color(1f, 0.9f, 0.4f);
         var coinsUI = coinsText.gameObject.AddComponent<CoinsUI>();
         new W(coinsUI).Ref("_text", coinsText).Apply();
@@ -192,6 +194,20 @@ public static class CoffeGameSceneSetup
         var confirmBtn = Btn("BtnConfirm", ct, "Подтвердить ✓");
         SetRect(confirmBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.05f), new Vector2(0.6f, 0.13f));
         confirmBtn.gameObject.SetActive(false);
+
+        // ── Экран «нет денег» с рекламой за монеты (пункт 5) ────────────────
+        var noMoneyPanel = Panel("NoMoneyPanel", ct, new Vector2(0.32f, 0.32f), new Vector2(0.68f, 0.68f), new Color(0.06f, 0.05f, 0.04f, 0.95f));
+        Text("NoMoneyText", noMoneyPanel.transform, "Не хватает монет на ингредиент!", 28, TextAlignmentOptions.Top, new Vector2(0.05f, 0.6f), new Vector2(0.95f, 0.95f));
+        var adBtn    = Btn("BtnWatchAd", noMoneyPanel.transform, "Смотреть рекламу (+60)");
+        SetRect(adBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.34f), new Vector2(0.9f, 0.5f));
+        var noMoneyClose = Btn("BtnNoMoneyClose", noMoneyPanel.transform, "Закрыть");
+        SetRect(noMoneyClose.GetComponent<RectTransform>(), new Vector2(0.3f, 0.12f), new Vector2(0.7f, 0.26f));
+        var adForCoins = noMoneyPanel.AddComponent<AdForCoins>();
+        new W(adForCoins).Ref("_panel", noMoneyPanel).Apply();
+        AddPersistentClick(adBtn, adForCoins, "WatchAd");
+        AddPersistentClick(noMoneyClose, adForCoins, "Close");
+        ApplyPanelSprite(noMoneyPanel);
+        noMoneyPanel.SetActive(false);
 
         // ── КЛИКАБЕЛЬНЫЕ ПРЕДМЕТЫ НА РЕАЛЬНЫХ ОБЪЕКТАХ СЦЕНЫ ────────────────
         //  Ингредиенты — дети Ingridients1; топпинги — дети ShelfItems.
@@ -276,6 +292,12 @@ public static class CoffeGameSceneSetup
             .Arr("_customerPrefabs", stickmen)
             .Apply();
 
+        // ── Полировка панелей спрайтами Mini UI (пункт 7, балансно) ─────────
+        ApplyPanelSprite(machinePanel);
+        ApplyPanelSprite(hintPanel);
+        ApplyPanelSprite(resultPanel);
+        ApplyPanelSprite(dialoguePanel);
+
         // CustomerController — переиспользуем существующего ходячего гостя.
         // Анимацию/размер с него снимет и исходную модель удалит сам CustomerController (Awake).
         var existingGuest = FindSceneStickman();
@@ -295,6 +317,9 @@ public static class CoffeGameSceneSetup
             .Ref("_volumeLabel", volLabel)
             .Apply();
 
+        // Главный герой (Female 1 Smooth Prefab) — не удаляем, добавляем idle (пункт 8)
+        var hero = SetupHero();
+
         // CoffeeCraftingSystem (предметы + кружка + минигейм + подача + UI)
         new W(craft)
             .Ref("_stages", stages)
@@ -307,6 +332,8 @@ public static class CoffeGameSceneSetup
             .Ref("_achievementText", achievement)
             .Ref("_satisfactionFill", satFill)
             .Ref("_commentText", commentText)
+            .Ref("_noMoneyPanel", noMoneyPanel)
+            .Ref("_heroObject", hero)
             .Apply();
 
         // TutorialController
@@ -431,7 +458,8 @@ public static class CoffeGameSceneSetup
             if (it == null) it = child.gameObject.AddComponent<IngredientItem>();
             it.kind = IngredientItem.ItemKind.Ingredient;
             it.ingredientIndex = i;
-            AddWorldLabel(child.gameObject, Loc.T("Основа ", "Base ") + (i + 1)); // подпись над предметом (пункт 2)
+            it.displayName = MagicIngredientName(child.name); // имя из объекта (пункт 1)
+            RemoveWorldLabel(child.gameObject);               // убираем парящие подписи (пункт 2)
             i++;
         }
         Debug.Log($"CoffeGameSetup: ингредиентов (дети {parentName}): {i}");
@@ -454,37 +482,78 @@ public static class CoffeGameSceneSetup
             it.kind = IngredientItem.ItemKind.Topping;
             // Пропускаем Topping.None (0) — реальным предметам даём Cream, Cinnamon, ...
             it.topping = tops[Mathf.Min(i + 1, tops.Length - 1)];
+            it.displayName = child.name;   // имя из объекта (пункт 1)
+            RemoveWorldLabel(child.gameObject);
             i++;
         }
         Debug.Log($"CoffeGameSetup: топпингов (дети {parentName}): {i}");
     }
 
-    // Подпись (TextMesh) над 3D-объектом
-    static void AddWorldLabel(GameObject go, string text)
+    // Убирает парящую подпись над объектом, если осталась от прошлой версии (пункт 2)
+    static void RemoveWorldLabel(GameObject go)
     {
-        if (go.transform.Find("ItemLabel") != null) return; // не дублируем
-        var rend = go.GetComponentInChildren<Renderer>();
-        float top = rend != null ? rend.bounds.size.y : 1f;
+        var lbl = go.transform.Find("ItemLabel");
+        if (lbl != null) Object.DestroyImmediate(lbl.gameObject);
+    }
 
-        var lbl = new GameObject("ItemLabel");
-        lbl.transform.SetParent(go.transform, false);
-        lbl.transform.localPosition = new Vector3(0f, top * 0.6f + 0.4f, 0f);
-        lbl.transform.localScale = Vector3.one * 0.2f;
-        var tm = lbl.AddComponent<TextMesh>();
-        tm.text = text;
-        tm.fontSize = 48;
-        tm.characterSize = 0.08f;
-        tm.anchor = TextAnchor.LowerCenter;
-        tm.alignment = TextAlignment.Center;
-        tm.color = Color.white;
-        var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
-                   ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-        if (font != null)
+    // Магическое имя ингредиента по имени объекта (пункт 1)
+    static string MagicIngredientName(string objName)
+    {
+        string n = objName.ToLower();
+        if (n.Contains("goblet"))      return "Кубок забвения";
+        if (n.Contains("inkwell"))     return "Чернильный отвар";
+        if (n.Contains("drinkinghorn"))return "Рунный рог";
+        if (n.Contains("jar_big") || n.Contains("jarbig")) return "Большой сосуд зорь";
+        if (n.Contains("jar_full")|| n.Contains("jarfull"))return "Полная склянка лун";
+        if (n.Contains("jar"))         return "Сосуд странствий";
+        return objName; // запасной вариант — как назван объект
+    }
+
+    // Находит главного героя, добавляет idle-анимацию (не удаляет!). Пункт 8.
+    static GameObject SetupHero()
+    {
+        var hero = GameObject.Find("Female 1 Smooth Prefab");
+        if (hero == null)
         {
-            tm.font = font;
-            var mr = lbl.GetComponent<MeshRenderer>();
-            if (mr != null) mr.sharedMaterial = font.material;
+            Debug.LogWarning("CoffeGameSetup: главный герой 'Female 1 Smooth Prefab' не найден — " +
+                             "назначь его в CoffeeCraftingSystS._heroObject вручную.");
+            return null;
         }
+        var an = hero.GetComponentInChildren<Animator>();
+        if (an == null) an = hero.AddComponent<Animator>();
+        if (an.runtimeAnimatorController == null)
+        {
+            var idle = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
+                "Assets/PrefsAll/Hyper Casual Characters/Animator controller/idle.controller");
+            if (idle != null) an.runtimeAnimatorController = idle;
+        }
+        return hero;
+    }
+
+    // Применяет красивый 9-slice спрайт Mini UI к панели (пункт 7, балансно)
+    static Sprite _panelSprite;
+    static void ApplyPanelSprite(GameObject panel)
+    {
+        if (_panelSprite == null)
+            _panelSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+                "Assets/Mini UI/9 Splice Panels/Dark Theme RoundEdge Panels/Dark Theme RoundEdge DARK.png");
+        if (_panelSprite == null) return;
+        var img = panel.GetComponent<Image>();
+        if (img != null) { img.sprite = _panelSprite; img.type = Image.Type.Sliced; img.color = Color.white; }
+    }
+
+    // Иконка-картинка из ассета на Canvas
+    static Image IconImage(string name, Transform parent, string assetPath, Vector2 aMin, Vector2 aMax)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+        go.transform.SetParent(parent, false);
+        SetRect((RectTransform)go.transform, aMin, aMax);
+        var img = go.GetComponent<Image>();
+        var sp = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+        if (sp != null) img.sprite = sp;
+        img.preserveAspect = true;
+        img.raycastTarget = false;
+        return img;
     }
 
     static void EnsureCollider(GameObject go)
