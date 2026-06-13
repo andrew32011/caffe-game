@@ -1,135 +1,66 @@
 /// <summary>
-/// Система приготовления кофе. Три зоны: Ингредиенты → Машина → Топпинги.
-/// Камера двигается между зонами через существующую машину этапов Stages
-/// (этапы 2/3/4 — зоны, этап 5 — возврат к стойке; cameraTarget задан в Stages).
-/// Кружка отображается в UI снизу экрана.
+/// Система приготовления кофе на основе кликов по 3D-предметам на столах
+/// (а не по кнопкам UI). Игрок выбирает предмет → он подсвечивается и летит
+/// в кружку игрока (CupController), камера переезжает на следующую зону через Stages.
+///
+/// Порядок зон (этапы Stages): 2 ингредиенты → 3 машина (объём/сладость/заварка)
+/// → 4 топпинги → 5 стойка (готово к подаче).
+///
 /// Сцена: MainScene
-/// Зависимости: Stages, CupUI
+/// Зависимости: Stages, CupController, IngredientItem (саморегистрация), GameInput
 /// SDK: Нет
 /// </summary>
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class CoffeeCraftingSystem : MonoBehaviour
 {
+    public static CoffeeCraftingSystem Instance { get; private set; }
+
     // ─── Инспектор ───────────────────────────────────────────────────────────
 
     [Header("Машина этапов (существующая, объект StagesScripts)")]
     [SerializeField] private Stages _stages;
 
-    [Header("Зоны (индексы этапов Stages)")]
+    [Header("Индексы этапов Stages (зоны)")]
     [SerializeField] private int _ingredientsStageIndex = 2;
     [SerializeField] private int _machineStageIndex     = 3;
     [SerializeField] private int _toppingsStageIndex    = 4;
-    [SerializeField] private int _counterStageIndex     = 5; // Возврат к стойке
+    [SerializeField] private int _counterStageIndex     = 5;
 
-    [Header("UI — Панель с зонами (кнопки навигации)")]
-    [SerializeField] private GameObject _craftingPanel;
-    [SerializeField] private Button     _btnIngredients;
-    [SerializeField] private Button     _btnMachine;
-    [SerializeField] private Button     _btnToppings;
-    [SerializeField] private Button     _btnServe;         // Подать кофе
+    [Header("Кружка игрока")]
+    [SerializeField] private CupController _cup;
 
-    [Header("UI — Зона ингредиентов")]
-    [SerializeField] private GameObject _ingredientsPanel;
-    [SerializeField] private Button[]   _ingredientButtons; // Кнопки типов напитков
-
-    [Header("UI — Зона машины")]
-    [SerializeField] private GameObject _machinePanel;
-    [SerializeField] private Button     _btnSmall;
-    [SerializeField] private Button     _btnMedium;
-    [SerializeField] private Button     _btnLarge;
-    [SerializeField] private Button     _btnSweetNone;
-    [SerializeField] private Button     _btnSweetLow;
-    [SerializeField] private Button     _btnSweetMed;
-    [SerializeField] private Button     _btnSweetHigh;
-    [SerializeField] private Button     _btnBrew;
-
-    [Header("UI — Зона топпингов")]
-    [SerializeField] private GameObject _toppingsPanel;
-    [SerializeField] private Button[]   _toppingButtons;
-
-    [Header("UI — Кружка (визуальное состояние)")]
-    [SerializeField] private GameObject _cupUI;
-    [SerializeField] private TextMeshProUGUI _cupStatusText;
-    [SerializeField] private Image       _cupFillImage;
-
-    [Header("UI — Заказ гостя (подсказка)")]
+    [Header("UI — заказ гостя (подсказка, опционально)")]
     [SerializeField] private TextMeshProUGUI _orderDisplayText;
+
+    // ─── Реестр предметов (саморегистрация IngredientItem) ────────────────────
+
+    private static readonly List<IngredientItem> _items = new List<IngredientItem>();
+    public static void Register(IngredientItem i)   { if (!_items.Contains(i)) _items.Add(i); }
+    public static void Unregister(IngredientItem i) { _items.Remove(i); }
 
     // ─── Состояние ───────────────────────────────────────────────────────────
 
-    private CoffeeOrder _targetOrder;   // Что заказал гость
-    private CoffeeOrder _prepared;      // Что готовит игрок
+    private CoffeeOrder _targetOrder;
+    private CoffeeOrder _prepared;
 
-    private bool _typeSelected    = false;
-    private bool _volumeSelected  = false;
-    private bool _sweetSelected   = false; // Может быть None — всё равно считается
-    private bool _brewed          = false;
-    private bool _toppingSelected = false; // Может быть None
-
-    private bool _orderReady      = false;
-
-    // ─── Публичные свойства ───────────────────────────────────────────────────
+    private bool _typeSelected, _volumeSelected, _sweetSelected, _brewed, _toppingSelected, _orderReady;
 
     public bool        IsOrderReady       => _orderReady;
     public CoffeeOrder GetPreparedOrder() => _prepared;
+    public CoffeeOrder TargetOrder        => _targetOrder;
 
-    // ─── Инициализация ───────────────────────────────────────────────────────
+    // ─── Жизненный цикл ──────────────────────────────────────────────────────
 
     private void Awake()
     {
-        BindButtons();
+        Instance = this;
+        ResetCup();
     }
 
-    private void BindButtons()
-    {
-        // Навигация между зонами
-        _btnIngredients?.onClick.AddListener(() => GoToZone(_ingredientsStageIndex, _ingredientsPanel));
-        _btnMachine    ?.onClick.AddListener(() => GoToZone(_machineStageIndex,     _machinePanel));
-        _btnToppings   ?.onClick.AddListener(() => GoToZone(_toppingsStageIndex,    _toppingsPanel));
-        _btnServe      ?.onClick.AddListener(OnServeClicked);
-
-        // Ингредиенты (кнопки в порядке enum CoffeeType)
-        if (_ingredientButtons != null)
-        {
-            CoffeeType[] types = (CoffeeType[])System.Enum.GetValues(typeof(CoffeeType));
-            for (int i = 0; i < _ingredientButtons.Length && i < types.Length; i++)
-            {
-                CoffeeType t = types[i];
-                _ingredientButtons[i].onClick.AddListener(() => SelectType(t));
-            }
-        }
-
-        // Машина — объём
-        _btnSmall ?.onClick.AddListener(() => SelectVolume(Volume.Small));
-        _btnMedium?.onClick.AddListener(() => SelectVolume(Volume.Medium));
-        _btnLarge ?.onClick.AddListener(() => SelectVolume(Volume.Large));
-
-        // Машина — сладость
-        _btnSweetNone?.onClick.AddListener(() => SelectSweetness(SweetnessLevel.None));
-        _btnSweetLow ?.onClick.AddListener(() => SelectSweetness(SweetnessLevel.Low));
-        _btnSweetMed ?.onClick.AddListener(() => SelectSweetness(SweetnessLevel.Medium));
-        _btnSweetHigh?.onClick.AddListener(() => SelectSweetness(SweetnessLevel.High));
-
-        // Заварить
-        _btnBrew?.onClick.AddListener(OnBrewClicked);
-
-        // Топпинги
-        if (_toppingButtons != null)
-        {
-            Topping[] tops = (Topping[])System.Enum.GetValues(typeof(Topping));
-            for (int i = 0; i < _toppingButtons.Length && i < tops.Length; i++)
-            {
-                Topping t = tops[i];
-                _toppingButtons[i].onClick.AddListener(() => SelectTopping(t));
-            }
-        }
-    }
-
-    // ─── Публичное API ───────────────────────────────────────────────────────
+    // ─── Публичное API (вызывает DayController) ──────────────────────────────
 
     public void SetTargetOrder(CoffeeOrder order)
     {
@@ -138,248 +69,113 @@ public class CoffeeCraftingSystem : MonoBehaviour
             _orderDisplayText.text = Loc.T("Заказ: ", "Order: ") + order.GetDisplayName();
     }
 
+    /// <summary>Начинает приготовление: чистая кружка, камера к ингредиентам.</summary>
     public void Show()
     {
         ResetCup();
-        _craftingPanel?.SetActive(true);
-        _cupUI        ?.SetActive(true);
         _orderReady = false;
-
-        // Обновляем кнопку «Подать» — недоступна пока не готово
-        if (_btnServe != null) _btnServe.interactable = false;
-
-        // По умолчанию открываем зону ингредиентов
-        GoToZone(_ingredientsStageIndex, _ingredientsPanel);
+        if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(true);
+        _stages?.JumpToStage(_ingredientsStageIndex);
     }
 
+    /// <summary>Скрывает подсказку заказа. Кружка остаётся у игрока.</summary>
     public void Hide()
     {
-        _craftingPanel     ?.SetActive(false);
-        _cupUI             ?.SetActive(false);
-        _ingredientsPanel  ?.SetActive(false);
-        _machinePanel      ?.SetActive(false);
-        _toppingsPanel     ?.SetActive(false);
+        if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(false);
     }
 
     public void ResetCup()
     {
-        _prepared       = new CoffeeOrder();
-        _typeSelected   = false;
-        _volumeSelected = false;
-        _sweetSelected  = false;
-        _brewed         = false;
-        _toppingSelected= false;
-        _orderReady     = false;
-
-        UpdateCupUI();
-
-        if (_btnServe != null) _btnServe.interactable = false;
+        _prepared        = new CoffeeOrder();
+        _typeSelected    = false;
+        _volumeSelected  = false;
+        _sweetSelected   = false;
+        _brewed          = false;
+        _toppingSelected = false;
+        _orderReady      = false;
+        _cup?.ResetCup();
     }
 
-    // ─── Навигация зон ───────────────────────────────────────────────────────
+    // ─── Клик по предмету ─────────────────────────────────────────────────────
 
-    private void GoToZone(int stageIndex, GameObject panel)
+    public void OnItemClicked(IngredientItem item)
     {
-        HideAllZonePanels();
-        panel?.SetActive(true);
+        if (GameInput.Locked || item == null) return;
 
-        // Камеру двигает существующая машина этапов (cameraTarget в Stages)
-        _stages?.JumpToStage(stageIndex);
-    }
-
-    private void HideAllZonePanels()
-    {
-        _ingredientsPanel?.SetActive(false);
-        _machinePanel    ?.SetActive(false);
-        _toppingsPanel   ?.SetActive(false);
-    }
-
-    // ─── Выбор ингредиентов ───────────────────────────────────────────────────
-
-    private void SelectType(CoffeeType type)
-    {
-        _prepared.type  = type;
-        _typeSelected   = true;
-        UpdateCupUI();
-
-        // Переходим к машине
-        GoToZone(_machineStageIndex, _machinePanel);
-    }
-
-    private void SelectVolume(Volume vol)
-    {
-        _prepared.volume = vol;
-        _volumeSelected  = true;
-        UpdateCupUI();
-        HighlightVolumeButton(vol);
-    }
-
-    private void SelectSweetness(SweetnessLevel sweet)
-    {
-        _prepared.sweet = sweet;
-        _sweetSelected  = true;
-        UpdateCupUI();
-        HighlightSweetnessButton(sweet);
-    }
-
-    private void OnBrewClicked()
-    {
-        if (!_typeSelected || !_volumeSelected)
+        switch (item.kind)
         {
-            ShowHint(Loc.T("Сначала выбери тип напитка и объём!",
-                           "Pick a drink type and size first!"));
-            return;
-        }
+            case IngredientItem.ItemKind.Drink:
+                _prepared.type = item.drinkType;
+                _typeSelected  = true;
+                _cup?.AddItemVisual(item);
+                item.FlashSelected();
+                _stages?.JumpToStage(_machineStageIndex);
+                break;
 
-        _brewed = true;
-        UpdateCupUI();
+            case IngredientItem.ItemKind.Volume:
+                _prepared.volume = item.volume;
+                _volumeSelected  = true;
+                item.FlashSelected();
+                break;
 
-        // Анимация кофемашины
-        StartCoroutine(BrewAnimation());
-    }
+            case IngredientItem.ItemKind.Sweetness:
+                _prepared.sweet = item.sweetness;
+                _sweetSelected  = true;
+                item.FlashSelected();
+                break;
 
-    private IEnumerator BrewAnimation()
-    {
-        // Имитация приготовления
-        if (_cupStatusText != null) _cupStatusText.text = Loc.T("Готовится...", "Brewing...");
-        if (_cupFillImage  != null) _cupFillImage.color = new Color(0.6f, 0.4f, 0.1f);
+            case IngredientItem.ItemKind.Brew:
+                if (_typeSelected && _volumeSelected)
+                {
+                    _brewed = true;
+                    item.FlashSelected();
+                    _stages?.JumpToStage(_toppingsStageIndex);
+                }
+                break;
 
-        yield return new WaitForSeconds(1.5f);
-
-        if (_cupStatusText != null)
-            _cupStatusText.text = Loc.T("Готово! Добавь топпинг или подай.",
-                                        "Done! Add a topping or serve.");
-
-        // Переходим к топпингам
-        GoToZone(_toppingsStageIndex, _toppingsPanel);
-    }
-
-    private void SelectTopping(Topping topping)
-    {
-        _prepared.topping = topping;
-        _toppingSelected  = true;
-        UpdateCupUI();
-
-        // Возвращаемся к стойке
-        GoToZone(_counterStageIndex, null);
-        HideAllZonePanels();
-
-        // Если заварено — готово к подаче
-        if (_brewed)
-        {
-            _orderReady = true;
-            if (_btnServe != null) _btnServe.interactable = true;
-            if (_cupStatusText != null)
-                _cupStatusText.text = Loc.T("Кофе готов! Нажми «Подать»",
-                                            "Coffee is ready! Press \"Serve\"");
+            case IngredientItem.ItemKind.Topping:
+                _prepared.topping = item.topping;
+                _toppingSelected  = true;
+                _cup?.AddItemVisual(item);
+                item.FlashSelected();
+                _stages?.JumpToStage(_counterStageIndex);
+                if (_brewed) _orderReady = true;
+                break;
         }
     }
 
-    private void OnServeClicked()
+    // ─── Подсказка: какой предмет нажать следующим ───────────────────────────
+    //  Используется туториалом (пульсация нужного предмета) и HintManager-ом.
+
+    public IngredientItem GetNextHintItem()
     {
+        if (_targetOrder == null) return null;
+
+        if (!_typeSelected)
+            return Find(IngredientItem.ItemKind.Drink);
+        if (!_volumeSelected)
+            return Find(IngredientItem.ItemKind.Volume);
+        if (_targetOrder.sweet != SweetnessLevel.None && !_sweetSelected)
+            return Find(IngredientItem.ItemKind.Sweetness);
         if (!_brewed)
-        {
-            ShowHint(Loc.T("Сначала заварить кофе в машине!",
-                           "Brew the coffee in the machine first!"));
-            return;
-        }
-
-        _orderReady = true;
-
-        // Если топпинг не выбран явно — считается None
+            return FindAny(IngredientItem.ItemKind.Brew);
         if (!_toppingSelected)
-            _prepared.topping = Topping.None;
-        _toppingSelected = true;
+            return Find(IngredientItem.ItemKind.Topping);
 
-        if (_btnServe != null) _btnServe.interactable = false;
+        return null;
     }
 
-    // ─── UI кружки ────────────────────────────────────────────────────────────
-
-    private void UpdateCupUI()
+    private IngredientItem Find(IngredientItem.ItemKind kind)
     {
-        if (_cupStatusText == null) return;
-
-        var lines = new System.Text.StringBuilder();
-        lines.Append("☕ ");
-
-        if (_typeSelected)   lines.Append(_prepared.GetTypeName());
-        else                 lines.Append(Loc.T("[тип?]", "[type?]"));
-
-        lines.Append(" • ");
-
-        if (_volumeSelected) lines.Append(_prepared.GetVolumeName());
-        else                 lines.Append(Loc.T("[объём?]", "[size?]"));
-
-        if (_sweetSelected && _prepared.sweet != SweetnessLevel.None)
-        {
-            lines.Append(" • ");
-            lines.Append(_prepared.GetSweetnessName());
-        }
-
-        if (_toppingSelected && _prepared.topping != Topping.None)
-        {
-            lines.Append(" + ");
-            lines.Append(_prepared.GetToppingName());
-        }
-
-        _cupStatusText.text = lines.ToString();
-
-        // Прогресс кружки (визуально)
-        if (_cupFillImage != null)
-        {
-            float progress = 0;
-            if (_typeSelected)   progress += 0.33f;
-            if (_brewed)         progress += 0.33f;
-            if (_toppingSelected)progress += 0.34f;
-            _cupFillImage.fillAmount = progress;
-        }
+        foreach (var it in _items)
+            if (it != null && it.Matches(_targetOrder, kind)) return it;
+        return null;
     }
 
-    private void HighlightVolumeButton(Volume vol)
+    private IngredientItem FindAny(IngredientItem.ItemKind kind)
     {
-        var selected = new ColorBlock();
-        selected.normalColor      = new Color(0.3f, 0.8f, 0.3f);
-        selected.highlightedColor = new Color(0.3f, 0.8f, 0.3f);
-        selected.pressedColor     = new Color(0.2f, 0.6f, 0.2f);
-        selected.selectedColor    = new Color(0.3f, 0.8f, 0.3f);
-        selected.colorMultiplier  = 1f;
-        selected.fadeDuration     = 0.1f;
-
-        if (_btnSmall  != null) _btnSmall .colors = (vol == Volume.Small)  ? selected : ColorBlock.defaultColorBlock;
-        if (_btnMedium != null) _btnMedium.colors = (vol == Volume.Medium) ? selected : ColorBlock.defaultColorBlock;
-        if (_btnLarge  != null) _btnLarge .colors = (vol == Volume.Large)  ? selected : ColorBlock.defaultColorBlock;
-    }
-
-    private void HighlightSweetnessButton(SweetnessLevel sw)
-    {
-        var selected = new ColorBlock();
-        selected.normalColor      = new Color(0.3f, 0.8f, 0.3f);
-        selected.highlightedColor = new Color(0.3f, 0.8f, 0.3f);
-        selected.pressedColor     = new Color(0.2f, 0.6f, 0.2f);
-        selected.selectedColor    = new Color(0.3f, 0.8f, 0.3f);
-        selected.colorMultiplier  = 1f;
-        selected.fadeDuration     = 0.1f;
-
-        if (_btnSweetNone != null) _btnSweetNone.colors = (sw == SweetnessLevel.None)   ? selected : ColorBlock.defaultColorBlock;
-        if (_btnSweetLow  != null) _btnSweetLow .colors = (sw == SweetnessLevel.Low)    ? selected : ColorBlock.defaultColorBlock;
-        if (_btnSweetMed  != null) _btnSweetMed .colors = (sw == SweetnessLevel.Medium) ? selected : ColorBlock.defaultColorBlock;
-        if (_btnSweetHigh != null) _btnSweetHigh.colors = (sw == SweetnessLevel.High)   ? selected : ColorBlock.defaultColorBlock;
-    }
-
-    private void ShowHint(string message)
-    {
-        if (_cupStatusText != null)
-        {
-            _cupStatusText.text = message;
-            StartCoroutine(ClearHintAfterDelay(message, 2f));
-        }
-    }
-
-    private IEnumerator ClearHintAfterDelay(string original, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        if (_cupStatusText != null && _cupStatusText.text == original)
-            UpdateCupUI();
+        foreach (var it in _items)
+            if (it != null && it.kind == kind) return it;
+        return null;
     }
 }

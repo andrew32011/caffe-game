@@ -87,6 +87,20 @@ public class TutorialController : MonoBehaviour
                 yield return new WaitForSeconds(step.pauseAfter);
         }
 
+        // ─── ПУНКТ 2: практика — игрок сам готовит пробный напиток ──────────
+        var tryLine = new List<DialogueLine>
+        {
+            new DialogueLine
+            {
+                speakerName = Loc.T("Мастер кофе", "Coffee Master"),
+                text = Loc.T("А теперь попробуй сама. Нажимай на предметы, которые подсвечиваются — приготовь маленький эспрессо.",
+                             "Now try it yourself. Tap the items that light up — make a small espresso.")
+            }
+        };
+        yield return StartCoroutine(_dialogue.PlayDialogueLines(tryLine));
+
+        yield return StartCoroutine(PracticeOrder());
+
         // Туториал закончен — первый реальный заказ
         var finalLines = new List<DialogueLine>
         {
@@ -98,6 +112,39 @@ public class TutorialController : MonoBehaviour
             }
         };
         yield return StartCoroutine(_dialogue.PlayDialogueLines(finalLines));
+    }
+
+    // ─── Практика: ведём игрока, подсвечивая нужный предмет ───────────────────
+
+    private IEnumerator PracticeOrder()
+    {
+        var craft = CoffeeCraftingSystem.Instance;
+        if (craft == null) yield break;
+
+        // Пробный заказ — маленький эспрессо (тип + объём + заварка)
+        var target = new CoffeeOrder { type = CoffeeType.Espresso, volume = Volume.Small };
+        craft.SetTargetOrder(target);
+        craft.Show();
+
+        GameInput.Locked = false; // на практике клики разрешены
+
+        IngredientItem pulsing = null;
+        while (!craft.IsOrderReady)
+        {
+            var next = craft.GetNextHintItem();
+            if (next != pulsing)
+            {
+                if (pulsing != null) pulsing.SetPulsing(false);
+                pulsing = next;
+                if (pulsing != null) pulsing.SetPulsing(true);
+            }
+            yield return null;
+        }
+
+        if (pulsing != null) pulsing.SetPulsing(false);
+        GameInput.Locked = true;
+        craft.Hide();
+        craft.ResetCup();
     }
 
     // ─── Подсветка объекта ───────────────────────────────────────────────────
@@ -133,28 +180,8 @@ public class TutorialController : MonoBehaviour
             }
         }
 
-        // Пульсация масштаба
-        StartCoroutine(PulseObject(target));
-    }
-
-    private IEnumerator PulseObject(GameObject target)
-    {
-        if (target == null) yield break;
-
-        Vector3 originalScale = target.transform.localScale;
-        float elapsed = 0f;
-
-        while (_activeHighlights.Count > 0)
-        {
-            elapsed += Time.deltaTime;
-            float pulse = 1f + 0.05f * Mathf.Sin(elapsed * 4f);
-            if (target != null)
-                target.transform.localScale = originalScale * pulse;
-            yield return null;
-        }
-
-        if (target != null)
-            target.transform.localScale = originalScale;
+        // ПУНКТ 1: пульсацию (масштаб) объектов сцены убрали — стол больше не «дышит».
+        // Пульсируют только мелкие предметы-ингредиенты во время практики (IngredientItem).
     }
 
     private void ClearHighlights()

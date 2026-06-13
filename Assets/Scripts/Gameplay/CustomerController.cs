@@ -17,6 +17,12 @@ public class CustomerController : MonoBehaviour
     [SerializeField] private ProcessVisitor _processVisitor; // ProcessVisitorManager из сцены
     [SerializeField] private Transform _visitorRoot;         // VisitorBasis из сцены (двигается ProcessVisitor-ом)
 
+    [Header("Шаблон из сцены (размер + анимация существующего бота)")]
+    [Tooltip("Локальный масштаб, снятый с уже стоящего в сцене stickman-а (заполняет Editor-скрипт).")]
+    [SerializeField] private Vector3 _botScale = Vector3.one;
+    [Tooltip("Контроллер анимации существующего бота (заполняет Editor-скрипт).")]
+    [SerializeField] private RuntimeAnimatorController _botController;
+
     [Header("Полоска удовлетворённости")]
     [SerializeField] private SatisfactionBar _satisfactionBarPrefab;
     [SerializeField] private float _barHeightOffset = 2.2f;
@@ -51,7 +57,14 @@ public class CustomerController : MonoBehaviour
         _currentModel = Instantiate(stickmanPrefab, _visitorRoot);
         _currentModel.transform.localPosition = Vector3.zero;
         _currentModel.transform.localRotation = Quaternion.identity;
+
+        // Размер и анимация — как у существующего в сцене бота (пункт 4)
+        if (_botScale != Vector3.zero)
+            _currentModel.transform.localScale = _botScale;
+
         _animator = _currentModel.GetComponentInChildren<Animator>();
+        if (_animator != null && _botController != null)
+            _animator.runtimeAnimatorController = _botController;
 
         // Полоска удовлетворённости над головой
         if (_satisfactionBarPrefab != null)

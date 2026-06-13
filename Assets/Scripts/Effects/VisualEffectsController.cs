@@ -67,6 +67,15 @@ public class VisualEffectsController : MonoBehaviour
         StartCoroutine(CoinPopRoutine(totalCoins));
     }
 
+    /// <summary>Плавное затемнение/высветление всего экрана. Awaitable.
+    /// toBlack=true — уводим в чёрный, false — открываем картинку.</summary>
+    public IEnumerator FadeScreen(bool toBlack, float duration = 0.6f)
+    {
+        float from = _blackOverlay != null ? _blackOverlay.color.a : (toBlack ? 0f : 1f);
+        float to   = toBlack ? 1f : 0f;
+        yield return StartCoroutine(FadeOverlay(_blackOverlay, from, to, duration));
+    }
+
     /// <summary>Запускает вставную сцену с нужным эффектом и текстом.</summary>
     public IEnumerator PlayVignette(
         VignetteEffectType effectType,

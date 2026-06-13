@@ -87,11 +87,15 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator StartGameFlow()
     {
+        GameInput.Locked = true;             // на старте управление выключено
         yield return new WaitForSeconds(0.3f); // Ждём инициализации всех систем
 
         if (!_saveData.tutorialDone)
         {
             yield return StartCoroutine(RunTutorial());
+
+            // Затемнение между обучением и первым днём (пункт 5)
+            yield return StartCoroutine(Transition());
         }
 
         yield return StartCoroutine(RunGameDays());
@@ -105,12 +109,30 @@ public class GameManager : MonoBehaviour
 
         if (_tutorialController != null)
         {
+            // Туториал сам управляет замком: на объяснении — выкл, на практике — вкл
             yield return StartCoroutine(_tutorialController.RunTutorial());
         }
 
+        GameInput.Locked = true; // после обучения управление выключаем (пункт 5)
         _saveData.tutorialDone = true;
         _saveData.currentDay   = 1;
         SaveGame();
+    }
+
+    /// <summary>Затемнить экран → пауза → высветлить. Управление выключено на время.</summary>
+    private IEnumerator Transition()
+    {
+        GameInput.Locked = true;
+        if (_vfxController != null)
+        {
+            yield return StartCoroutine(_vfxController.FadeScreen(true, 0.6f));
+            yield return new WaitForSeconds(0.3f);
+            yield return StartCoroutine(_vfxController.FadeScreen(false, 0.6f));
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.6f);
+        }
     }
 
     // ─── Цикл дней ───────────────────────────────────────────────────────────
@@ -136,7 +158,9 @@ public class GameManager : MonoBehaviour
             bool dayCompleted = false;
             while (!dayCompleted)
             {
+                GameInput.Locked = false; // на время рабочего дня управление включено
                 yield return StartCoroutine(_dayController.RunDay(dayData));
+                GameInput.Locked = true;  // после дня — выключаем (пункт 5)
                 dayCompleted = _dayController.DaySuccess;
 
                 if (!dayCompleted)
@@ -191,8 +215,8 @@ public class GameManager : MonoBehaviour
             if (_saveData.currentDay > 20)
                 break;
 
-            // Пауза между днями
-            yield return new WaitForSeconds(0.5f);
+            // Затемнение между днями (пункт 5)
+            yield return StartCoroutine(Transition());
         }
 
         yield return StartCoroutine(ShowGameComplete());

@@ -155,7 +155,8 @@ public class DayController : MonoBehaviour
                     yield break;
                 }
 
-                _craftingSystem.ResetCup();
+                // Сбрасываем и возвращаем игрока к первому столу для повторной попытки
+                _craftingSystem.Show();
                 yield return new WaitForSeconds(0.5f);
             }
         }
