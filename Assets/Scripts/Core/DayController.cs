@@ -87,53 +87,65 @@ public class DayController : MonoBehaviour
 
     // ─── Один гость ───────────────────────────────────────────────────────────
 
+    private int _consecutiveFails = 0; // подряд полностью проваленных напитков (пункт 4.1)
+
     private IEnumerator ServeCustomer(DayCustomerEntry entry, int coinsPerOrder)
     {
-        // 1. Ставим модель гостя на VisitorBasis
+        // 1. Ставим модель гостя на VisitorBasis; ГГ пока скрыт (пункт 2)
+        _craftingSystem.SetHeroVisible(false);
         _customerController.SpawnModel(GetCustomerPrefab(entry.stickmanIndex));
 
         // 2. Этап 0: гость идёт к стойке (Stage0 запускает ProcessVisitor)
         yield return StartCoroutine(GoToStageAndWait(_stageGuestEnter));
         yield return StartCoroutine(_customerController.WaitForRouteEnd());
 
-        // 3. Этап 1: приветственный диалог у стойки
+        // 3. Этап 1: приветственный диалог — ГГ виден (пункт 2)
         yield return StartCoroutine(GoToStageAndWait(_stageGreeting));
+        _craftingSystem.SetHeroVisible(true);
         yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.greetingLines));
 
-        // 4. Подсказка знает заказ; запускаем таймер настроения (стартует с 50%)
+        // 4. Полоса показывает ЗАПОМНЕННУЮ удовлетворённость этого клиента (пункт 4.3)
+        float stored = GameManager.Instance != null
+            ? GameManager.Instance.GetClientSatisfaction(entry.characterType) : 0.5f;
         _hintManager?.SetCurrentOrder(entry.order);
-        _customerController.StartSatisfactionTimer();
+        _customerController.SetSatisfaction(stored);
 
-        // 5. Готовим напиток (ингредиент → машина → топпинги → «Подать»)
+        // 5. Готовим напиток. Рекламная подсказка доступна после 2 провалов подряд (пункт 4.1)
+        _craftingSystem.SetAdHintAllowed(_consecutiveFails >= 2);
         _craftingSystem.SetTargetOrder(entry.order);
         _craftingSystem.Show();
         yield return new WaitUntil(() => _craftingSystem.IsOrderReady);
         _craftingSystem.Hide();
 
         // 6. Оценка результата (доля совпавших параметров 0..1)
-        float satisfaction = _craftingSystem.EvaluateSatisfaction();
-        _customerController.StopSatisfactionTimer();
+        float result = _craftingSystem.EvaluateSatisfaction();
 
-        // Этап 5: возвращаемся к стойке, подаём кофе
+        // Серия провалов: полностью неудачный напиток (< 0.3) копит счётчик
+        if (result < 0.3f) _consecutiveFails++; else _consecutiveFails = 0;
+
+        // Этап 5: возвращаемся к стойке, подаём кофе (ГГ снова виден — в ServeRoutine)
         yield return StartCoroutine(GoToStageAndWait(_stageServe));
         yield return new WaitForSeconds(0.3f);
 
-        // Меняем полосу удовлетворённости под результат (пункт 7)
-        _customerController.SetSatisfaction(satisfaction);
+        // 7. Обновляем ЗАПОМНЕННУЮ шкалу клиента (среднее старого и нового) (пункт 4.3)
+        float newStored = Mathf.Clamp01(stored * 0.5f + result * 0.5f);
+        GameManager.Instance?.SetClientSatisfaction(entry.characterType, newStored);
+        _customerController.SetSatisfaction(newStored);
         yield return new WaitForSeconds(0.6f);
 
-        // 7. Экономика (пункт 5): себестоимость уже списана живьём в крафте;
-        //    здесь клиент платит по удовлетворённости (в первые дни — щедро).
+        // 8. Экономика (пункт 5): платит по качеству напитка (в первые дни — щедро),
+        //    с бонусом за хорошие отношения с клиентом (пункт 4.3).
         float mult  = _currentDayNumber <= _earlyDayLimit ? _earlyDayMultiplier : 1f;
-        int payment = Mathf.RoundToInt(_basePrice * satisfaction * mult);
+        int payment = Mathf.RoundToInt(_basePrice * result * (0.5f + newStored) * mult);
         GameManager.Instance?.AddCoins(payment);
         _coinsEarnedToday += payment - _craftingSystem.CurrentDrinkCost;
 
-        // 8. Реакция гостя
+        // 9. Реакция гостя — реплика зависит от отношений (пункт 4.3)
         yield return StartCoroutine(GoToStageAndWait(_stageReaction));
-        bool happy = satisfaction >= _satisfiedThreshold;
+        bool happy = newStored >= _satisfiedThreshold;
         if (happy)
         {
+            UiEffects.Instance?.CoinBurst(payment); // пункт 5
             _vfxController?.PlayCoinEffect(payment);
             yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.storyRevealLines));
         }
@@ -143,8 +155,9 @@ public class DayController : MonoBehaviour
             yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.wrongOrderLines));
         }
 
-        // 9. Гость уходит
+        // 10. Гость уходит — ГГ снова прячем (пункт 2)
         yield return new WaitForSeconds(0.4f);
+        _craftingSystem.SetHeroVisible(false);
         yield return StartCoroutine(LetCustomerLeave());
     }
 

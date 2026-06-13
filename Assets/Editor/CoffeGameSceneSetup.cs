@@ -21,6 +21,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEditor.Animations;
 using TMPro;
 
 public static class CoffeGameSceneSetup
@@ -153,6 +154,18 @@ public static class CoffeGameSceneSetup
         var serveBtn = Btn("BtnServe", ct, "Подать ☕");
         SetRect(serveBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.04f), new Vector2(0.6f, 0.12f));
         serveBtn.gameObject.SetActive(false);
+
+        // ── Кнопка рекламной подсказки (после 2 провалов подряд, пункт 4.1) ──
+        var adHintBtn = Btn("BtnAdHint", ct, "Подсказка (реклама)");
+        SetRect(adHintBtn.GetComponent<RectTransform>(), new Vector2(0.73f, 0.86f), new Vector2(0.985f, 0.93f));
+        adHintBtn.gameObject.SetActive(false);
+
+        // ── 2D-эффекты достижений (UiEffects, пункт 5) ──────────────────────
+        var uiFx = canvasGO.AddComponent<UiEffects>();
+        new W(uiFx)
+            .Ref("_root", canvasGO.GetComponent<RectTransform>())
+            .Ref("_coinSprite", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/Icons/Bronze Coin.png"))
+            .Apply();
 
         // ── Панель машины: 2 вертикальных заполнения (температура, объём) ────
         var machinePanel = Panel("MachinePanel", ct, new Vector2(0.35f, 0.25f), new Vector2(0.65f, 0.75f), new Color(0.06f, 0.06f, 0.1f, 0.9f));
@@ -334,6 +347,7 @@ public static class CoffeGameSceneSetup
             .Ref("_commentText", commentText)
             .Ref("_noMoneyPanel", noMoneyPanel)
             .Ref("_heroObject", hero)
+            .Ref("_adHintButton", adHintBtn)
             .Apply();
 
         // TutorialController
@@ -510,7 +524,7 @@ public static class CoffeGameSceneSetup
     }
 
     // Находит главного героя (Female 1 Smooth Prefab — ребёнок Main Camera),
-    // добавляет процедурный idle. НЕ удаляет. Пункт 8.
+    // ОТКРЕПЛЯЕТ от камеры (пункт 2) и вешает гуманоидный idle (пункт 1). НЕ удаляет.
     static GameObject SetupHero()
     {
         GameObject hero = GameObject.Find("Female 1 Smooth Prefab");
@@ -541,12 +555,75 @@ public static class CoffeGameSceneSetup
             return null;
         }
 
-        // Процедурный idle (скелетные клипы к этому ригу не подходят)
-        if (hero.GetComponent<HeroIdle>() == null)
-            hero.AddComponent<HeroIdle>();
+        // Пункт 2: открепляем от камеры (сохраняя мировую позицию), чтобы он не
+        // «ездил» с камерой. Позицию за стойкой пользователь поправит вручную.
+        hero.transform.SetParent(null, true);
 
-        Debug.Log($"CoffeGameSetup: главный герой '{hero.name}' найден, добавлен HeroIdle.");
+        // Пункт 1: гуманоидная анимация Standing Idle с ретаргетом на риг героя
+        bool animOk = SetupHeroAnimation(hero);
+        var hi = hero.GetComponent<HeroIdle>();
+        if (animOk)
+        {
+            if (hi != null) Object.DestroyImmediate(hi); // настоящий клип заменяет процедурный
+        }
+        else
+        {
+            if (hi == null) hero.AddComponent<HeroIdle>(); // запасной процедурный idle
+            Debug.LogWarning("CoffeGameSetup: не удалось настроить гуманоидную анимацию героя — " +
+                             "оставил процедурный HeroIdle. Проверь Rig=Humanoid у Standing Idle.fbx и Female 1.fbx.");
+        }
+
+        Debug.Log($"CoffeGameSetup: главный герой '{hero.name}' откреплён от камеры, idle={(animOk ? "humanoid" : "procedural")}.");
         return hero;
+    }
+
+    // Настраивает Female + Standing Idle как Humanoid, строит контроллер и вешает Animator.
+    static bool SetupHeroAnimation(GameObject hero)
+    {
+        // 1. Female FBX → Humanoid + аватар из этой модели
+        string femalePath = AssetDatabase.GUIDToAssetPath("32e26f88fac2c504fa382ed43968e1f9");
+        var femaleImp = AssetImporter.GetAtPath(femalePath) as ModelImporter;
+        if (femaleImp == null) return false;
+        if (femaleImp.animationType != ModelImporterAnimationType.Human ||
+            femaleImp.avatarSetup != ModelImporterAvatarSetup.CreateFromThisModel)
+        {
+            femaleImp.animationType = ModelImporterAnimationType.Human;
+            femaleImp.avatarSetup   = ModelImporterAvatarSetup.CreateFromThisModel;
+            femaleImp.SaveAndReimport();
+        }
+        Avatar femaleAvatar = null;
+        foreach (var a in AssetDatabase.LoadAllAssetsAtPath(femalePath))
+            if (a is Avatar av) femaleAvatar = av;
+
+        // 2. Standing Idle FBX → Humanoid (аватар из этой модели)
+        const string idlePath = "Assets/Standing Idle.fbx";
+        var idleImp = AssetImporter.GetAtPath(idlePath) as ModelImporter;
+        if (idleImp == null) return false;
+        if (idleImp.animationType != ModelImporterAnimationType.Human ||
+            idleImp.avatarSetup != ModelImporterAvatarSetup.CreateFromThisModel)
+        {
+            idleImp.animationType = ModelImporterAnimationType.Human;
+            idleImp.avatarSetup   = ModelImporterAvatarSetup.CreateFromThisModel;
+            idleImp.SaveAndReimport();
+        }
+        AnimationClip idleClip = null;
+        foreach (var a in AssetDatabase.LoadAllAssetsAtPath(idlePath))
+            if (a is AnimationClip c && !c.name.StartsWith("__preview")) idleClip = c;
+
+        if (femaleAvatar == null || idleClip == null) return false;
+
+        // 3. Контроллер с idle-клипом
+        const string ctrlPath = "Assets/HeroIdleController.controller";
+        var ctrl = AnimatorController.CreateAnimatorControllerAtPathWithClip(ctrlPath, idleClip);
+        if (ctrl == null) return false;
+
+        // 4. Animator на герое: контроллер + аватар
+        var anim = hero.GetComponent<Animator>();
+        if (anim == null) anim = hero.AddComponent<Animator>();
+        anim.runtimeAnimatorController = ctrl;
+        anim.avatar = femaleAvatar;
+        anim.applyRootMotion = false;
+        return true;
     }
 
     // Применяет красивый 9-slice спрайт Mini UI к панели (пункт 7, балансно)

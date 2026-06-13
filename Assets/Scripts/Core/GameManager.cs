@@ -139,13 +139,25 @@ public class GameManager : MonoBehaviour
     {
         GameInput.Locked = true;
 
-        // Приглушаем свет
+        // ГГ виден во сне (пункт 2), как сновидец
+        CoffeeCraftingSystem.Instance?.SetHeroVisible(true);
+
+        // Приглушаем свет почти до тьмы (пункт 3 — должно быть ясно, что это сон)
         if (_sceneLight == null) _sceneLight = FindObjectOfType<Light>();
         float origIntensity = _sceneLight != null ? _sceneLight.intensity : 0f;
         if (_sceneLight != null)
-            yield return StartCoroutine(FadeLight(_sceneLight, origIntensity, origIntensity * 0.25f, 0.6f));
+            yield return StartCoroutine(FadeLight(_sceneLight, origIntensity, origIntensity * 0.1f, 0.5f));
 
-        // Эффект + текст сна (чередуем эффекты по дням)
+        // 1) Уводим экран в чёрный и крупной надписью говорим, что это сон (пункт 3)
+        if (_vfxController != null)
+            yield return StartCoroutine(_vfxController.FadeScreen(true, 0.6f));
+        _dialogue?.ShowMessage(Loc.T("Это сон. Всего лишь сон…", "It's a dream. Only a dream…"), 2.2f);
+        yield return new WaitForSeconds(2.6f);
+
+        // 2) Чуть приоткрываем тьму и играем кошмар: эффект + текст
+        if (_vfxController != null)
+            yield return StartCoroutine(_vfxController.FadeScreen(false, 0.5f)); // станет видно сцену в темноте
+
         var effects = new[]
         {
             VignetteEffectType.CameraShake, VignetteEffectType.RedPulse,
@@ -157,9 +169,11 @@ public class GameManager : MonoBehaviour
 
         yield return StartCoroutine(_vfxController.PlayVignette(effect, text, _dialogue));
 
-        // Возвращаем свет
+        // Возвращаем свет (просыпаемся)
         if (_sceneLight != null)
             yield return StartCoroutine(FadeLight(_sceneLight, _sceneLight.intensity, origIntensity, 0.6f));
+
+        CoffeeCraftingSystem.Instance?.SetHeroVisible(false);
     }
 
     private IEnumerator FadeLight(Light light, float from, float to, float dur)
@@ -235,6 +249,9 @@ public class GameManager : MonoBehaviour
             // оплата клиента), поэтому здесь totalCoins НЕ трогаем — иначе двойной учёт.
             _currentPhase = GamePhase.DayResult;
 
+            // 2D-баннер конца дня (пункт 5)
+            UiEffects.Instance?.DayEndBanner(Loc.T($"День {day} завершён", $"Day {day} complete"));
+
             if (_dayResultUI != null)
             {
                 _dayResultUI.Show(day, _dayController.CoinsEarnedToday, dayData.GetDayEndText());
@@ -308,6 +325,25 @@ public class GameManager : MonoBehaviour
     public void AddCoins(int amount)
     {
         _saveData.totalCoins += amount;
+    }
+
+    // ─── Память удовлетворённости по клиентам (пункт 4.3) ────────────────────
+
+    public float GetClientSatisfaction(CharacterType type)
+    {
+        int key = (int)type;
+        int i = _saveData.clientKeys.IndexOf(key);
+        return i >= 0 ? _saveData.clientSats[i] : 0.5f; // новый клиент — нейтральные 50%
+    }
+
+    public void SetClientSatisfaction(CharacterType type, float value)
+    {
+        int key = (int)type;
+        value = Mathf.Clamp01(value);
+        int i = _saveData.clientKeys.IndexOf(key);
+        if (i >= 0) _saveData.clientSats[i] = value;
+        else { _saveData.clientKeys.Add(key); _saveData.clientSats.Add(value); }
+        SaveGame();
     }
 
     // ─── Сохранение / Загрузка ───────────────────────────────────────────────

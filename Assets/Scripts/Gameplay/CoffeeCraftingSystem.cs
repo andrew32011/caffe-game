@@ -55,6 +55,9 @@ public class CoffeeCraftingSystem : MonoBehaviour
     [Header("Главный герой (деактивируется на время готовки, пункт 8)")]
     [SerializeField] private GameObject _heroObject;
 
+    [Header("Подсказка за рекламу (доступна после 2 провалов подряд, пункт 4.1)")]
+    [SerializeField] private Button _adHintButton;
+
     [Header("Допуск совпадения ползунков (0..1)")]
     [SerializeField] private float _tolerance = 0.15f;
 
@@ -86,11 +89,27 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
     // ─── Жизненный цикл ──────────────────────────────────────────────────────
 
+    private bool _adHintAllowed;
+
     private void Awake()
     {
         Instance = this;
         if (_serveButton   != null) _serveButton.onClick.AddListener(OnServeClicked);
         if (_confirmButton != null) _confirmButton.onClick.AddListener(OnConfirmIngredient);
+        if (_adHintButton  != null) _adHintButton.onClick.AddListener(OnAdHintClicked);
+    }
+
+    /// <summary>Разрешена ли реклама-подсказка для текущего клиента (ставит DayController).</summary>
+    public void SetAdHintAllowed(bool allowed) => _adHintAllowed = allowed;
+
+    private void OnAdHintClicked()
+    {
+#if RewardedAdv_yg
+        YG.YG2.RewardedAdvShow("hint");
+        // награду ловим в HintManager/здесь? упрощённо — открываем сразу после показа
+#endif
+        RevealPreciseHint();
+        if (_adHintButton != null) _adHintButton.gameObject.SetActive(false);
     }
 
     // ─── Публичное API (DayController) ───────────────────────────────────────
@@ -98,18 +117,48 @@ public class CoffeeCraftingSystem : MonoBehaviour
     public void SetTargetOrder(CoffeeOrder order)
     {
         _target = order;
+        _hintRevealed = false;
+        // Пункт 4.1/4.2: по умолчанию только расплывчатый намёк, не точный заказ
         if (_orderDisplayText != null)
-            _orderDisplayText.text = order != null ? DescribeTarget() : "";
+            _orderDisplayText.text = order != null ? VagueHint() : "";
     }
 
-    // Понятное описание желания клиента из имеющихся у нас названий (пункты 1,6)
+    private bool _hintRevealed;
+
+    /// <summary>Открыть точную подсказку (после просмотра рекламы при 2 провалах подряд, пункт 4.1).</summary>
+    public void RevealPreciseHint()
+    {
+        _hintRevealed = true;
+        if (_orderDisplayText != null && _target != null)
+            _orderDisplayText.text = DescribeTarget();
+    }
+
+    // Расплывчатый намёк клиента — игрок додумывает сам (пункт 4.2)
+    private string VagueHint()
+    {
+        string temp = TempTarget() < 0.35f ? Loc.T("прохладного", "something cool")
+            : TempTarget() < 0.7f ? Loc.T("тёплого", "something warm")
+            : Loc.T("обжигающе горячего", "something piping hot");
+        string vol = _target.volume == Volume.Small ? Loc.T("совсем чуть-чуть", "just a little")
+            : _target.volume == Volume.Large ? Loc.T("да побольше", "and plenty of it")
+            : Loc.T("в самый раз", "just right");
+        string baseHint = ((int)_target.type % 2 == 0)
+            ? Loc.T("чего-то необычного", "something unusual")
+            : Loc.T("чего-то привычного", "something familiar");
+        string top = _target.topping != Topping.None
+            ? Loc.T(", и чтоб с изюминкой", ", with a little something extra")
+            : "";
+        return Loc.T("«Хочется ", "\"I'd like ") + baseHint + ", " + temp + ", " + vol + top + "…»";
+    }
+
+    // Точное описание желания (только после рекламной подсказки, пункт 4.1)
     private string DescribeTarget()
     {
         string baseName = IngredientName(TargetIngredientIndex());
         string temp = TempWord(TempTarget());
         string vol  = VolWord(_target.volume);
         string top  = _target.topping != Topping.None ? " + " + ToppingName(_target.topping) : "";
-        return Loc.T("Хочет: ", "Wants: ") + baseName + " · " + temp + " · " + vol + top;
+        return Loc.T("Точно хочет: ", "Exactly wants: ") + baseName + " · " + temp + " · " + vol + top;
     }
 
     private string IngredientName(int index)
@@ -142,18 +191,20 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _cup?.ResetCup();              // пункт 1: чистим содержимое кружки под нового клиента
         _stage = Stage.Ingredients;
         GameInput.Locked = false;      // пункт 5: разблокируем клики для нового клиента
-        SetHeroActive(false);          // пункт 8: прячем ГГ на время готовки
+        SetHeroVisible(false);          // пункт 8: прячем ГГ на время готовки
         if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(true);
         HideButton(_serveButton);
         HideButton(_confirmButton);
         if (_selectedText != null) _selectedText.gameObject.SetActive(false);
         if (_noMoneyPanel != null) _noMoneyPanel.SetActive(false);
+        if (_adHintButton != null) _adHintButton.gameObject.SetActive(_adHintAllowed); // пункт 4.1
         _machine?.HidePanel();
         UpdateSatisfactionUI();        // полоса в нейтраль (50%)
         _stages?.JumpToStage(_ingredientsStageIndex);
     }
 
-    private void SetHeroActive(bool on)
+    /// <summary>Показать/скрыть главного героя (активен только на диалоге и во сне, пункт 2).</summary>
+    public void SetHeroVisible(bool on)
     {
         if (_heroObject != null) _heroObject.SetActive(on);
     }
@@ -311,7 +362,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _stage = Stage.Done;
         _stages?.JumpToStage(_counterStageIndex);
         if (_cup != null) yield return StartCoroutine(_cup.MoveTo(CupController.Zone.Counter));
-        SetHeroActive(true);   // пункт 8: ГГ снова виден за стойкой
+        SetHeroVisible(true);   // пункт 8: ГГ снова виден за стойкой
         _orderReady = true;
     }
 

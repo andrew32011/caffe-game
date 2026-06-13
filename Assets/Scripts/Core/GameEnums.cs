@@ -187,4 +187,9 @@ public class GameSaveData
     public int currentDay    = 0; // 0 = обучение ещё не пройдено
     public bool tutorialDone = false;
     public int totalCoins    = 100; // стартовый капитал кофейни (хватает на первые ингредиенты)
+
+    // Память удовлетворённости по уникальным клиентам (пункт 4.3):
+    // параллельные списки (JsonUtility не умеет Dictionary).
+    public System.Collections.Generic.List<int>   clientKeys = new System.Collections.Generic.List<int>();
+    public System.Collections.Generic.List<float> clientSats = new System.Collections.Generic.List<float>();
 }
