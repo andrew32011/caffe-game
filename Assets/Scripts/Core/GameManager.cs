@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Сохранение")]
     [SerializeField] private int _startDay = 1; // 0 — показывать туториал
+    [Tooltip("Всегда показывать обучение при старте (игнорируя сохранение). Удобно при разработке.")]
+    [SerializeField] private bool _forceTutorial = true;
 
     // ─── Состояние ───────────────────────────────────────────────────────────
 
@@ -90,7 +92,7 @@ public class GameManager : MonoBehaviour
         GameInput.Locked = true;             // на старте управление выключено
         yield return new WaitForSeconds(0.3f); // Ждём инициализации всех систем
 
-        if (!_saveData.tutorialDone)
+        if (_forceTutorial || !_saveData.tutorialDone)
         {
             yield return StartCoroutine(RunTutorial());
 

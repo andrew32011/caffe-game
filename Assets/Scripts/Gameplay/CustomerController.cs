@@ -17,11 +17,16 @@ public class CustomerController : MonoBehaviour
     [SerializeField] private ProcessVisitor _processVisitor; // ProcessVisitorManager из сцены
     [SerializeField] private Transform _visitorRoot;         // VisitorBasis из сцены (двигается ProcessVisitor-ом)
 
-    [Header("Шаблон из сцены (размер + анимация существующего бота)")]
-    [Tooltip("Локальный масштаб, снятый с уже стоящего в сцене stickman-а (заполняет Editor-скрипт).")]
+    [Header("Существующий ходячий гость (шаблон визуала/анимации)")]
+    [Tooltip("Уже стоящий/ходящий в сцене гость. С него копируется анимация и размер, " +
+             "после чего его исходная модель удаляется — гостей рисуем подменой модели.")]
+    [SerializeField] private GameObject _existingGuest;
+    [Tooltip("Локальный масштаб модели (снимается с _existingGuest, либо задаётся вручную).")]
     [SerializeField] private Vector3 _botScale = Vector3.one;
-    [Tooltip("Контроллер анимации существующего бота (заполняет Editor-скрипт).")]
+    [Tooltip("Контроллер анимации (снимается с _existingGuest, либо задаётся вручную).")]
     [SerializeField] private RuntimeAnimatorController _botController;
+
+    private Avatar _botAvatar; // аватар рига (для гуманоидов) — снимается с _existingGuest
 
     [Header("Полоска удовлетворённости")]
     [SerializeField] private SatisfactionBar _satisfactionBarPrefab;
@@ -36,10 +41,30 @@ public class CustomerController : MonoBehaviour
     private Animator        _animator;
     private SatisfactionBar _satisfactionBar;
 
-    private float _satisfactionValue   = 100f;  // 0..100
+    private float _satisfactionValue   = 50f;  // 0..100 (гость приходит наполовину довольным — пункт 7)
     private bool  _satisfactionRunning = false;
 
     public float SatisfactionValue => _satisfactionValue;
+
+    // ─── Захват шаблона из существующего гостя ───────────────────────────────
+
+    private void Awake()
+    {
+        // Снимаем анимацию + размер с уже имеющегося в сцене ходячего гостя
+        // и удаляем его исходную модель — дальше рисуем гостей подменой модели.
+        if (_existingGuest != null)
+        {
+            _botScale = _existingGuest.transform.localScale;
+            var anim = _existingGuest.GetComponentInChildren<Animator>();
+            if (anim != null)
+            {
+                if (anim.runtimeAnimatorController != null) _botController = anim.runtimeAnimatorController;
+                _botAvatar = anim.avatar;
+            }
+            Destroy(_existingGuest);
+            _existingGuest = null;
+        }
+    }
 
     // ─── Модель гостя ────────────────────────────────────────────────────────
 
@@ -63,8 +88,11 @@ public class CustomerController : MonoBehaviour
             _currentModel.transform.localScale = _botScale;
 
         _animator = _currentModel.GetComponentInChildren<Animator>();
-        if (_animator != null && _botController != null)
-            _animator.runtimeAnimatorController = _botController;
+        if (_animator != null)
+        {
+            if (_botController != null) _animator.runtimeAnimatorController = _botController;
+            if (_botAvatar != null)     _animator.avatar = _botAvatar;
+        }
 
         // Полоска удовлетворённости над головой
         if (_satisfactionBarPrefab != null)
@@ -75,11 +103,11 @@ public class CustomerController : MonoBehaviour
                 Quaternion.identity,
                 _visitorRoot);
 
-            _satisfactionBar.SetValue(1f);
+            _satisfactionBar.SetValue(0.5f); // приходит наполовину довольным (пункт 7)
             _satisfactionBar.gameObject.SetActive(false);
         }
 
-        _satisfactionValue   = 100f;
+        _satisfactionValue   = 50f;
         _satisfactionRunning = false;
     }
 
@@ -144,11 +172,14 @@ public class CustomerController : MonoBehaviour
         UpdateBar();
     }
 
-    /// <summary>Заполнить полоску до 100% (правильный заказ).</summary>
-    public void FillSatisfactionBar()
+    /// <summary>Заполнить полоску до 100% (полностью довольный гость).</summary>
+    public void FillSatisfactionBar() => SetSatisfaction(1f);
+
+    /// <summary>Плавно меняет полосу до заданного значения 0..1 (результат заказа, пункт 7).</summary>
+    public void SetSatisfaction(float value01)
     {
         _satisfactionRunning = false;
-        StartCoroutine(AnimateFillBar());
+        StartCoroutine(AnimateToValue(Mathf.Clamp01(value01) * 100f));
     }
 
     private IEnumerator DrainSatisfactionRoutine()
@@ -162,18 +193,15 @@ public class CustomerController : MonoBehaviour
         }
     }
 
-    private IEnumerator AnimateFillBar()
+    private IEnumerator AnimateToValue(float target)
     {
-        const float target = 100f;
-        const float speed  = 80f; // % в секунду
-
-        while (_satisfactionValue < target - 0.5f)
+        const float speed = 80f; // % в секунду
+        while (Mathf.Abs(_satisfactionValue - target) > 0.5f)
         {
             _satisfactionValue = Mathf.MoveTowards(_satisfactionValue, target, speed * Time.deltaTime);
             UpdateBar();
             yield return null;
         }
-
         _satisfactionValue = target;
         UpdateBar();
     }

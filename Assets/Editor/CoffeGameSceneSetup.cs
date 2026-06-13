@@ -34,6 +34,10 @@ public static class CoffeGameSceneSetup
         // ── Удаляем прошлый результат (идемпотентность) ─────────────────────
         DestroyIfExists(SystemsRootName);
         DestroyIfExists(CanvasName);
+        // Чистим объекты прошлого дизайна (кубы-станции)
+        DestroyIfExists("Items_Ingredients");
+        DestroyIfExists("Items_Machine");
+        DestroyIfExists("Items_Toppings");
 
         // ── Существующие объекты сцены ──────────────────────────────────────
         var stages = Object.FindObjectOfType<Stages>();
@@ -84,6 +88,7 @@ public static class CoffeGameSceneSetup
         var dayCtrl   = goDay.AddComponent<DayController>();
         var custCtrl  = goCust.AddComponent<CustomerController>();
         var craft     = goCraft.AddComponent<CoffeeCraftingSystem>();
+        var machine   = goCraft.AddComponent<MachineMinigame>();
         var dlg        = goDlg.AddComponent<DialogueDisplayer>();
         var tut       = goTut.AddComponent<TutorialController>();
         var hint      = goHint.AddComponent<HintManager>();
@@ -139,51 +144,34 @@ public static class CoffeGameSceneSetup
         // ── Заказ гостя (верх центр) ────────────────────────────────────────
         var orderText = Text("OrderDisplayText", ct, "Заказ: ...", 30, TextAlignmentOptions.Center, new Vector2(0.3f, 0.9f), new Vector2(0.7f, 0.98f));
 
-        // ── 3D-ПРЕДМЕТЫ НА СТОЛАХ (вместо кнопок) ───────────────────────────
-        //  Игрок выбирает напиток кликом по предмету на столе. Контейнеры-станции
-        //  ставятся у маркеров камеры; предметы можно потом перетащить на нужные места.
-        Transform ingStation = MakeStation("Items_Ingredients", FindMarker("Ingridients"));
-        Transform macStation = MakeStation("Items_Machine",     FindMarker("Cofemachine", "CofeMashine"));
-        Transform topStation = MakeStation("Items_Toppings",    FindMarker("CofeBasis"));
+        // ── Ачивка («Отлично!»/«В точку!») сверху ───────────────────────────
+        var achievement = Text("AchievementText", ct, "В точку!", 48, TextAlignmentOptions.Center, new Vector2(0.25f, 0.78f), new Vector2(0.75f, 0.9f));
+        achievement.color = new Color(0.4f, 1f, 0.5f);
+        achievement.gameObject.SetActive(false);
 
-        // Ингредиенты — 11 типов (порядок enum CoffeeType)
-        string[] ingNames = { "Эспрессо", "Американо", "Капучино", "Латте", "Мокко", "Травяной чай", "Зелёный чай", "Вода", "Горячий шоколад", "Чёрный кофе", "Кофе Правды" };
-        for (int i = 0; i < ingNames.Length; i++)
-        {
-            var it = MakeItem(ingStation, "Drink_" + i, ingNames[i], i, new Color(0.5f, 0.3f, 0.15f));
-            it.kind = IngredientItem.ItemKind.Drink;
-            it.drinkType = (CoffeeType)i;
-        }
+        // ── Кнопка «Подать» (низ по центру; пункт 10) ───────────────────────
+        var serveBtn = Btn("BtnServe", ct, "Подать ☕");
+        SetRect(serveBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.04f), new Vector2(0.6f, 0.12f));
+        serveBtn.gameObject.SetActive(false);
 
-        // Машина — объёмы (3) + сладость (4) + заварить (1)
-        string[] volN = { "Маленький", "Средний", "Большой" };
-        for (int i = 0; i < volN.Length; i++)
-        {
-            var it = MakeItem(macStation, "Vol_" + i, volN[i], i, new Color(0.2f, 0.4f, 0.7f));
-            it.kind = IngredientItem.ItemKind.Volume;
-            it.volume = (Volume)i;
-        }
-        string[] swN = { "Без сахара", "Слабо", "Средне", "Сладко" };
-        for (int i = 0; i < swN.Length; i++)
-        {
-            var it = MakeItem(macStation, "Sweet_" + i, swN[i], i + 4, new Color(0.7f, 0.7f, 0.75f));
-            it.kind = IngredientItem.ItemKind.Sweetness;
-            it.sweetness = (SweetnessLevel)i;
-        }
-        var brewItem = MakeItem(macStation, "Brew", "ЗАВАРИТЬ", 9, new Color(0.7f, 0.25f, 0.15f));
-        brewItem.kind = IngredientItem.ItemKind.Brew;
+        // ── Панель машины: 2 вертикальных заполнения (температура, объём) ────
+        var machinePanel = Panel("MachinePanel", ct, new Vector2(0.35f, 0.25f), new Vector2(0.65f, 0.75f), new Color(0.06f, 0.06f, 0.1f, 0.9f));
+        var tempFill   = VerticalBar("TempBar",   machinePanel.transform, new Vector2(0.12f, 0.18f), new Vector2(0.42f, 0.82f), new Color(0.9f, 0.4f, 0.2f));
+        var tempLabel  = Text("TempLabel", machinePanel.transform, "Температура", 22, TextAlignmentOptions.Center, new Vector2(0.0f, 0.02f), new Vector2(0.5f, 0.16f));
+        var volFill    = VerticalBar("VolumeBar", machinePanel.transform, new Vector2(0.58f, 0.18f), new Vector2(0.88f, 0.82f), new Color(0.2f, 0.5f, 0.9f));
+        var volLabel   = Text("VolumeLabel", machinePanel.transform, "Объём", 22, TextAlignmentOptions.Center, new Vector2(0.5f, 0.02f), new Vector2(1.0f, 0.16f));
+        machinePanel.SetActive(false);
 
-        // Топпинги — 6 (порядок enum Topping)
-        string[] topNames = { "Без топпинга", "Сливки", "Корица", "Карамель", "Шоколад", "Мята" };
-        for (int i = 0; i < topNames.Length; i++)
-        {
-            var it = MakeItem(topStation, "Top_" + i, topNames[i], i, new Color(0.4f, 0.6f, 0.3f));
-            it.kind = IngredientItem.ItemKind.Topping;
-            it.topping = (Topping)i;
-        }
+        // ── КЛИКАБЕЛЬНЫЕ ПРЕДМЕТЫ НА РЕАЛЬНЫХ ОБЪЕКТАХ СЦЕНЫ ────────────────
+        //  Ингредиенты — дети Ingridients1; топпинги — дети ShelfItems.
+        //  Вешаем на каждый IngredientItem + Collider (без замены визуала).
+        int ingCount = MakeIngredientItems("Ingridients1");
+        MakeToppingItems("ShelfItems");
 
-        // ── Кружка игрока (прикреплена к Main Camera, ездит с игроком) ───────
-        CupController cupController = MakeCup(mainCam);
+        // ── Кружка: используем существующий PlayerCup + якоря зон ───────────
+        CupController cupController = SetupCup("PlayerCup",
+            FindMarker("Ingridients"), FindMarker("Cofemachine", "CofeMashine"),
+            FindMarker("CofeBasis"),   FindMarker("PointCashier", "PointCashierForDialog"));
 
         // ── Кнопка «Подсказка» (левый нижний угол, видна всегда) ────────────
         var btnHint = Btn("BtnHint", ct, "Подсказка");
@@ -257,22 +245,33 @@ public static class CoffeGameSceneSetup
             .Arr("_customerPrefabs", stickmen)
             .Apply();
 
-        // CustomerController + захват размера/анимации существующего бота (пункт 4)
-        Vector3 botScale; RuntimeAnimatorController botCtrl;
-        CaptureAndDeleteSceneBots(out botScale, out botCtrl);
+        // CustomerController — переиспользуем существующего ходячего гостя.
+        // Анимацию/размер с него снимет и исходную модель удалит сам CustomerController (Awake).
+        var existingGuest = FindSceneStickman();
         new W(custCtrl)
             .Ref("_processVisitor", pv)
             .Ref("_visitorRoot", visitorRoot)
             .Ref("_satisfactionBarPrefab", sbComp)
-            .Ref("_botController", botCtrl)
+            .Ref("_existingGuest", existingGuest)
             .Apply();
-        SetVector3(custCtrl, "_botScale", botScale);
 
-        // CoffeeCraftingSystem (3D-предметы + кружка)
+        // MachineMinigame — UI вертикальных шкал
+        new W(machine)
+            .Ref("_panel", machinePanel)
+            .Ref("_tempFill", tempFill)
+            .Ref("_tempLabel", tempLabel)
+            .Ref("_volumeFill", volFill)
+            .Ref("_volumeLabel", volLabel)
+            .Apply();
+
+        // CoffeeCraftingSystem (предметы + кружка + минигейм + подача)
         new W(craft)
             .Ref("_stages", stages)
             .Ref("_cup", cupController)
+            .Ref("_machine", machine)
             .Ref("_orderDisplayText", orderText)
+            .Ref("_achievementText", achievement)
+            .Ref("_serveButton", serveBtn)
             .Apply();
 
         // TutorialController
@@ -382,147 +381,153 @@ public static class CoffeGameSceneSetup
         return null;
     }
 
-    // Контейнер-станция ПЕРЕД камерой-маркером (чтобы предметы были в кадре),
-    // ориентирован так же, как камера. Если маркер не найден — в начале координат.
-    static Transform MakeStation(string name, Transform marker)
+    // Навешивает IngredientItem (kind=Ingredient) на детей объекта-родителя (Ingridients1).
+    // Возвращает количество ингредиентов.
+    static int MakeIngredientItems(string parentName)
     {
-        DestroyIfExists(name);
-        var go = new GameObject(name);
-        if (marker != null)
+        var parent = GameObject.Find(parentName);
+        if (parent == null) { Debug.LogWarning($"CoffeGameSetup: не найден {parentName} (ингредиенты)."); return 0; }
+
+        int i = 0;
+        foreach (Transform child in parent.transform)
         {
-            go.transform.position = marker.position + marker.forward * 2.5f;
-            go.transform.rotation = marker.rotation;
+            EnsureCollider(child.gameObject);
+            var it = child.GetComponent<IngredientItem>();
+            if (it == null) it = child.gameObject.AddComponent<IngredientItem>();
+            it.kind = IngredientItem.ItemKind.Ingredient;
+            it.ingredientIndex = i;
+            i++;
         }
-        return go.transform;
+        Debug.Log($"CoffeGameSetup: ингредиентов (дети {parentName}): {i}");
+        return i;
     }
 
-    // Кликабельный предмет-кубик с подписью. index — позиция в сетке станции.
-    static IngredientItem MakeItem(Transform station, string goName, string label, int index, Color color)
+    // Навешивает IngredientItem (kind=Topping) на детей ShelfItems. Топпинг по порядку enum.
+    static void MakeToppingItems(string parentName)
     {
-        var cube = GameObject.CreatePrimitive(PrimitiveType.Cube); // BoxCollider уже есть → OnMouseDown работает
-        cube.name = goName;
-        cube.transform.SetParent(station, false);
+        var parent = GameObject.Find(parentName);
+        if (parent == null) { Debug.LogWarning($"CoffeGameSetup: не найден {parentName} (топпинги)."); return; }
 
-        // Сетка в плоскости, обращённой к камере: x — столбцы, y — ряды (вниз)
-        int col = index % 4, rowi = index / 4;
-        cube.transform.localPosition = new Vector3(-0.55f + col * 0.36f, 0.4f - rowi * 0.36f, 0f);
-        cube.transform.localScale = Vector3.one * 0.28f;
-
-        var mr = cube.GetComponent<MeshRenderer>();
-        if (mr != null)
+        var tops = (Topping[])System.Enum.GetValues(typeof(Topping));
+        int i = 0;
+        foreach (Transform child in parent.transform)
         {
-            var mat = new Material(Shader.Find("Standard"));
-            mat.color = color;
-            mat.EnableKeyword("_EMISSION");
-            mr.sharedMaterial = mat;
+            EnsureCollider(child.gameObject);
+            var it = child.GetComponent<IngredientItem>();
+            if (it == null) it = child.gameObject.AddComponent<IngredientItem>();
+            it.kind = IngredientItem.ItemKind.Topping;
+            // Пропускаем Topping.None (0) — реальным предметам даём Cream, Cinnamon, ...
+            it.topping = tops[Mathf.Min(i + 1, tops.Length - 1)];
+            i++;
         }
-
-        // Подпись над предметом
-        var lbl = new GameObject("Label");
-        lbl.transform.SetParent(cube.transform, false);
-        lbl.transform.localPosition = new Vector3(0f, 0.9f, 0f);
-        lbl.transform.localRotation = Quaternion.Euler(0f, 180f, 0f); // текстом к камере
-        lbl.transform.localScale = Vector3.one * 0.12f;
-        var tm = lbl.AddComponent<TextMesh>();
-        tm.text = label;
-        tm.fontSize = 48;
-        tm.characterSize = 0.1f;
-        tm.anchor = TextAnchor.LowerCenter;
-        tm.alignment = TextAlignment.Center;
-        tm.color = Color.white;
-        var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
-                   ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-        if (font != null)
-        {
-            tm.font = font;
-            var lblMr = lbl.GetComponent<MeshRenderer>();
-            if (lblMr != null) lblMr.sharedMaterial = font.material;
-        }
-
-        return cube.AddComponent<IngredientItem>();
+        Debug.Log($"CoffeGameSetup: топпингов (дети {parentName}): {i}");
     }
 
-    // Кружка, прикреплённая к камере (ездит с игроком)
-    static CupController MakeCup(Camera cam)
+    static void EnsureCollider(GameObject go)
     {
-        DestroyIfExists("PlayerCup");
-        var cup = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        cup.name = "PlayerCup";
-        Object.DestroyImmediate(cup.GetComponent<Collider>()); // кружке коллайдер не нужен
-        cup.transform.localScale = new Vector3(0.12f, 0.1f, 0.12f);
-
-        var mr = cup.GetComponent<MeshRenderer>();
-        if (mr != null)
+        if (go.GetComponentInChildren<Collider>() != null) return;
+        var rend = go.GetComponentInChildren<Renderer>();
+        if (rend != null)
         {
-            var mat = new Material(Shader.Find("Standard"));
-            mat.color = new Color(0.95f, 0.95f, 0.95f);
-            mr.sharedMaterial = mat;
-        }
-
-        if (cam != null)
-        {
-            cup.transform.SetParent(cam.transform, false);
-            cup.transform.localPosition = new Vector3(0.35f, -0.28f, 0.9f); // нижний правый угол обзора
-            cup.transform.localRotation = Quaternion.identity;
-        }
-
-        var anchor = new GameObject("ContentAnchor");
-        anchor.transform.SetParent(cup.transform, false);
-        anchor.transform.localPosition = new Vector3(0f, 1.1f, 0f);
-
-        var ctrl = cup.AddComponent<CupController>();
-        var so = new SerializedObject(ctrl);
-        var p = so.FindProperty("_contentAnchor");
-        if (p != null) p.objectReferenceValue = anchor.transform;
-        so.ApplyModifiedPropertiesWithoutUndo();
-        return ctrl;
-    }
-
-    // Снимает размер + контроллер анимации с существующего в сцене stickman-а
-    // и удаляет ВСЕ такие объекты из сцены (пункт 4).
-    static void CaptureAndDeleteSceneBots(out Vector3 scale, out RuntimeAnimatorController controller)
-    {
-        scale = Vector3.one;
-        controller = null;
-
-        var found = new List<GameObject>();
-        foreach (var go in Object.FindObjectsOfType<GameObject>())
-        {
-            // корневой объект-инстанс stickman (имя содержит "stickman")
-            if (go.name.ToLower().Contains("stickman") && go.transform.parent == null)
-                found.Add(go);
-        }
-        // запасной вариант: ищем по имени среди всех (если в иерархии)
-        if (found.Count == 0)
-        {
-            foreach (var go in Object.FindObjectsOfType<GameObject>())
-                if (go.name.ToLower().Contains("stickman"))
-                    found.Add(go);
-        }
-
-        if (found.Count > 0)
-        {
-            var template = found[0];
-            scale = template.transform.localScale;
-            var anim = template.GetComponentInChildren<Animator>();
-            if (anim != null) controller = anim.runtimeAnimatorController;
-            Debug.Log($"CoffeGameSetup: шаблон бота — '{template.name}', scale={scale}, удалено из сцены: {found.Count}");
+            var bc = go.AddComponent<BoxCollider>();
+            // Подгоняем коллайдер под видимые границы (приблизительно)
+            var b = rend.bounds;
+            bc.center = go.transform.InverseTransformPoint(b.center);
+            bc.size = go.transform.InverseTransformVector(b.size);
         }
         else
         {
-            Debug.LogWarning("CoffeGameSetup: существующий бот (stickman) в сцене не найден — используется scale=1, контроллер из префаба.");
+            go.AddComponent<BoxCollider>();
         }
-
-        foreach (var go in found)
-            Object.DestroyImmediate(go);
     }
 
-    static void SetVector3(Object target, string field, Vector3 value)
+    // Настраивает существующую кружку (PlayerCup): CupController + якоря зон.
+    static CupController SetupCup(string cupName, Transform ingA, Transform macA, Transform topA, Transform countA)
     {
-        var so = new SerializedObject(target);
-        var p = so.FindProperty(field);
-        if (p != null) p.vector3Value = value;
+        var cup = GameObject.Find(cupName);
+        if (cup == null)
+        {
+            cup = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            cup.name = cupName;
+            Object.DestroyImmediate(cup.GetComponent<Collider>());
+            cup.transform.localScale = new Vector3(0.12f, 0.1f, 0.12f);
+            Debug.LogWarning("CoffeGameSetup: PlayerCup не найден — создан цилиндр-заглушка.");
+        }
+        cup.transform.SetParent(null, true); // кружка живёт в мире, не под камерой
+
+        Transform Anchor(string n, Transform near, Vector3 fallback)
+        {
+            var a = new GameObject(n).transform;
+            a.position = near != null ? near.position : fallback;
+            if (near != null) a.rotation = near.rotation;
+            return a;
+        }
+        var aIng   = Anchor("CupAnchor_Ingredients", ingA,   cup.transform.position);
+        var aMac   = Anchor("CupAnchor_Machine",     macA,   cup.transform.position);
+        var aTop   = Anchor("CupAnchor_Toppings",    topA,   cup.transform.position);
+        var aCount = Anchor("CupAnchor_Counter",     countA, cup.transform.position);
+
+        var content = new GameObject("ContentAnchor").transform;
+        content.SetParent(cup.transform, false);
+        content.localPosition = new Vector3(0f, 0.6f, 0f);
+
+        var ctrl = cup.GetComponent<CupController>();
+        if (ctrl == null) ctrl = cup.AddComponent<CupController>();
+
+        var so = new SerializedObject(ctrl);
+        SetRef(so, "_ingredientsAnchor", aIng);
+        SetRef(so, "_machineAnchor",     aMac);
+        SetRef(so, "_toppingsAnchor",    aTop);
+        SetRef(so, "_counterAnchor",     aCount);
+        SetRef(so, "_contentAnchor",     content);
         so.ApplyModifiedPropertiesWithoutUndo();
+
+        // ставим кружку на стол ингредиентов
+        cup.transform.position = aIng.position;
+        return ctrl;
+    }
+
+    static void SetRef(SerializedObject so, string field, Object value)
+    {
+        var p = so.FindProperty(field);
+        if (p != null) p.objectReferenceValue = value;
+    }
+
+    // Вертикальная шкала-заполнение (Image: Filled, Vertical) на UI-панели.
+    static Image VerticalBar(string name, Transform parent, Vector2 aMin, Vector2 aMax, Color color)
+    {
+        // Фон
+        var bg = new GameObject(name + "_BG", typeof(RectTransform), typeof(Image));
+        bg.transform.SetParent(parent, false);
+        SetRect((RectTransform)bg.transform, aMin, aMax);
+        bg.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
+
+        // Заполнение
+        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+        go.transform.SetParent(bg.transform, false);
+        SetRect((RectTransform)go.transform, Vector2.zero, Vector2.one);
+        var img = go.GetComponent<Image>();
+        img.color = color;
+        img.sprite = BuiltinSprite();
+        img.type = Image.Type.Filled;
+        img.fillMethod = Image.FillMethod.Vertical;
+        img.fillOrigin = (int)Image.OriginVertical.Bottom;
+        img.fillAmount = 0.5f;
+        img.raycastTarget = false;
+        return img;
+    }
+
+    // Находит один stickman в сцене (для роли существующего гостя). Не удаляет.
+    static GameObject FindSceneStickman()
+    {
+        foreach (var go in Object.FindObjectsOfType<GameObject>())
+            if (go.name.ToLower().Contains("stickman") && go.transform.parent == null)
+                return go;
+        foreach (var go in Object.FindObjectsOfType<GameObject>())
+            if (go.name.ToLower().Contains("stickman"))
+                return go;
+        Debug.LogWarning("CoffeGameSetup: ходячий гость (stickman) в сцене не найден — назначь _existingGuest вручную.");
+        return null;
     }
 
     static GameObject Child(GameObject parent, string name)

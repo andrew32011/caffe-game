@@ -1,7 +1,9 @@
 /// <summary>
-/// Кликабельный 3D-предмет на столе (ингредиент / объём / сладость / заварка / топпинг).
-/// Игрок выбирает напиток не кнопкой, а кликом по предмету на столе.
+/// Кликабельный 3D-предмет на столе. Два вида:
+///   Ingredient — сосуд из Ingridients1 (основа напитка), при клике «выливается» в кружку;
+///   Topping    — предмет из ShelfItems, при клике уменьшенная копия падает в кружку.
 /// Требует Collider. Клик ловится через OnMouseDown (нужна Camera.main).
+/// Объём и температуру задаёт не предмет, а минигейм машины (MachineMinigame).
 /// Сцена: MainScene
 /// Зависимости: CoffeeCraftingSystem, GameInput, GameEnums
 /// SDK: Нет
@@ -12,14 +14,14 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class IngredientItem : MonoBehaviour
 {
-    public enum ItemKind { Drink, Volume, Sweetness, Brew, Topping }
+    public enum ItemKind { Ingredient, Topping }
 
     [Header("Что это за предмет")]
-    public ItemKind kind = ItemKind.Drink;
-    public CoffeeType     drinkType;
-    public Volume         volume;
-    public SweetnessLevel sweetness;
-    public Topping        topping;
+    public ItemKind kind = ItemKind.Ingredient;
+    [Tooltip("Индекс основы (0..N-1, как порядок детей Ingridients1).")]
+    public int ingredientIndex;
+    [Tooltip("Какой топпинг даёт этот предмет (для kind = Topping).")]
+    public Topping topping;
 
     [Header("Подсветка / пульсация")]
     public float pulseAmplitude = 0.12f;
@@ -58,7 +60,6 @@ public class IngredientItem : MonoBehaviour
         }
     }
 
-    /// <summary>Пульсация + свечение (подсказка/туториал — «нажми меня»).</summary>
     public void SetPulsing(bool on)
     {
         _pulsing = on;
@@ -66,7 +67,6 @@ public class IngredientItem : MonoBehaviour
         SetEmission(on ? PulseColor : Color.black);
     }
 
-    /// <summary>Короткая вспышка при выборе.</summary>
     public void FlashSelected()
     {
         StopAllCoroutines();
@@ -90,20 +90,5 @@ public class IngredientItem : MonoBehaviour
             _mpb.SetColor("_EmissionColor", c);
             r.SetPropertyBlock(_mpb);
         }
-    }
-
-    /// <summary>Совпадает ли предмет с требованием заказа на шаге expected.</summary>
-    public bool Matches(CoffeeOrder target, ItemKind expected)
-    {
-        if (target == null || kind != expected) return false;
-        switch (kind)
-        {
-            case ItemKind.Drink:     return drinkType == target.type;
-            case ItemKind.Volume:    return volume    == target.volume;
-            case ItemKind.Sweetness: return sweetness == target.sweet;
-            case ItemKind.Topping:   return topping   == target.topping;
-            case ItemKind.Brew:      return true;
-        }
-        return false;
     }
 }

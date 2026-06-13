@@ -41,18 +41,23 @@ public class DayController : MonoBehaviour
     [SerializeField] private int _stageReaction   = 6;
     [SerializeField] private int _stageGuestLeave = 7;
 
-    [Header("Настройки")]
-    [SerializeField] private int _maxMistakesPerDay = 3;
+    [Header("Экономика (пункт 8)")]
+    [Tooltip("Сколько максимум платит полностью довольный клиент.")]
+    [SerializeField] private int _basePrice = 40;
+    [Tooltip("Себестоимость основы напитка (вычитается всегда).")]
+    [SerializeField] private int _ingredientCost = 8;
+    [Tooltip("Себестоимость одного топпинга.")]
+    [SerializeField] private int _toppingCost = 3;
+    [Tooltip("Порог удовлетворённости, ниже которого клиент недоволен (показ подсказок).")]
+    [Range(0f, 1f)] [SerializeField] private float _satisfiedThreshold = 0.5f;
 
     // ─── Состояние ───────────────────────────────────────────────────────────
 
-    private int  _coinsEarnedToday = 0;
-    private int  _mistakesCount    = 0;
+    private int  _coinsEarnedToday = 0;   // чистая прибыль за день (может быть < 0)
     private bool _daySuccess       = false;
 
     public bool DaySuccess       => _daySuccess;
     public int  CoinsEarnedToday => _coinsEarnedToday;
-    public int  MistakesCount    => _mistakesCount;
 
     // ─── Главный метод ────────────────────────────────────────────────────────
 
@@ -60,7 +65,6 @@ public class DayController : MonoBehaviour
     public IEnumerator RunDay(DayData dayData)
     {
         _coinsEarnedToday = 0;
-        _mistakesCount    = 0;
         _daySuccess       = false;
 
         _dialogue?.ShowDayIntro(dayData.dayNumber);
@@ -71,16 +75,12 @@ public class DayController : MonoBehaviour
             yield return StartCoroutine(
                 ServeCustomer(customerEntry, dayData.coinsPerCorrectOrder));
 
-            if (_mistakesCount >= _maxMistakesPerDay)
-            {
-                _daySuccess = false;
-                yield break;
-            }
-
             yield return new WaitForSeconds(1f); // Пауза между гостями
         }
 
-        _daySuccess = true;
+        // Пункт 9: провала по «3 ошибкам» больше нет. День считается провальным
+        // только если кофейня отработала в минус (экономика — см. _coinsEarnedToday).
+        _daySuccess = _coinsEarnedToday >= 0;
     }
 
     // ─── Один гость ───────────────────────────────────────────────────────────
@@ -98,74 +98,51 @@ public class DayController : MonoBehaviour
         yield return StartCoroutine(GoToStageAndWait(_stageGreeting));
         yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.greetingLines));
 
-        // 4. Подсказка знает заказ; запускаем таймер настроения
+        // 4. Подсказка знает заказ; запускаем таймер настроения (стартует с 50%)
         _hintManager?.SetCurrentOrder(entry.order);
         _customerController.StartSatisfactionTimer();
 
-        // 5. Мини-игра приготовления (камеру по зонам двигает CoffeeCraftingSystem через Stages)
-        bool orderCorrect = false;
-
+        // 5. Готовим напиток (ингредиент → машина → топпинги → «Подать»)
         _craftingSystem.SetTargetOrder(entry.order);
         _craftingSystem.Show();
+        yield return new WaitUntil(() => _craftingSystem.IsOrderReady);
+        _craftingSystem.Hide();
 
-        while (!orderCorrect)
+        // 6. Оценка результата (доля совпавших параметров 0..1)
+        float satisfaction = _craftingSystem.EvaluateSatisfaction();
+        _customerController.StopSatisfactionTimer();
+
+        // Этап 5: возвращаемся к стойке, подаём кофе
+        yield return StartCoroutine(GoToStageAndWait(_stageServe));
+        yield return new WaitForSeconds(0.3f);
+
+        // Меняем полосу удовлетворённости под результат (пункт 7)
+        _customerController.SetSatisfaction(satisfaction);
+        yield return new WaitForSeconds(0.6f);
+
+        // 7. Экономика: оплата по удовлетворённости минус себестоимость (пункт 8)
+        int payment = Mathf.RoundToInt(_basePrice * satisfaction);
+        int cost    = _ingredientCost + _toppingCost * _craftingSystem.ChosenToppingCount;
+        int profit  = payment - cost;
+        _coinsEarnedToday += profit;
+
+        // 8. Реакция гостя
+        yield return StartCoroutine(GoToStageAndWait(_stageReaction));
+        bool happy = satisfaction >= _satisfiedThreshold;
+        if (happy)
         {
-            yield return new WaitUntil(() => _craftingSystem.IsOrderReady);
-
-            CoffeeOrder prepared = _craftingSystem.GetPreparedOrder();
-            orderCorrect = entry.order.Matches(prepared);
-
-            if (orderCorrect)
-            {
-                // ─── ПРАВИЛЬНЫЙ ЗАКАЗ ────────────────────────────────────────
-                _craftingSystem.Hide();
-                _coinsEarnedToday += coinsPerOrder;
-
-                // Этап 5: возвращаемся к стойке, подаём кофе
-                yield return StartCoroutine(GoToStageAndWait(_stageServe));
-                yield return new WaitForSeconds(0.5f);
-
-                _customerController.FillSatisfactionBar();
-                yield return new WaitForSeconds(0.5f);
-
-                // Этап 6: реакция и сюжетное раскрытие
-                yield return StartCoroutine(GoToStageAndWait(_stageReaction));
-                yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.storyRevealLines));
-
-                _vfxController?.PlayCoinEffect(_coinsEarnedToday);
-            }
-            else
-            {
-                // ─── НЕПРАВИЛЬНЫЙ ЗАКАЗ ──────────────────────────────────────
-                _mistakesCount++;
-                _customerController.DecreaseSatisfaction(30f);
-
-                yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.wrongOrderLines));
-                _vfxController?.ShakeCamera(0.3f, 0.15f);
-
-                if (_mistakesCount >= _maxMistakesPerDay)
-                {
-                    _craftingSystem.Hide();
-                    _dialogue.ShowMessage(
-                        Loc.T("Слишком много ошибок! День начинается заново.",
-                              "Too many mistakes! The day starts over."), 2.5f);
-                    yield return new WaitForSeconds(2.5f);
-
-                    yield return StartCoroutine(LetCustomerLeave());
-                    yield break;
-                }
-
-                // Сбрасываем и возвращаем игрока к первому столу для повторной попытки
-                _craftingSystem.Show();
-                yield return new WaitForSeconds(0.5f);
-            }
+            _vfxController?.PlayCoinEffect(payment);
+            yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.storyRevealLines));
+        }
+        else
+        {
+            _vfxController?.ShakeCamera(0.3f, 0.15f);
+            yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.wrongOrderLines));
         }
 
-        // 6. Гость уходит
-        _customerController.StopSatisfactionTimer();
-        yield return new WaitForSeconds(0.5f);
+        // 9. Гость уходит
+        yield return new WaitForSeconds(0.4f);
         yield return StartCoroutine(LetCustomerLeave());
-        _craftingSystem.Hide();
     }
 
     // ─── Вспомогательные ─────────────────────────────────────────────────────
