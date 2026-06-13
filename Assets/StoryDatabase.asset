@@ -67,6 +67,64 @@ MonoBehaviour:
           Mirror Gorge. Be careful with your questions. (Leaves the tea unfinished
           and walks out)
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 0
+      order:
+        type: 4
+        volume: 0
+        sweet: 3
+        topping: 5
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 3
+      order:
+        type: 7
+        volume: 1
+        sweet: 1
+        topping: 3
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u041F\u0435\u0440\u0432\u044B\u0439 \u0434\u0435\u043D\u044C \u043F\u043E\u0437\u0430\u0434\u0438.
       \u0422\u044B \u0443\u0437\u043D\u0430\u043B\u0430 \u043E \u0437\u043D\u0430\u043A\u0435
       \u041E\u0440\u0434\u0435\u043D\u0430 \u2014 \u0442\u0440\u0438 \u043A\u0440\u0443\u0433\u0430.
@@ -134,6 +192,64 @@ MonoBehaviour:
           A man with three circles on his chest argued with those who bore the same
           circles on their palms. They took him away. (Drinks slowly.) If you find
           something of his, the water will show you more.
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 2
+      order:
+        type: 10
+        volume: 1
+        sweet: 0
+        topping: 2
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 4
+      order:
+        type: 4
+        volume: 1
+        sweet: 2
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\u0412\u043E\u0434\u0430 \u043F\u043E\u043C\u043D\u0438\u0442 \u0432\u0441\u0451.
       \u041C\u0435\u0441\u044F\u0446 \u043D\u0430\u0437\u0430\u0434 \u041A\u0430\u044F
@@ -217,6 +333,64 @@ MonoBehaviour:
         textEn: Information has a price. Tomorrow, bring me your brightest memory
           of him in this vial. (Places a small crystal vial on the counter)
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 6
+      order:
+        type: 6
+        volume: 1
+        sweet: 1
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 3
+      order:
+        type: 10
+        volume: 0
+        sweet: 2
+        topping: 5
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u041E\u0440\u0434\u0435\u043D \u0434\u0435\u0440\u0436\u0438\u0442
       \u0441\u0432\u043E\u0438\u0445 \u043F\u043B\u0435\u043D\u043D\u0438\u043A\u043E\u0432
       \u0432 \xAB\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u043E\u0439 \u0422\u0435\u043C\u043D\u0438\u0446\u0435\xBB.
@@ -296,6 +470,64 @@ MonoBehaviour:
         textEn: "(Hands over a crumpled map with a mark: 'Dreamweaver \u2014 Shadow
           Market, behind the clock')"
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 1
+      order:
+        type: 1
+        volume: 2
+        sweet: 2
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 2
+      order:
+        type: 8
+        volume: 2
+        sweet: 3
+        topping: 2
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\xAB\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u0430\u044F
       \u0422\u0435\u043C\u043D\u0438\u0446\u0430\xBB \u2014 \u043A\u0430\u0440\u043C\u0430\u043D
       \u0440\u0435\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u0438 \u0443 \u0423\u0449\u0435\u043B\u044C\u044F.
@@ -365,6 +597,64 @@ MonoBehaviour:
           learned the details. He was taken so he couldn't interfere \u2014 OR to
           be forced to work for them. Be ready for either."
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 6
+      order:
+        type: 8
+        volume: 0
+        sweet: 3
+        topping: 3
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 8
+      order:
+        type: 5
+        volume: 2
+        sweet: 0
+        topping: 1
+      greetingLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\xAB\u0420\u0430\u0437\u0440\u044B\u0432 \u041F\u043E\u043A\u0440\u043E\u0432\u0430\xBB
       \u2014 \u0440\u0438\u0442\u0443\u0430\u043B \u0432 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0435
       \u043B\u0443\u043D\u043D\u043E\u0435 \u0437\u0430\u0442\u043C\u0435\u043D\u0438\u0435.
@@ -433,6 +723,64 @@ MonoBehaviour:
         textEn: "It describes not only the rupture points but also the Anchors \u2014
           artifacts that can stabilize the borders forever. The Order will most likely
           destroy it. If you find even a page \u2014 I will trade it for useful knowledge."
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 8
+      order:
+        type: 3
+        volume: 1
+        sweet: 0
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 3
+      order:
+        type: 5
+        volume: 0
+        sweet: 0
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\xAB\u0421\u043A\u0440\u0438\u0436\u0430\u043B\u0438 \u0413\u0440\u0430\u043D\u0438\u0446\xBB
       \u0443\u043A\u0440\u0430\u0434\u0435\u043D\u044B. \u0412 \u043A\u043D\u0438\u0433\u0435
@@ -516,6 +864,64 @@ MonoBehaviour:
         textEn: "Nothing. Just... if you see among them a woman with a lightning-shaped
           scar on her neck \u2014 tell her 'the echo has forgiven her'. (Leaves quickly)"
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 3
+      order:
+        type: 9
+        volume: 2
+        sweet: 1
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 7
+      order:
+        type: 3
+        volume: 2
+        sweet: 1
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u044B\u0439 \u0432\u043E\u0440
       \u0434\u0430\u043B \u0442\u0435\u0431\u0435 \u0442\u0440\u0435\u0441\u043D\u0443\u0432\u0448\u0435\u0435
       \u0437\u0435\u0440\u043A\u0430\u043B\u043E. \u0415\u0441\u043B\u0438 \u0443\u0432\u0438\u0434\u0438\u0448\u044C
@@ -563,6 +969,64 @@ MonoBehaviour:
           \u043E\u043F\u0430\u0441\u043D\u044B. \u041D\u0435\u043A\u043E\u0442\u043E\u0440\u044B\u0435
           \u0441\u043C\u043E\u0442\u0440\u044F\u0442 \u0432 \u043E\u0431\u0435 \u0441\u0442\u043E\u0440\u043E\u043D\u044B."
         textEn: You look tired. Mirrors are dangerous. Some of them look both ways.
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 1
+      order:
+        type: 5
+        volume: 0
+        sweet: 2
+        topping: 4
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 0
+      order:
+        type: 7
+        volume: 1
+        sweet: 2
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\u041A\u0430\u0439 \u0436\u0438\u0432! \u0415\u0433\u043E \u0434\u0435\u0440\u0436\u0438\u0442
       \u0436\u0435\u043D\u0449\u0438\u043D\u0430 \u0441\u043E \u0448\u0440\u0430\u043C\u043E\u043C-\u043C\u043E\u043B\u043D\u0438\u0435\u0439.
@@ -657,6 +1121,64 @@ MonoBehaviour:
         textEn: The envelope smells of ash and... fear. Be careful. They can use
           time against you.
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 1
+      order:
+        type: 0
+        volume: 1
+        sweet: 3
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 8
+      order:
+        type: 10
+        volume: 1
+        sweet: 2
+        topping: 4
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u041F\u0438\u0441\u044C\u043C\u043E \u043E\u0442 \u041A\u0430\u044F
       \u0447\u0435\u0440\u0435\u0437 \u0440\u0430\u0437\u0440\u044B\u0432 \u0432\u043E
       \u0432\u0440\u0435\u043C\u0435\u043D\u0438. \u041E\u043D \u0436\u0438\u0432.
@@ -726,6 +1248,64 @@ MonoBehaviour:
           \u0432 \u0431\u0435\u0437\u043B\u0443\u043D\u043D\u0443\u044E \u043D\u043E\u0447\u044C."
         textEn: Yes. Their altar lies where three shadows meet. Look where the light
           of the Black Lantern falls. It shines only on a moonless night.
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 4
+      order:
+        type: 7
+        volume: 1
+        sweet: 0
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 7
+      order:
+        type: 9
+        volume: 0
+        sweet: 2
+        topping: 1
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\u0410\u043B\u0442\u0430\u0440\u044C \u041E\u0440\u0434\u0435\u043D\u0430
       \u2014 \u043C\u0435\u0441\u0442\u043E \u0442\u0440\u0451\u0445 \u0442\u0435\u043D\u0435\u0439.
@@ -810,6 +1390,64 @@ MonoBehaviour:
         textEn: "(Touches the coin \u2014 it is ice-cold. Three circles are engraved
           on its back.)"
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 6
+      order:
+        type: 2
+        volume: 2
+        sweet: 1
+        topping: 5
+      greetingLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 3
+      order:
+        type: 8
+        volume: 2
+        sweet: 0
+        topping: 4
+      greetingLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u041D\u0435\u0437\u043D\u0430\u043A\u043E\u043C\u043A\u0430 \u0441\u043E
       \u0448\u0440\u0430\u043C\u043E\u043C-\u043C\u043E\u043B\u043D\u0438\u0435\u0439
       \u043F\u0440\u0435\u0434\u043B\u0430\u0433\u0430\u043B\u0430 \u0437\u0430\u0431\u0432\u0435\u043D\u0438\u0435.
@@ -868,6 +1506,64 @@ MonoBehaviour:
           \u043F\u0440\u0435\u0434\u0430\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u043E."
         textEn: (Nodding from another table.) True. A week ago. Together with that
           very book. I suspect a betrayal from within.
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 7
+      order:
+        type: 8
+        volume: 0
+        sweet: 2
+        topping: 1
+      greetingLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 6
+      order:
+        type: 5
+        volume: 2
+        sweet: 1
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\u0427\u0451\u0440\u043D\u044B\u0439 \u0424\u043E\u043D\u0430\u0440\u044C
       \u0443\u043A\u0440\u0430\u0434\u0435\u043D. \u0412\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0435\u0435
@@ -945,6 +1641,64 @@ MonoBehaviour:
         textEn: They have watching 'eyes' of bronze and crystal everywhere. Bring
           me one.
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 6
+      order:
+        type: 4
+        volume: 1
+        sweet: 3
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 6
+      order:
+        type: 3
+        volume: 0
+        sweet: 0
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u041F\u0430\u0440\u043E\u0432\u043E\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440
       \u043C\u043E\u0436\u0435\u0442 \u0437\u0430\u0433\u043B\u0443\u0448\u0438\u0442\u044C
       \u0447\u0430\u0440\u044B \u041E\u0440\u0434\u0435\u043D\u0430. \u0415\u043C\u0443
@@ -1011,6 +1765,64 @@ MonoBehaviour:
           Order. I didn't know what for, back then. Now I regret it. Take this grain
           of moon silver. It draws out lies. Put it in the drink of someone you don't
           trust. If they lie \u2014 the drink will darken."
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 1
+      order:
+        type: 10
+        volume: 2
+        sweet: 0
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 5
+      order:
+        type: 10
+        volume: 0
+        sweet: 2
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\u041B\u0443\u043D\u043D\u043E\u0435 \u0441\u0435\u0440\u0435\u0431\u0440\u043E
       \u0432\u044B\u044F\u0432\u043B\u044F\u0435\u0442 \u043B\u043E\u0436\u044C.
@@ -1087,6 +1899,64 @@ MonoBehaviour:
           \u0445\u043E\u0440\u043E\u0448\u0435\u043D\u044C\u043A\u043E."
         textEn: Yes... that is it. The Anchor Song. The Order fears it. Your husband
           must have known it. Remember it well.
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 2
+      order:
+        type: 6
+        volume: 0
+        sweet: 1
+        topping: 3
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 8
+      order:
+        type: 7
+        volume: 1
+        sweet: 3
+        topping: 3
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\xAB\u041F\u0435\u0441\u043D\u044F \u042F\u043A\u043E\u0440\u044F\xBB
       \u2014 \u044D\u0442\u043E \u043A\u043E\u043B\u044B\u0431\u0435\u043B\u044C\u043D\u0430\u044F
@@ -1172,6 +2042,64 @@ MonoBehaviour:
           \u043C\u0435\u043D\u044F."
         textEn: A trap. The Order is trying to lure me out.
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 8
+      order:
+        type: 1
+        volume: 1
+        sweet: 2
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 3
+      order:
+        type: 9
+        volume: 1
+        sweet: 2
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u0421\u0442\u0440\u0430\u043D\u043D\u0438\u043A \u0431\u044B\u043B
       \u043F\u043E\u0434 \u043A\u043E\u043D\u0442\u0440\u043E\u043B\u0435\u043C \u041E\u0440\u0434\u0435\u043D\u0430.
       \u0427\u0430\u0439 \u043F\u043E\u0447\u0435\u0440\u043D\u0435\u043B \u043E\u0442
@@ -1248,6 +2176,64 @@ MonoBehaviour:
           \u0417\u0434\u0435\u0441\u044C, \u0432 \u043A\u043E\u0444\u0435\u0439\u043D\u0435."
         textEn: (Serves coffee to all the allies.) Tomorrow at midnight. Here, in
           the coffee house.
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 5
+      order:
+        type: 7
+        volume: 1
+        sweet: 3
+        topping: 1
+      greetingLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        speakerNameEn: "\u0417\u0430\u0432\u0441\u0435\u0433\u0434\u0430\u0442\u0430\u0439"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 7
+      order:
+        type: 1
+        volume: 1
+        sweet: 0
+        topping: 2
+      greetingLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        speakerNameEn: "\u0421\u0442\u0430\u0440\u044B\u0439 \u043C\u0430\u0433"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\u0421\u043E\u044E\u0437\u043D\u0438\u043A\u0438 \u0433\u043E\u0442\u043E\u0432\u044B.
       \u0422\u0443\u043C\u0430\u043D, \u0437\u0435\u0440\u043A\u0430\u043B\u0430,
@@ -1337,6 +2323,64 @@ MonoBehaviour:
         textEn: In... in the old water tower. On the Border Cliff. The key... I have
           it. (Falls)
         triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 7
+      order:
+        type: 3
+        volume: 2
+        sweet: 0
+        topping: 4
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 2
+      order:
+        type: 8
+        volume: 2
+        sweet: 1
+        topping: 0
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
     dayEndText: "\u041E\u0440\u0434\u0435\u043D \u043E\u0431\u0435\u0437\u0432\u0440\u0435\u0436\u0435\u043D.
       \u041A\u043B\u044E\u0447-\u0430\u043C\u0443\u043B\u0435\u0442 \u043F\u043E\u043B\u0443\u0447\u0435\u043D.
       \u041A\u0430\u0439 \u2014 \u0432 \u0432\u043E\u0434\u043E\u043D\u0430\u043F\u043E\u0440\u043D\u043E\u0439
@@ -1398,6 +2442,64 @@ MonoBehaviour:
         text: "\u0414\u043E\u0440\u043E\u0433\u0430 \u0441\u0432\u043E\u0431\u043E\u0434\u043D\u0430.
           \u041F\u043E\u0440\u0430 \u0437\u0430 \u041A\u0430\u0435\u043C."
         textEn: The road is clear. Time to go get Kai.
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 0
+      order:
+        type: 9
+        volume: 0
+        sweet: 1
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 1
+      order:
+        type: 4
+        volume: 1
+        sweet: 3
+        topping: 3
+      greetingLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        speakerNameEn: "\u041F\u043E\u0434\u043C\u0430\u0441\u0442\u0435\u0440\u044C\u0435"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\u041A\u0430\u0439 \u0441\u0432\u043E\u0431\u043E\u0434\u0435\u043D!
       \u041D\u0443\u0436\u043D\u043E \u043E\u0431\u0440\u0430\u0442\u0438\u0442\u044C
@@ -1509,6 +2611,64 @@ MonoBehaviour:
           \u0432 \u043D\u043E\u0440\u043C\u0443.)"
         textEn: (For a second, every cup reflects the calm landscape of its owner's
           home world. Then everything returns to normal.)
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 1
+      order:
+        type: 5
+        volume: 1
+        sweet: 2
+        topping: 2
+      greetingLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        speakerNameEn: "\u0413\u043E\u0440\u043E\u0436\u0430\u043D\u043A\u0430"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
+        triggerSpeech: 1
+    - characterType: 0
+      stickmanIndex: 1
+      order:
+        type: 2
+        volume: 0
+        sweet: 2
+        topping: 0
+      greetingLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0414\u043E\u0431\u0440\u043E\u0433\u043E \u0434\u043D\u044F! \u041D\u0430\u043B\u0435\u0439
+          \u043C\u043D\u0435 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
+          \u043F\u043E \u0432\u043A\u0443\u0441\u0443."
+        textEn: Good day! Pour me something to my taste.
+        triggerSpeech: 1
+      wrongOrderLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0425\u043C, \u044D\u0442\u043E \u043D\u0435 \u0441\u043E\u0432\u0441\u0435\u043C
+          \u0442\u043E, \u0447\u0442\u043E \u044F \u0445\u043E\u0442\u0435\u043B..."
+        textEn: Hmm, that's not quite what I wanted...
+        triggerSpeech: 1
+      storyRevealLines:
+      - speakerName: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        speakerNameEn: "\u041F\u0443\u0442\u043D\u0438\u043A"
+        text: "\u0412\u043E\u0442 \u044D\u0442\u043E \u0434\u0440\u0443\u0433\u043E\u0435
+          \u0434\u0435\u043B\u043E. \u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0445\u043E\u0437\u044F\u0439\u043A\u0430!"
+        textEn: Now that's better. Thank you, keeper!
         triggerSpeech: 1
     dayEndText: "\xAB\u042F\u043A\u043E\u0440\u044C\xBB \u043F\u0440\u0438\u0433\u043E\u0442\u043E\u0432\u043B\u0435\u043D.
       \u0413\u0440\u0430\u043D\u0438\u0446\u044B \u0437\u0430\u043F\u0435\u0447\u0430\u0442\u0430\u043D\u044B
