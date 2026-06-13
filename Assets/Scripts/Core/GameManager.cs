@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviour
     [Header("Машина этапов (существующая, объект StagesScripts)")]
     [SerializeField] private Stages _stages;
 
+    [Header("Свет для «сна» (приглушается между днями; можно не задавать — найдётся сам)")]
+    [SerializeField] private Light _sceneLight;
+
     [Header("Сохранение")]
     [SerializeField] private int _startDay = 1; // 0 — показывать туториал
     [Tooltip("Всегда показывать обучение при старте (игнорируя сохранение). Удобно при разработке.")]
@@ -121,6 +124,56 @@ public class GameManager : MonoBehaviour
         SaveGame();
     }
 
+    // ─── «Сон» между днями (пункт 8) ───────────────────────────────────────
+
+    private static readonly string[][] DreamLines =
+    {
+        new[] { "Это всего лишь сон... всего лишь сон.", "It's only a dream... only a dream." },
+        new[] { "Кай зовёт меня сквозь туман: «Найди меня...»", "Kai calls through the fog: \"Find me...\"" },
+        new[] { "Три круга горят в темноте. Они смотрят.", "Three circles burn in the dark. They are watching." },
+        new[] { "На столе — письмо, пахнущее пеплом. «Я ещё жив.»", "A letter on the table, smelling of ash. \"I am still alive.\"" },
+        new[] { "Стены дышат. Я просыпаюсь — но не уверена, что проснулась.", "The walls breathe. I wake — but I'm not sure I'm awake." },
+    };
+
+    private IEnumerator PlayDreamVignette(int day)
+    {
+        GameInput.Locked = true;
+
+        // Приглушаем свет
+        if (_sceneLight == null) _sceneLight = FindObjectOfType<Light>();
+        float origIntensity = _sceneLight != null ? _sceneLight.intensity : 0f;
+        if (_sceneLight != null)
+            yield return StartCoroutine(FadeLight(_sceneLight, origIntensity, origIntensity * 0.25f, 0.6f));
+
+        // Эффект + текст сна (чередуем эффекты по дням)
+        var effects = new[]
+        {
+            VignetteEffectType.CameraShake, VignetteEffectType.RedPulse,
+            VignetteEffectType.VisionLoss,  VignetteEffectType.DarknessFlash
+        };
+        var effect = effects[day % effects.Length];
+        string text = Loc.IsRu ? DreamLines[day % DreamLines.Length][0]
+                               : DreamLines[day % DreamLines.Length][1];
+
+        yield return StartCoroutine(_vfxController.PlayVignette(effect, text, _dialogue));
+
+        // Возвращаем свет
+        if (_sceneLight != null)
+            yield return StartCoroutine(FadeLight(_sceneLight, _sceneLight.intensity, origIntensity, 0.6f));
+    }
+
+    private IEnumerator FadeLight(Light light, float from, float to, float dur)
+    {
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / Mathf.Max(0.01f, dur);
+            if (light != null) light.intensity = Mathf.Lerp(from, to, t);
+            yield return null;
+        }
+        if (light != null) light.intensity = to;
+    }
+
     /// <summary>Затемнить экран → пауза → высветлить. Управление выключено на время.</summary>
     private IEnumerator Transition()
     {
@@ -178,8 +231,9 @@ public class GameManager : MonoBehaviour
             YG2.GameplayStop();
 
             // ─── Экран результатов дня ──────────────────────────────────────
+            // Деньги меняются живьём в процессе дня (списание себестоимости +
+            // оплата клиента), поэтому здесь totalCoins НЕ трогаем — иначе двойной учёт.
             _currentPhase = GamePhase.DayResult;
-            _saveData.totalCoins += _dayController.CoinsEarnedToday;
 
             if (_dayResultUI != null)
             {
@@ -199,6 +253,13 @@ public class GameManager : MonoBehaviour
                     dayData.vignetteEffect,
                     dayData.GetVignetteText(),
                     _dialogue));
+            }
+
+            // ─── «Сон» в конце каждого дня (пункт 8): тусклый свет + эффекты + текст ─
+            if (day < 20 && _vfxController != null)
+            {
+                _currentPhase = GamePhase.StoryVignette;
+                yield return StartCoroutine(PlayDreamVignette(day));
             }
 
             // ─── Межуровневая реклама (каждые 3 дня) ────────────────────────

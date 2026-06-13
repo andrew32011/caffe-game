@@ -881,5 +881,60 @@ public class StoryDatabase : ScriptableObject
                 }
             }
         });
+
+        // ── Пункты 6,7: гарантируем минимум 3 посетителя в день ──────────────
+        PadDaysToMinimumCustomers(3);
+    }
+
+    // Добивает каждый день до minCount гостей «завсегдатаями» со своим заказом.
+    private void PadDaysToMinimumCustomers(int minCount)
+    {
+        // Имена-завсегдатаи (флавор; механика — случайный заказ)
+        (string ru, string en)[] regulars =
+        {
+            ("Завсегдатай", "Regular"),
+            ("Путник",      "Traveller"),
+            ("Горожанка",   "Townswoman"),
+            ("Старый маг",  "Old Mage"),
+            ("Подмастерье", "Apprentice"),
+        };
+        CoffeeType[] types     = (CoffeeType[])System.Enum.GetValues(typeof(CoffeeType));
+        Volume[]     volumes   = (Volume[])System.Enum.GetValues(typeof(Volume));
+        SweetnessLevel[] sweets= (SweetnessLevel[])System.Enum.GetValues(typeof(SweetnessLevel));
+        Topping[]    toppings  = (Topping[])System.Enum.GetValues(typeof(Topping));
+
+        foreach (var day in days)
+        {
+            int seed = day.dayNumber * 7919;
+            var rng = new System.Random(seed);
+
+            while (day.customers.Count < minCount)
+            {
+                var reg = regulars[rng.Next(regulars.Length)];
+                var order = new CoffeeOrder
+                {
+                    type    = types[rng.Next(types.Length)],
+                    volume  = volumes[rng.Next(volumes.Length)],
+                    sweet   = sweets[rng.Next(sweets.Length)],
+                    topping = rng.Next(2) == 0 ? Topping.None : toppings[rng.Next(toppings.Length)]
+                };
+
+                day.customers.Add(new DayCustomerEntry
+                {
+                    characterType = CharacterType.Traveler,
+                    stickmanIndex = rng.Next(0, 9),
+                    order = order,
+                    greetingLines = L(
+                        (reg.ru, "Доброго дня! Налей мне что-нибудь по вкусу.",
+                                 "Good day! Pour me something to my taste.")),
+                    wrongOrderLines = L(
+                        (reg.ru, "Хм, это не совсем то, что я хотел...",
+                                 "Hmm, that's not quite what I wanted...")),
+                    storyRevealLines = L(
+                        (reg.ru, "Вот это другое дело. Спасибо, хозяйка!",
+                                 "Now that's better. Thank you, keeper!"))
+                });
+            }
+        }
     }
 }

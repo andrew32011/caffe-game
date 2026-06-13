@@ -42,15 +42,24 @@ public class ProcessVisitor : MonoBehaviour
     {
         if (!isMoving || currentTarget == null || targetObject == null) return;
 
-        // Двигаем целевой объект к точке
-        Vector3 direction = (currentTarget.position - targetObject.position).normalized;
-        targetObject.position += direction * moveSpeed * Time.deltaTime;
-        targetObject.forward = direction; // Поворачиваем лицом к цели
+        // Двигаем целевой объект к точке (плавно, без «притягивания»)
+        targetObject.position = Vector3.MoveTowards(
+            targetObject.position, currentTarget.position, moveSpeed * Time.deltaTime);
 
-        // Проверка достижения точки
-        if (Vector3.Distance(targetObject.position, currentTarget.position) < 0.3f)
+        // Плавный поворот в сторону движения (а не мгновенный разворот)
+        Vector3 direction = currentTarget.position - targetObject.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude > 0.0001f)
         {
-            ReachPoint();
+            Quaternion look = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            targetObject.rotation = Quaternion.Slerp(
+                targetObject.rotation, look, 6f * Time.deltaTime);
+        }
+
+        // Достигли точки — переходим к следующей (без жёсткого «прилипания»)
+        if (Vector3.Distance(targetObject.position, currentTarget.position) < 0.05f)
+        {
+            SetNextTarget();
         }
     }
 
@@ -169,13 +178,6 @@ public class ProcessVisitor : MonoBehaviour
         // Устанавливаем текущую цель
         currentTarget = routePoints[currentPointIndex];
         currentPointIndex += moveDirection;
-    }
-
-    private void ReachPoint()
-    {
-        // Точно ставим объект в точку
-        targetObject.position = currentTarget.position;
-        SetNextTarget();
     }
 
     public System.Action OnRouteCompleted;

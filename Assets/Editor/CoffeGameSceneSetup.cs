@@ -162,6 +162,37 @@ public static class CoffeGameSceneSetup
         var volLabel   = Text("VolumeLabel", machinePanel.transform, "Объём", 22, TextAlignmentOptions.Center, new Vector2(0.5f, 0.02f), new Vector2(1.0f, 0.16f));
         machinePanel.SetActive(false);
 
+        // ── Полоса удовлетворённости сверху (пункт 4) ───────────────────────
+        var satBarBG = Panel("SatisfactionBG", ct, new Vector2(0.3f, 0.93f), new Vector2(0.7f, 0.97f), new Color(0f, 0f, 0f, 0.5f));
+        var satFillGO = new GameObject("SatisfactionFill", typeof(RectTransform), typeof(Image));
+        satFillGO.transform.SetParent(satBarBG.transform, false);
+        SetRect((RectTransform)satFillGO.transform, Vector2.zero, Vector2.one);
+        var satFill = satFillGO.GetComponent<Image>();
+        satFill.color = new Color(0.3f, 0.85f, 0.4f);
+        satFill.sprite = WhiteSprite();
+        satFill.type = Image.Type.Filled;
+        satFill.fillMethod = Image.FillMethod.Horizontal;
+        satFill.fillAmount = 0.5f;
+        satFill.raycastTarget = false;
+
+        // Комментарий после шага («Супер!/Не то»)
+        var commentText = Text("CommentText", ct, "", 34, TextAlignmentOptions.Center, new Vector2(0.3f, 0.86f), new Vector2(0.7f, 0.92f));
+        commentText.color = new Color(1f, 0.95f, 0.6f);
+        commentText.gameObject.SetActive(false);
+
+        // ── Деньги кофейни (сверху слева, пункт 5) ──────────────────────────
+        var coinsText = Text("CoinsText", ct, "Касса: 0", 28, TextAlignmentOptions.TopLeft, new Vector2(0.02f, 0.9f), new Vector2(0.25f, 0.98f));
+        coinsText.color = new Color(1f, 0.9f, 0.4f);
+        var coinsUI = coinsText.gameObject.AddComponent<CoinsUI>();
+        new W(coinsUI).Ref("_text", coinsText).Apply();
+
+        // ── Выбор ингредиента + кнопка «Подтвердить» (пункт 2) ──────────────
+        var selectedText = Text("SelectedText", ct, "Выбрано: …", 28, TextAlignmentOptions.Center, new Vector2(0.3f, 0.18f), new Vector2(0.7f, 0.24f));
+        selectedText.gameObject.SetActive(false);
+        var confirmBtn = Btn("BtnConfirm", ct, "Подтвердить ✓");
+        SetRect(confirmBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.05f), new Vector2(0.6f, 0.13f));
+        confirmBtn.gameObject.SetActive(false);
+
         // ── КЛИКАБЕЛЬНЫЕ ПРЕДМЕТЫ НА РЕАЛЬНЫХ ОБЪЕКТАХ СЦЕНЫ ────────────────
         //  Ингредиенты — дети Ingridients1; топпинги — дети ShelfItems.
         //  Вешаем на каждый IngredientItem + Collider (без замены визуала).
@@ -264,14 +295,18 @@ public static class CoffeGameSceneSetup
             .Ref("_volumeLabel", volLabel)
             .Apply();
 
-        // CoffeeCraftingSystem (предметы + кружка + минигейм + подача)
+        // CoffeeCraftingSystem (предметы + кружка + минигейм + подача + UI)
         new W(craft)
             .Ref("_stages", stages)
             .Ref("_cup", cupController)
             .Ref("_machine", machine)
             .Ref("_orderDisplayText", orderText)
-            .Ref("_achievementText", achievement)
+            .Ref("_selectedText", selectedText)
+            .Ref("_confirmButton", confirmBtn)
             .Ref("_serveButton", serveBtn)
+            .Ref("_achievementText", achievement)
+            .Ref("_satisfactionFill", satFill)
+            .Ref("_commentText", commentText)
             .Apply();
 
         // TutorialController
@@ -396,6 +431,7 @@ public static class CoffeGameSceneSetup
             if (it == null) it = child.gameObject.AddComponent<IngredientItem>();
             it.kind = IngredientItem.ItemKind.Ingredient;
             it.ingredientIndex = i;
+            AddWorldLabel(child.gameObject, Loc.T("Основа ", "Base ") + (i + 1)); // подпись над предметом (пункт 2)
             i++;
         }
         Debug.Log($"CoffeGameSetup: ингредиентов (дети {parentName}): {i}");
@@ -421,6 +457,34 @@ public static class CoffeGameSceneSetup
             i++;
         }
         Debug.Log($"CoffeGameSetup: топпингов (дети {parentName}): {i}");
+    }
+
+    // Подпись (TextMesh) над 3D-объектом
+    static void AddWorldLabel(GameObject go, string text)
+    {
+        if (go.transform.Find("ItemLabel") != null) return; // не дублируем
+        var rend = go.GetComponentInChildren<Renderer>();
+        float top = rend != null ? rend.bounds.size.y : 1f;
+
+        var lbl = new GameObject("ItemLabel");
+        lbl.transform.SetParent(go.transform, false);
+        lbl.transform.localPosition = new Vector3(0f, top * 0.6f + 0.4f, 0f);
+        lbl.transform.localScale = Vector3.one * 0.2f;
+        var tm = lbl.AddComponent<TextMesh>();
+        tm.text = text;
+        tm.fontSize = 48;
+        tm.characterSize = 0.08f;
+        tm.anchor = TextAnchor.LowerCenter;
+        tm.alignment = TextAlignment.Center;
+        tm.color = Color.white;
+        var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
+                   ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+        if (font != null)
+        {
+            tm.font = font;
+            var mr = lbl.GetComponent<MeshRenderer>();
+            if (mr != null) mr.sharedMaterial = font.material;
+        }
     }
 
     static void EnsureCollider(GameObject go)
@@ -508,7 +572,7 @@ public static class CoffeGameSceneSetup
         SetRect((RectTransform)go.transform, Vector2.zero, Vector2.one);
         var img = go.GetComponent<Image>();
         img.color = color;
-        img.sprite = BuiltinSprite();
+        img.sprite = WhiteSprite();
         img.type = Image.Type.Filled;
         img.fillMethod = Image.FillMethod.Vertical;
         img.fillOrigin = (int)Image.OriginVertical.Bottom;
@@ -517,16 +581,22 @@ public static class CoffeGameSceneSetup
         return img;
     }
 
-    // Находит один stickman в сцене (для роли существующего гостя). Не удаляет.
+    // Находит ходячего гостя (НЕ главного героя!). Приоритет — stickman под VisitorBasis,
+    // т.к. именно его двигает ProcessVisitor. Так мы не заденем главного героя за стойкой.
     static GameObject FindSceneStickman()
     {
-        foreach (var go in Object.FindObjectsOfType<GameObject>())
-            if (go.name.ToLower().Contains("stickman") && go.transform.parent == null)
-                return go;
-        foreach (var go in Object.FindObjectsOfType<GameObject>())
-            if (go.name.ToLower().Contains("stickman"))
-                return go;
-        Debug.LogWarning("CoffeGameSetup: ходячий гость (stickman) в сцене не найден — назначь _existingGuest вручную.");
+        var vb = GameObject.Find("VisitorBasis");
+        if (vb != null)
+        {
+            foreach (Transform ch in vb.transform)
+                if (ch.name.ToLower().Contains("stickman"))
+                    return ch.gameObject;
+            // любой видимый ребёнок VisitorBasis — это и есть модель гостя
+            if (vb.transform.childCount > 0)
+                return vb.transform.GetChild(0).gameObject;
+        }
+        Debug.LogWarning("CoffeGameSetup: модель ходячего гостя не найдена под VisitorBasis — " +
+                         "назначь _existingGuest вручную (и НЕ выбирай главного героя!).");
         return null;
     }
 
@@ -653,6 +723,16 @@ public static class CoffeGameSceneSetup
     {
         // Встроенный UISprite Unity (белый закруглённый квадрат)
         return AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+    }
+
+    private static Sprite _whiteSprite;
+    // Плоский белый спрайт без 9-slice — чёткие шкалы (пункт 3)
+    static Sprite WhiteSprite()
+    {
+        if (_whiteSprite != null) return _whiteSprite;
+        var tex = Texture2D.whiteTexture;
+        _whiteSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+        return _whiteSprite;
     }
 
     static void AddPersistentClick(Button btn, Object target, string method)

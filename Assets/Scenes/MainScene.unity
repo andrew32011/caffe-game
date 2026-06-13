@@ -5712,7 +5712,7 @@ MonoBehaviour:
     autoCompleteIfNoScript: 0
   - stageName: 7 guest leaves
     isEnabled: 1
-    cameraTarget: {fileID: 1763016925}
+    cameraTarget: {fileID: 954448081}
     cameraMoveDuration: 1
     disableCharacter: 0
     stageScript: {fileID: 1801658536}

@@ -1,13 +1,15 @@
 /// <summary>
 /// Оркестратор приготовления. Флоу (пункт 5):
-///   зона 1 — клик по сосуду (Ingridients1) → «выливается» в кружку → едем к машине;
-///   машина — минигейм 2 заполнений (температура, объём), показываем «Отлично!»;
+///   зона 1 — клик по сосуду (Ingridients1): сначала показываем выбор и кнопку
+///            «Подтвердить»; после подтверждения «выливаем» в кружку и едем к машине;
+///   машина — минигейм 2 вертикальных шкал (температура, объём);
 ///   топпинги — клик по предметам ShelfItems → копия падает в кружку;
 ///   кнопка «Подать» → возвращаемся за стойку, заказ готов.
-/// Желание клиента берём из CoffeeOrder (StoryDatabase): type→основа, volume→объём,
-/// sweet→температура, topping→топпинг. Удовлетворённость = доля совпавших параметров.
+/// Полоса удовлетворённости — UI сверху, обновляется после каждого шага, с
+/// комментарием («Супер!»/«Не совсем то»/«Не то»). Себестоимость ингредиента и
+/// топпингов списывается живьём (пункт 5). Клиент стартует с 50%.
 /// Сцена: MainScene
-/// Зависимости: Stages, CupController, MachineMinigame, IngredientItem, GameInput
+/// Зависимости: Stages, CupController, MachineMinigame, IngredientItem, GameManager, GameInput
 /// SDK: Нет
 /// </summary>
 using System.Collections;
@@ -33,10 +35,20 @@ public class CoffeeCraftingSystem : MonoBehaviour
     [SerializeField] private CupController  _cup;
     [SerializeField] private MachineMinigame _machine;
 
-    [Header("UI")]
+    [Header("UI — заказ / выбор / подтверждение")]
     [SerializeField] private TextMeshProUGUI _orderDisplayText;
-    [SerializeField] private TextMeshProUGUI _achievementText; // «Отлично!» вверху экрана
-    [SerializeField] private Button          _serveButton;     // «Подать» (пункт 10)
+    [SerializeField] private TextMeshProUGUI _selectedText;   // «Выбрано: …»
+    [SerializeField] private Button          _confirmButton;  // «Подтвердить» (пункт 2)
+    [SerializeField] private Button          _serveButton;    // «Подать» (пункт 10)
+    [SerializeField] private TextMeshProUGUI _achievementText;// «В точку!» (минигейм)
+
+    [Header("UI — удовлетворённость (сверху, пункт 4)")]
+    [SerializeField] private Image           _satisfactionFill; // Image: Filled, Horizontal
+    [SerializeField] private TextMeshProUGUI _commentText;      // «Супер!/Не то»
+
+    [Header("Экономика (пункт 5)")]
+    [SerializeField] private int _ingredientCost = 8;
+    [SerializeField] private int _toppingCost    = 3;
 
     [Header("Допуск совпадения ползунков (0..1)")]
     [SerializeField] private float _tolerance = 0.15f;
@@ -58,16 +70,22 @@ public class CoffeeCraftingSystem : MonoBehaviour
     private float _chosenTemp, _chosenVolume;
     private readonly List<Topping> _chosenToppings = new List<Topping>();
 
+    private bool _ingredientDecided, _machineDecided, _toppingDecided;
+    private IngredientItem _pending;     // выбранный, но не подтверждённый сосуд
+    private int  _currentDrinkCost;      // себестоимость текущего напитка
+
     private bool _orderReady;
-    public bool IsOrderReady => _orderReady;
+    public bool IsOrderReady       => _orderReady;
     public int  ChosenToppingCount => _chosenToppings.Count;
+    public int  CurrentDrinkCost   => _currentDrinkCost;
 
     // ─── Жизненный цикл ──────────────────────────────────────────────────────
 
     private void Awake()
     {
         Instance = this;
-        if (_serveButton != null) _serveButton.onClick.AddListener(OnServeClicked);
+        if (_serveButton   != null) _serveButton.onClick.AddListener(OnServeClicked);
+        if (_confirmButton != null) _confirmButton.onClick.AddListener(OnConfirmIngredient);
     }
 
     // ─── Публичное API (DayController) ───────────────────────────────────────
@@ -82,18 +100,22 @@ public class CoffeeCraftingSystem : MonoBehaviour
     public void Show()
     {
         ResetState();
+        _cup?.ResetCup();              // пункт 1: чистим содержимое кружки под нового клиента
         _stage = Stage.Ingredients;
         if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(true);
-        if (_serveButton != null) _serveButton.gameObject.SetActive(false);
+        HideButton(_serveButton);
+        HideButton(_confirmButton);
+        if (_selectedText != null) _selectedText.gameObject.SetActive(false);
         _machine?.HidePanel();
-        _cup?.SnapTo(CupController.Zone.Ingredients);
+        UpdateSatisfactionUI();        // полоса в нейтраль (50%)
         _stages?.JumpToStage(_ingredientsStageIndex);
     }
 
     public void Hide()
     {
         if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(false);
-        if (_serveButton != null) _serveButton.gameObject.SetActive(false);
+        HideButton(_serveButton);
+        HideButton(_confirmButton);
         _machine?.HidePanel();
     }
 
@@ -108,21 +130,17 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _chosenIngredient = -1;
         _chosenTemp = _chosenVolume = 0f;
         _chosenToppings.Clear();
+        _ingredientDecided = _machineDecided = _toppingDecided = false;
+        _pending = null;
+        _currentDrinkCost = 0;
         _orderReady = false;
     }
 
-    /// <summary>Доля совпавших параметров (0..1): основа, температура, объём, топпинг.</summary>
+    /// <summary>Итоговая удовлетворённость 0..1 (старт 50%, ±за каждый параметр).</summary>
     public float EvaluateSatisfaction()
     {
-        if (_target == null) return 0f;
-        int total = 4, matched = 0;
-
-        if (_chosenIngredient == TargetIngredientIndex()) matched++;
-        if (Mathf.Abs(_chosenTemp   - TempTarget())   <= _tolerance) matched++;
-        if (Mathf.Abs(_chosenVolume - VolumeTarget()) <= _tolerance) matched++;
-        if (ToppingMatches()) matched++;
-
-        return (float)matched / total;
+        _toppingDecided = true; // на выдаче топпинг считается решённым (даже если не клали)
+        return Satisfaction();
     }
 
     // ─── Клик по предмету ─────────────────────────────────────────────────────
@@ -133,30 +151,59 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
         if (_stage == Stage.Ingredients && item.kind == IngredientItem.ItemKind.Ingredient)
         {
-            _chosenIngredient = item.ingredientIndex;
-            item.FlashSelected();
-            StartCoroutine(IngredientThenMachine(item));
+            // Пункт 2: сначала выбираем (подсветка + «Выбрано» + подтвердить)
+            if (_pending != null) _pending.SetPulsing(false);
+            _pending = item;
+            item.SetPulsing(true);
+            if (_selectedText != null)
+            {
+                _selectedText.gameObject.SetActive(true);
+                _selectedText.text = Loc.T("Выбрано: основа ", "Selected: base ") + (item.ingredientIndex + 1);
+            }
+            ShowButton(_confirmButton);
         }
         else if (_stage == Stage.Toppings && item.kind == IngredientItem.ItemKind.Topping)
         {
             if (!_chosenToppings.Contains(item.topping))
+            {
                 _chosenToppings.Add(item.topping);
+                Spend(_toppingCost);                 // пункт 5: списываем за топпинг
+            }
             item.FlashSelected();
             _cup?.DropTopping(item);
-            if (_serveButton != null) _serveButton.gameObject.SetActive(true);
+            StepFeedback(_target != null && item.topping == _target.topping, partial: true);
+            ShowButton(_serveButton);
         }
+    }
+
+    // Подтверждение выбранного ингредиента (кнопка)
+    private void OnConfirmIngredient()
+    {
+        if (_stage != Stage.Ingredients || _pending == null) return;
+
+        var vessel = _pending;
+        vessel.SetPulsing(false);
+        _chosenIngredient = vessel.ingredientIndex;
+        _ingredientDecided = true;
+        Spend(_ingredientCost);                       // пункт 5: списываем за основу
+
+        if (_selectedText != null) _selectedText.gameObject.SetActive(false);
+        HideButton(_confirmButton);
+
+        StepFeedback(_chosenIngredient == TargetIngredientIndex(), partial: true);
+        StartCoroutine(IngredientThenMachine(vessel));
+        _pending = null;
     }
 
     private IEnumerator IngredientThenMachine(IngredientItem vessel)
     {
-        GameInput.Locked = true; // во время налива и переезда клики выключены
+        GameInput.Locked = true;
         if (_cup != null) yield return StartCoroutine(_cup.PourIngredient(vessel));
 
         _stage = Stage.Machine;
         _stages?.JumpToStage(_machineStageIndex);
         if (_cup != null) yield return StartCoroutine(_cup.MoveTo(CupController.Zone.Machine));
 
-        // Минигейм машины: бегунок температуры, затем объёма
         if (_machine != null)
         {
             GameInput.Locked = false; // клики нужны для фиксации бегунка
@@ -164,7 +211,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         }
         else
         {
-            OnMachineDone(TempTarget(), VolumeTarget()); // без минигейма — авто-совпадение
+            OnMachineDone(TempTarget(), VolumeTarget());
         }
     }
 
@@ -172,13 +219,14 @@ public class CoffeeCraftingSystem : MonoBehaviour
     {
         _chosenTemp   = temp;
         _chosenVolume = volume;
+        _machineDecided = true;
         _machine?.HidePanel();
 
-        bool tempOk = Mathf.Abs(temp - TempTarget()) <= _tolerance;
+        bool tempOk = Mathf.Abs(temp   - TempTarget())   <= _tolerance;
         bool volOk  = Mathf.Abs(volume - VolumeTarget()) <= _tolerance;
         if (tempOk && volOk) ShowAchievement(Loc.T("В точку!", "Spot on!"));
-        else if (tempOk || volOk) ShowAchievement(Loc.T("Неплохо", "Not bad"));
 
+        StepFeedback(tempOk && volOk, partial: true);
         StartCoroutine(ToToppings());
     }
 
@@ -190,8 +238,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         if (_cup != null) yield return StartCoroutine(_cup.MoveTo(CupController.Zone.Toppings));
 
         GameInput.Locked = false;
-        // Кнопку «Подать» можно нажать сразу (топпинги по желанию)
-        if (_serveButton != null) _serveButton.gameObject.SetActive(true);
+        ShowButton(_serveButton); // топпинги по желанию — можно сразу подать
     }
 
     private void OnServeClicked()
@@ -203,21 +250,73 @@ public class CoffeeCraftingSystem : MonoBehaviour
     private IEnumerator ServeRoutine()
     {
         GameInput.Locked = true;
-        if (_serveButton != null) _serveButton.gameObject.SetActive(false);
+        HideButton(_serveButton);
         _stage = Stage.Done;
         _stages?.JumpToStage(_counterStageIndex);
         if (_cup != null) yield return StartCoroutine(_cup.MoveTo(CupController.Zone.Counter));
         _orderReady = true;
     }
 
-    // ─── Подсказка для туториала: следующий нужный предмет ────────────────────
+    // ─── Удовлетворённость и комментарии ─────────────────────────────────────
+
+    private float Satisfaction()
+    {
+        int matched = 0, mismatched = 0;
+
+        if (_ingredientDecided) { if (_chosenIngredient == TargetIngredientIndex()) matched++; else mismatched++; }
+        if (_machineDecided)
+        {
+            if (Mathf.Abs(_chosenTemp   - TempTarget())   <= _tolerance) matched++; else mismatched++;
+            if (Mathf.Abs(_chosenVolume - VolumeTarget()) <= _tolerance) matched++; else mismatched++;
+        }
+        if (_toppingDecided) { if (ToppingMatches()) matched++; else mismatched++; }
+
+        return Mathf.Clamp01(0.5f + 0.5f * (matched - mismatched) / 4f);
+    }
+
+    private Coroutine _commentCo;
+
+    // partial=true — обновляем полосу по ходу готовки
+    private void StepFeedback(bool good, bool partial)
+    {
+        UpdateSatisfactionUI();
+        if (_commentText == null) return;
+        _commentText.text = good
+            ? Loc.T("Супер!", "Great!")
+            : Loc.T("Не совсем то…", "Not quite…");
+        if (_commentCo != null) StopCoroutine(_commentCo);
+        _commentCo = StartCoroutine(CommentRoutine());
+    }
+
+    private IEnumerator CommentRoutine()
+    {
+        _commentText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1.4f);
+        if (_commentText != null) _commentText.gameObject.SetActive(false);
+    }
+
+    private void UpdateSatisfactionUI()
+    {
+        if (_satisfactionFill != null)
+            _satisfactionFill.fillAmount = Satisfaction();
+    }
+
+    // ─── Экономика ────────────────────────────────────────────────────────────
+
+    private void Spend(int cost)
+    {
+        _currentDrinkCost += cost;
+        GameManager.Instance?.AddCoins(-cost); // живое списание из денег кофейни
+    }
+
+    // ─── Подсказка для туториала ──────────────────────────────────────────────
 
     public IngredientItem GetNextHintItem()
     {
         if (_target == null) return null;
-        if (_stage == Stage.Ingredients)
+        if (_stage == Stage.Ingredients && !_ingredientDecided)
             return FindIngredient(TargetIngredientIndex());
-        if (_stage == Stage.Toppings && _target.topping != Topping.None)
+        if (_stage == Stage.Toppings && _target.topping != Topping.None && !_chosenToppings.Contains(_target.topping))
             return FindTopping(_target.topping);
         return null;
     }
@@ -277,7 +376,10 @@ public class CoffeeCraftingSystem : MonoBehaviour
         return _chosenToppings.Contains(_target.topping);
     }
 
-    // ─── Ачивка ────────────────────────────────────────────────────────────────
+    // ─── Утилиты UI ────────────────────────────────────────────────────────────
+
+    private void ShowButton(Button b) { if (b != null) b.gameObject.SetActive(true); }
+    private void HideButton(Button b) { if (b != null) b.gameObject.SetActive(false); }
 
     private Coroutine _achievementCo;
 

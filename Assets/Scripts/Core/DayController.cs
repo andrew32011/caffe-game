@@ -41,19 +41,20 @@ public class DayController : MonoBehaviour
     [SerializeField] private int _stageReaction   = 6;
     [SerializeField] private int _stageGuestLeave = 7;
 
-    [Header("Экономика (пункт 8)")]
-    [Tooltip("Сколько максимум платит полностью довольный клиент.")]
+    [Header("Экономика (пункт 5)")]
+    [Tooltip("Сколько платит полностью довольный клиент в обычный день.")]
     [SerializeField] private int _basePrice = 40;
-    [Tooltip("Себестоимость основы напитка (вычитается всегда).")]
-    [SerializeField] private int _ingredientCost = 8;
-    [Tooltip("Себестоимость одного топпинга.")]
-    [SerializeField] private int _toppingCost = 3;
-    [Tooltip("Порог удовлетворённости, ниже которого клиент недоволен (показ подсказок).")]
+    [Tooltip("Множитель оплаты в первые дни (чтобы деньги не были проблемой сразу).")]
+    [SerializeField] private float _earlyDayMultiplier = 3f;
+    [Tooltip("До какого дня (включительно) действует повышенная оплата.")]
+    [SerializeField] private int _earlyDayLimit = 3;
+    [Tooltip("Порог удовлетворённости, ниже которого клиент недоволен.")]
     [Range(0f, 1f)] [SerializeField] private float _satisfiedThreshold = 0.5f;
 
     // ─── Состояние ───────────────────────────────────────────────────────────
 
     private int  _coinsEarnedToday = 0;   // чистая прибыль за день (может быть < 0)
+    private int  _currentDayNumber = 1;
     private bool _daySuccess       = false;
 
     public bool DaySuccess       => _daySuccess;
@@ -65,6 +66,7 @@ public class DayController : MonoBehaviour
     public IEnumerator RunDay(DayData dayData)
     {
         _coinsEarnedToday = 0;
+        _currentDayNumber = dayData.dayNumber;
         _daySuccess       = false;
 
         _dialogue?.ShowDayIntro(dayData.dayNumber);
@@ -120,11 +122,12 @@ public class DayController : MonoBehaviour
         _customerController.SetSatisfaction(satisfaction);
         yield return new WaitForSeconds(0.6f);
 
-        // 7. Экономика: оплата по удовлетворённости минус себестоимость (пункт 8)
-        int payment = Mathf.RoundToInt(_basePrice * satisfaction);
-        int cost    = _ingredientCost + _toppingCost * _craftingSystem.ChosenToppingCount;
-        int profit  = payment - cost;
-        _coinsEarnedToday += profit;
+        // 7. Экономика (пункт 5): себестоимость уже списана живьём в крафте;
+        //    здесь клиент платит по удовлетворённости (в первые дни — щедро).
+        float mult  = _currentDayNumber <= _earlyDayLimit ? _earlyDayMultiplier : 1f;
+        int payment = Mathf.RoundToInt(_basePrice * satisfaction * mult);
+        GameManager.Instance?.AddCoins(payment);
+        _coinsEarnedToday += payment - _craftingSystem.CurrentDrinkCost;
 
         // 8. Реакция гостя
         yield return StartCoroutine(GoToStageAndWait(_stageReaction));
