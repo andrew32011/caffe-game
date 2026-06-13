@@ -509,24 +509,43 @@ public static class CoffeGameSceneSetup
         return objName; // запасной вариант — как назван объект
     }
 
-    // Находит главного героя, добавляет idle-анимацию (не удаляет!). Пункт 8.
+    // Находит главного героя (Female 1 Smooth Prefab — ребёнок Main Camera),
+    // добавляет процедурный idle. НЕ удаляет. Пункт 8.
     static GameObject SetupHero()
     {
-        var hero = GameObject.Find("Female 1 Smooth Prefab");
+        GameObject hero = GameObject.Find("Female 1 Smooth Prefab");
+
+        // Запасной поиск: среди детей камеры (в т.ч. неактивных)
         if (hero == null)
         {
-            Debug.LogWarning("CoffeGameSetup: главный герой 'Female 1 Smooth Prefab' не найден — " +
-                             "назначь его в CoffeeCraftingSystS._heroObject вручную.");
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                foreach (var tr in cam.GetComponentsInChildren<Transform>(true))
+                {
+                    if (tr == cam.transform) continue;
+                    string n = tr.name.ToLower();
+                    if (n.Contains("female") || n.Contains("smooth prefab"))
+                    {
+                        hero = tr.gameObject;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (hero == null)
+        {
+            Debug.LogWarning("CoffeGameSetup: главный герой не найден под Main Camera — " +
+                             "назначь CoffeeCraftingSystem._heroObject вручную.");
             return null;
         }
-        var an = hero.GetComponentInChildren<Animator>();
-        if (an == null) an = hero.AddComponent<Animator>();
-        if (an.runtimeAnimatorController == null)
-        {
-            var idle = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
-                "Assets/PrefsAll/Hyper Casual Characters/Animator controller/idle.controller");
-            if (idle != null) an.runtimeAnimatorController = idle;
-        }
+
+        // Процедурный idle (скелетные клипы к этому ригу не подходят)
+        if (hero.GetComponent<HeroIdle>() == null)
+            hero.AddComponent<HeroIdle>();
+
+        Debug.Log($"CoffeGameSetup: главный герой '{hero.name}' найден, добавлен HeroIdle.");
         return hero;
     }
 
