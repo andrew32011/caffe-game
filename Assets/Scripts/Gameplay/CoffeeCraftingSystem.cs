@@ -216,7 +216,8 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _cup?.ResetCup();              // пункт 1: чистим содержимое кружки под нового клиента
         _stage = Stage.Ingredients;
         GameInput.Locked = false;      // пункт 5: разблокируем клики для нового клиента
-        SetHeroVisible(false);          // пункт 8: прячем ГГ на время готовки
+        // Пункт 2: ГГ НЕ прячем сразу — он исчезнет только после того, как камера
+        // уедет от стойки к ингредиентам (см. HideHeroWhenCameraLeaves ниже).
         if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(true);
         HideButton(_serveButton);
         HideButton(_confirmButton);
@@ -226,12 +227,25 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _machine?.HidePanel();
         UpdateSatisfactionUI();        // полоса в нейтраль (50%)
         _stages?.JumpToStage(_ingredientsStageIndex);
+        StartCoroutine(HideHeroWhenCameraLeaves());
     }
 
     /// <summary>Показать/скрыть главного героя (активен только на диалоге и во сне, пункт 2).</summary>
     public void SetHeroVisible(bool on)
     {
         if (_heroObject != null) _heroObject.SetActive(on);
+    }
+
+    // Пункт 2: прячем ГГ только после того, как камера доехала до зоны готовки
+    // (ушла от стойки), чтобы он не исчезал прямо в кадре.
+    private IEnumerator HideHeroWhenCameraLeaves()
+    {
+        if (_stages != null)
+        {
+            yield return null;                       // даём кадр на старт перехода
+            while (_stages.IsTransitioning) yield return null;
+        }
+        SetHeroVisible(false);
     }
 
     public void Hide()

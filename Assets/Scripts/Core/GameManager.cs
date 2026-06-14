@@ -148,16 +148,14 @@ public class GameManager : MonoBehaviour
         if (_sceneLight != null)
             yield return StartCoroutine(FadeLight(_sceneLight, origIntensity, origIntensity * 0.1f, 0.5f));
 
-        // 1) Уводим экран в чёрный и крупной надписью говорим, что это сон (пункт 3)
-        if (_vfxController != null)
-            yield return StartCoroutine(_vfxController.FadeScreen(true, 0.6f));
-        _dialogue?.ShowMessage(Loc.T("Это сон. Всего лишь сон…", "It's a dream. Only a dream…"), 2.2f);
-        yield return new WaitForSeconds(2.6f);
+        // 1) Показываем титр-заставку «Сон» с иконкой на потемневшей сцене —
+        //    аналогично «ДЕНЬ N» в начале дня (пункт 1). Сначала титр, потом эффект.
+        //    (Титр НЕ под чёрным оверлеем — иначе его не было бы видно; затемнение
+        //    дальше сделает сам PlayVignette.)
+        if (_dialogue != null)
+            yield return StartCoroutine(_dialogue.ShowTitleCardRoutine(Loc.T("СОН", "DREAM"), true, 2.2f));
 
-        // 2) Чуть приоткрываем тьму и играем кошмар: эффект + текст
-        if (_vfxController != null)
-            yield return StartCoroutine(_vfxController.FadeScreen(false, 0.5f)); // станет видно сцену в темноте
-
+        // 2) Кошмар: эффект + текст (PlayVignette сам затемняет вход и открывает сцену).
         // Пункт 1: во сне НЕ используем красные вспышки (RedPulse) — только
         // тьма, тряска и потеря зрения. Сон должен быть мрачным, а не «алым».
         var effects = new[]
@@ -190,27 +188,41 @@ public class GameManager : MonoBehaviour
         if (light != null) light.intensity = to;
     }
 
-    /// <summary>Затемнить экран → пауза → высветлить. Управление выключено на время.</summary>
+    /// <summary>Затемнить экран → реклама → высветлить. Управление выключено на время.
+    /// Пункт 4: вызывается на КАЖДОМ переходе — между днями и обучение→день 1.</summary>
     private IEnumerator Transition()
     {
         GameInput.Locked = true;
         if (_vfxController != null)
-        {
             yield return StartCoroutine(_vfxController.FadeScreen(true, 0.6f));
-            yield return new WaitForSeconds(0.3f);
-            yield return StartCoroutine(_vfxController.FadeScreen(false, 0.6f));
-        }
         else
-        {
-            yield return new WaitForSeconds(0.6f);
-        }
+            yield return new WaitForSeconds(0.3f);
+
+        // Всплывающая (межстраничная) реклама на переходе.
+        yield return StartCoroutine(ShowInterstitial());
+
+        if (_vfxController != null)
+            yield return StartCoroutine(_vfxController.FadeScreen(false, 0.6f));
+        else
+            yield return new WaitForSeconds(0.3f);
+    }
+
+    /// <summary>Показ межстраничной рекламы и ожидание её закрытия (если модуль установлен).</summary>
+    private IEnumerator ShowInterstitial()
+    {
+#if InterstitialAdv_yg
+        YG2.InterstitialAdvShow();
+        yield return new WaitUntil(() => !YG2.nowInterAdv);
+#else
+        yield return null;
+#endif
     }
 
     // ─── Цикл дней ───────────────────────────────────────────────────────────
 
     private IEnumerator RunGameDays()
     {
-        while (_saveData.currentDay <= 20)
+        while (_saveData.currentDay <= 40)
         {
             int day = _saveData.currentDay;
             DayData dayData = _storyDatabase?.GetDay(day);
@@ -275,26 +287,19 @@ public class GameManager : MonoBehaviour
             }
 
             // ─── «Сон» в конце каждого дня (пункт 8): тусклый свет + эффекты + текст ─
-            if (day < 20 && _vfxController != null)
+            if (day < 40 && _vfxController != null)
             {
                 _currentPhase = GamePhase.StoryVignette;
                 yield return StartCoroutine(PlayDreamVignette(day));
             }
 
-            // ─── Межуровневая реклама (каждые 3 дня) ────────────────────────
-            if (day % 3 == 0)
-            {
-#if InterstitialAdv_yg
-                YG2.InterstitialAdvShow();
-                yield return new WaitUntil(() => !YG2.nowInterAdv);
-#endif
-            }
+            // Реклама теперь показывается на каждом переходе — внутри Transition() (пункт 4).
 
             // ─── Переход к следующему дню ────────────────────────────────────
             _saveData.currentDay++;
             SaveGame();
 
-            if (_saveData.currentDay > 20)
+            if (_saveData.currentDay > 40)
                 break;
 
             // Затемнение между днями (пункт 5)

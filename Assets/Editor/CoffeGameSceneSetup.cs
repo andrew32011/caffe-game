@@ -135,7 +135,11 @@ public static class CoffeGameSceneSetup
 
         // ── Заставка дня (центр) ────────────────────────────────────────────
         var dayIntroPanel = Panel("DayIntroPanel", ct, new Vector2(0.3f, 0.4f), new Vector2(0.7f, 0.6f), new Color(0f, 0f, 0f, 0.8f));
-        var dayIntroText  = Text("DayIntroText", dayIntroPanel.transform, "ДЕНЬ 1", 64, TextAlignmentOptions.Center, Vector2.zero, Vector2.one);
+        var dayIntroText  = Text("DayIntroText", dayIntroPanel.transform, "ДЕНЬ 1", 64, TextAlignmentOptions.Center, new Vector2(0f, 0f), new Vector2(1f, 0.62f));
+        // Иконка сна (луна/звёзды) — видна только на заставке «Сон» (пункт 1)
+        var sleepIcon = IconImage("SleepIcon", dayIntroPanel.transform, "Assets/Mini UI/UI Icons/MoonStars.png",
+            new Vector2(0.38f, 0.6f), new Vector2(0.62f, 0.98f));
+        sleepIcon.gameObject.SetActive(false);
 
         // ── Сообщение (центр, CanvasGroup) ──────────────────────────────────
         var messagePanel = Panel("MessagePanel", ct, new Vector2(0.2f, 0.42f), new Vector2(0.8f, 0.58f), new Color(0.1f, 0f, 0f, 0.8f));
@@ -278,6 +282,7 @@ public static class CoffeGameSceneSetup
         dlg.continueHint   = continueHint;
         dlg.dayIntroPanel  = dayIntroPanel;
         dlg.dayIntroText   = dayIntroText;
+        dlg.sleepIcon      = sleepIcon.gameObject;
         dlg.messageText    = messageText;
         dlg.messageGroup   = messageGroup;
         dlg.speechMixer    = speech;
@@ -725,19 +730,54 @@ public static class CoffeGameSceneSetup
         }
     }
 
-    // Настраивает существующую кружку (PlayerCup): CupController + якоря зон.
+    // Настраивает кружку (PlayerCup): реальная модель Coffee Cup C + CupController + якоря зон.
     static CupController SetupCup(string cupName, Transform ingA, Transform macA, Transform topA, Transform countA)
     {
         var cup = GameObject.Find(cupName);
         if (cup == null)
         {
-            cup = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            cup.name = cupName;
-            Object.DestroyImmediate(cup.GetComponent<Collider>());
-            cup.transform.localScale = new Vector3(0.12f, 0.1f, 0.12f);
-            Debug.LogWarning("CoffeGameSetup: PlayerCup не найден — создан цилиндр-заглушка.");
+            cup = new GameObject(cupName);
+            Debug.LogWarning("CoffeGameSetup: PlayerCup не найден — создан новый объект-носитель кружки.");
         }
-        cup.transform.SetParent(null, true); // кружка живёт в мире, не под камерой
+        cup.transform.SetParent(null, true);   // кружка живёт в мире, не под камерой
+        cup.transform.localScale = Vector3.one; // масштаб задаём модели-визуалу ниже
+
+        // Пункт 3: реальная кружка из ассетов вместо цилиндра.
+        // Снимаем старый примитив-меш с самого PlayerCup и старый визуал.
+        var oldMf = cup.GetComponent<MeshFilter>();   if (oldMf != null) Object.DestroyImmediate(oldMf);
+        var oldMr = cup.GetComponent<MeshRenderer>(); if (oldMr != null) Object.DestroyImmediate(oldMr);
+        var oldCol = cup.GetComponent<Collider>();    if (oldCol != null) Object.DestroyImmediate(oldCol);
+        var oldVisual = cup.transform.Find("CupVisual");
+        if (oldVisual != null) Object.DestroyImmediate(oldVisual.gameObject);
+
+        float cupHeight = 0.16f; // целевая высота кружки в мире
+        var cupPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/PrefsAll/Food Pack-Demo/Prefabs/Coffee Cup C.prefab");
+        if (cupPrefab != null)
+        {
+            var visual = (GameObject)PrefabUtility.InstantiatePrefab(cupPrefab);
+            visual.name = "CupVisual";
+            visual.transform.SetParent(cup.transform, false);
+            visual.transform.localPosition = Vector3.zero;
+            visual.transform.localRotation = Quaternion.identity;
+
+            // Авто-масштаб по габаритам, чтобы кружка была нужного размера независимо
+            // от исходного масштаба модели.
+            var rends = visual.GetComponentsInChildren<Renderer>();
+            if (rends.Length > 0)
+            {
+                var b = rends[0].bounds;
+                for (int i = 1; i < rends.Length; i++) b.Encapsulate(rends[i].bounds);
+                float h = Mathf.Max(0.0001f, b.size.y);
+                float k = cupHeight / h;
+                visual.transform.localScale *= k;
+                cupHeight = h * k;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("CoffeGameSetup: 'Coffee Cup C.prefab' не найден — оставил пустой PlayerCup.");
+        }
 
         Transform Anchor(string n, Transform near, Vector3 fallback)
         {
@@ -753,7 +793,7 @@ public static class CoffeGameSceneSetup
 
         var content = new GameObject("ContentAnchor").transform;
         content.SetParent(cup.transform, false);
-        content.localPosition = new Vector3(0f, 0.6f, 0f);
+        content.localPosition = new Vector3(0f, cupHeight * 0.6f, 0f); // у кромки кружки
 
         var ctrl = cup.GetComponent<CupController>();
         if (ctrl == null) ctrl = cup.AddComponent<CupController>();

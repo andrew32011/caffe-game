@@ -160,9 +160,9 @@ public class DayController : MonoBehaviour
             yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.wrongOrderLines));
         }
 
-        // 10. Гость уходит — ГГ снова прячем (пункт 2)
+        // 10. Гость уходит. ГГ прячем ВНУТРИ LetCustomerLeave — уже после того, как
+        //     камера ушла от стойки (пункт 2: не исчезать в кадре).
         yield return new WaitForSeconds(0.4f);
-        _craftingSystem.SetHeroVisible(false);
         yield return StartCoroutine(LetCustomerLeave());
     }
 
@@ -172,6 +172,7 @@ public class DayController : MonoBehaviour
     private IEnumerator LetCustomerLeave()
     {
         yield return StartCoroutine(GoToStageAndWait(_stageGuestLeave));
+        _craftingSystem.SetHeroVisible(false); // пункт 2: прячем ГГ ПОСЛЕ ухода камеры
         yield return StartCoroutine(_customerController.WaitForRouteEnd());
         _customerController.RemoveModel();
     }

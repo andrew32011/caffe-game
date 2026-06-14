@@ -28,6 +28,8 @@ public class DialogueDisplayer : MonoBehaviour
     [Header("Заставка дня")]
     public GameObject dayIntroPanel;
     public TextMeshProUGUI dayIntroText;
+    [Tooltip("Иконка «сон» на заставке (луна/звёзды). Видна только для заставки сна.")]
+    public GameObject sleepIcon;
 
     [Header("Быстрое сообщение (центр экрана)")]
     public TextMeshProUGUI messageText;
@@ -194,17 +196,25 @@ public class DialogueDisplayer : MonoBehaviour
 
     public void ShowDayIntro(int dayNumber)
     {
-        if (dayIntroPanel == null || dayIntroText == null) return;
-
-        dayIntroText.text = Loc.T($"ДЕНЬ {dayNumber}", $"DAY {dayNumber}");
-        StartCoroutine(ShowDayIntroRoutine());
+        StartCoroutine(ShowTitleCardRoutine(Loc.T($"ДЕНЬ {dayNumber}", $"DAY {dayNumber}"), false, 1.8f));
     }
 
-    private IEnumerator ShowDayIntroRoutine()
+    /// <summary>Заставка-титр по центру (как «ДЕНЬ N»). Awaitable.
+    /// sleep=true — показывает иконку сна (пункт 1).</summary>
+    public IEnumerator ShowTitleCardRoutine(string text, bool sleep = false, float seconds = 1.8f)
     {
+        if (dayIntroPanel == null || dayIntroText == null)
+        {
+            yield return new WaitForSeconds(seconds);
+            yield break;
+        }
+
+        dayIntroText.text = text;
+        if (sleepIcon != null) sleepIcon.SetActive(sleep);
         dayIntroPanel.SetActive(true);
-        yield return new WaitForSeconds(1.8f);
+        yield return new WaitForSeconds(seconds);
         dayIntroPanel.SetActive(false);
+        if (sleepIcon != null) sleepIcon.SetActive(false);
     }
 
     // ─── Быстрое сообщение в центре экрана ───────────────────────────────────
