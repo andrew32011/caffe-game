@@ -195,8 +195,12 @@ public class StoryDatabase : ScriptableObject
                     storyRevealLines = L(
                         ("Мира",       "Мой муж Кай пропал. Вы не видели мужчину с медальоном из трёх кругов?",
                                        "My husband Kai is missing. Have you seen a man with a three-circle medallion?"),
-                        ("Странник",   "Три круга... Это знак Ордена. Они ходят у Зеркального Ущелья. Будь осторожна с вопросами. (Оставляет чай недопитым, уходит)",
-                                       "Three circles... That is the sign of the Order. They roam near the Mirror Gorge. Be careful with your questions. (Leaves the tea unfinished and walks out)")
+                        ("Странник",   "Три круга... Это знак Ордена. Они ходят у Зеркального Ущелья. Будь осторожна с вопросами.",
+                                       "Three circles... That is the sign of the Order. They roam near the Mirror Gorge. Be careful with your questions."),
+                        ("Странник",   "Дорога за ним долгая и опасная. Чтобы добраться до Ущелья и снарядиться, нужно не меньше 10 000 монет. Копи — кофейня прокормит мечту. (Оставляет чай недопитым, уходит)",
+                                       "The road after him is long and dangerous. To reach the Gorge and outfit yourself you'll need at least 10,000 coins. Save up — the coffee house can fund a dream. (Leaves the tea unfinished and walks out)"),
+                        ("Мира",       "Десять тысяч монет. Я накоплю. Я найду тебя, Кай.",
+                                       "Ten thousand coins. I'll save them. I will find you, Kai.")
                     )
                 }
             }
@@ -1534,8 +1538,8 @@ public class StoryDatabase : ScriptableObject
         days.Add(new DayData
         {
             dayNumber = 40, coinsPerCorrectOrder = 50,
-            dayEndText   = "«Якорь» приготовлен. Границы запечатаны навсегда. «Междумирье» — снова дом.",
-            dayEndTextEn = "The Anchor has been brewed. The borders are sealed forever. The Inbetween is home again.",
+            dayEndText   = "«Якорь» приготовлен, границы запечатаны. Но за стойкой пусто, а касса пуста. Кая больше нет — было лишь эхо.",
+            dayEndTextEn = "The Anchor is brewed, the borders sealed. But the counter is empty, and so is the till. Kai is gone — there was only an echo.",
             customers = new List<DayCustomerEntry>
             {
                 new DayCustomerEntry
@@ -1564,7 +1568,16 @@ public class StoryDatabase : ScriptableObject
                         ("Все",      "За дом!",
                                      "To home!"),
                         ("...",      "(В чашках у всех на секунду отражается спокойный пейзаж их родного мира. Потом всё возвращается в норму.)",
-                                     "(For a second, every cup reflects the calm landscape of its owner's home world. Then everything returns to normal.)")
+                                     "(For a second, every cup reflects the calm landscape of its owner's home world. Then everything returns to normal.)"),
+                        // ── Мрачная кода (пункт 2.1): спасение было, но цена — горькая ──
+                        ("Теневой торговец", "(У самой двери, тихо.) Мира… пока ты не привыкла к счастью. Тот, кто стоит за твоей стойкой, — не Кай. Настоящий Кай погиб ещё в ту первую ночь у Ущелья.",
+                                             "(At the door, quietly.) Mira… before you grow used to happiness. The one standing behind your counter is not Kai. The real Kai died that very first night by the Gorge."),
+                        ("Мира",     "Нет. Я слышала его голос. Читала его письма. Я его спасла.",
+                                     "No. I heard his voice. I read his letters. I saved him."),
+                        ("Теневой торговец", "Эхо. Орден оставил тебе эхо, чтобы ты перестала искать. А десять тысяч, что ты копила на дорогу за ним, — он забрал их этой ночью и ушёл.",
+                                             "An echo. The Order left you an echo so you'd stop searching. And the ten thousand you saved for the road after him — he took it all this night and left."),
+                        ("Мира",     "(Оборачивается — за стойкой пусто. Касса пуста.) …Значит, всё это время я варила кофе призраку.",
+                                     "(She turns — the counter is empty. The till is empty.) …So all this time I was brewing coffee for a ghost.")
                     )
                 }
             }
@@ -1633,13 +1646,17 @@ public class StoryDatabase : ScriptableObject
                     topping = rng.Next(2) == 0 ? Topping.None : toppings[rng.Next(toppings.Length)]
                 };
 
-                var greeting = L(
-                    (reg.ru, "Доброго дня! Налей мне что-нибудь по вкусу.",
-                             "Good day! Pour me something to my taste."));
-
                 // ~60% завсегдатаев приходят с шуткой (остальные — без, пункт 6).
+                // Шутка САМА служит приветствием (заканчивается заказом), поэтому
+                // обычную фразу «Доброго дня…» к ней НЕ добавляем — иначе гость
+                // здоровался бы дважды (пункт 3).
+                List<DialogueLine> greeting;
                 if (rng.Next(100) < 60)
-                    greeting.InsertRange(0, NextJoke());
+                    greeting = NextJoke();
+                else
+                    greeting = L(
+                        (reg.ru, "Доброго дня! Налей мне что-нибудь по вкусу.",
+                                 "Good day! Pour me something to my taste."));
 
                 day.customers.Add(new DayCustomerEntry
                 {

@@ -131,6 +131,7 @@ public static class CoffeGameSceneSetup
         var dialoguePanel = Panel("DialoguePanel", ct, new Vector2(0.1f, 0.02f), new Vector2(0.9f, 0.27f), new Color(0.05f, 0.05f, 0.1f, 0.85f));
         var speakerName   = Text("SpeakerName", dialoguePanel.transform, "Имя", 30, TextAlignmentOptions.TopLeft, new Vector2(0.02f, 0.7f), new Vector2(0.6f, 0.98f));
         var dialogueText  = Text("DialogueText", dialoguePanel.transform, "Текст реплики...", 28, TextAlignmentOptions.TopLeft, new Vector2(0.02f, 0.08f), new Vector2(0.98f, 0.68f));
+        dialogueText.enableAutoSizing = false; // печатная машинка: фикс. размер, без «прыжков»
         var continueHint  = Text("ContinueHint", dialoguePanel.transform, "▼ далее", 22, TextAlignmentOptions.BottomRight, new Vector2(0.6f, 0.0f), new Vector2(0.98f, 0.18f)).gameObject;
 
         // ── Заставка дня (центр) ────────────────────────────────────────────
@@ -165,6 +166,11 @@ public static class CoffeGameSceneSetup
         var adHintBtn = Btn("BtnAdHint", ct, "Подсказка (реклама)");
         SetRect(adHintBtn.GetComponent<RectTransform>(), new Vector2(0.73f, 0.86f), new Vector2(0.985f, 0.93f));
         adHintBtn.gameObject.SetActive(false);
+
+        // ── Кнопка «Комплимент за монеты» (пункт 2: поднять настроение клиента) ──
+        var complimentBtn = Btn("BtnCompliment", ct, "Комплимент");
+        SetRect(complimentBtn.GetComponent<RectTransform>(), new Vector2(0.38f, 0.14f), new Vector2(0.62f, 0.215f));
+        complimentBtn.gameObject.SetActive(false);
 
         // ── 2D-эффекты достижений (UiEffects, пункт 5) ──────────────────────
         var uiFx = canvasGO.AddComponent<UiEffects>();
@@ -328,12 +334,23 @@ public static class CoffeGameSceneSetup
         // исходную (снимается с существующего гостя в CustomerController.Awake).
         var idleCtrl = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
             "Assets/PrefsAll/Hyper Casual Characters/Animator controller/idle.controller");
+        // Пункт 1: эффекты-ауры над головой существ. Порядок: [0]искры,[1]дым,[2]пламя,[3]щит/вода,[4]портал.
+        const string fxDir = "Assets/PrefsAll/FreeQuickEffectsVol1/Prefabs/";
+        var auraPrefabs = new[]
+        {
+            AssetDatabase.LoadAssetAtPath<GameObject>(fxDir + "vfx_Sparks_01.prefab"),
+            AssetDatabase.LoadAssetAtPath<GameObject>(fxDir + "vfx_Smoke_01.prefab"),
+            AssetDatabase.LoadAssetAtPath<GameObject>(fxDir + "vfx_Flames_01.prefab"),
+            AssetDatabase.LoadAssetAtPath<GameObject>(fxDir + "vfx_Shield_01.prefab"),
+            AssetDatabase.LoadAssetAtPath<GameObject>(fxDir + "vfx_Portal_01.prefab"),
+        };
         new W(custCtrl)
             .Ref("_processVisitor", pv)
             .Ref("_visitorRoot", visitorRoot)
             .Ref("_satisfactionBarPrefab", sbComp)
             .Ref("_existingGuest", existingGuest)
             .Ref("_idleController", idleCtrl)   // покой, когда гость стоит
+            .Arr("_creatureAuraPrefabs", auraPrefabs) // пункт 1: ауры существ
             .Apply();
 
         // MachineMinigame — UI вертикальных шкал
@@ -363,6 +380,7 @@ public static class CoffeGameSceneSetup
             .Ref("_noMoneyPanel", noMoneyPanel)
             .Ref("_heroObject", hero)
             .Ref("_adHintButton", adHintBtn)
+            .Ref("_complimentButton", complimentBtn) // пункт 2: комплимент за монеты
             .Apply();
 
         // TutorialController
@@ -947,10 +965,15 @@ public static class CoffeGameSceneSetup
         go.transform.SetParent(parent, false);
         var t = go.AddComponent<TextMeshProUGUI>();
         t.text = content;
+        // Пункт 4: текст всегда аккуратно вписывается в свою область и не липнет к краям.
         t.fontSize = size;
+        t.fontSizeMax = size;
+        t.fontSizeMin = Mathf.Max(10f, size * 0.5f);
+        t.enableAutoSizing = true;
         t.alignment = align;
         t.color = Color.white;
         t.enableWordWrapping = true;
+        t.margin = new Vector4(12, 6, 12, 6); // отступы от краёв
         SetRect(t.rectTransform, aMin, aMax);
         return t;
     }

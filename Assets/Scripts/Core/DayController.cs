@@ -95,7 +95,7 @@ public class DayController : MonoBehaviour
         //    (пункт 1: не пропадает на прощании/приходе — прячем его только в зонах
         //    готовки, см. CoffeeCraftingSystem.HideHeroWhenCameraLeaves).
         _craftingSystem.SetHeroVisible(true);
-        _customerController.SpawnModel(GetCustomerPrefab(entry.stickmanIndex));
+        _customerController.SpawnModel(GetCustomerPrefab(entry.stickmanIndex), entry.characterType);
 
         // 2. Этап 0: гость идёт к стойке (Stage0 запускает ProcessVisitor)
         yield return StartCoroutine(GoToStageAndWait(_stageGuestEnter));
@@ -139,6 +139,21 @@ public class DayController : MonoBehaviour
         GameManager.Instance?.SetClientSatisfaction(entry.characterType, newStored);
         _customerController.SetSatisfaction(newStored);
         yield return new WaitForSeconds(0.6f);
+
+        // Пункт 2: клиент огорчён — можно поднять настроение комплиментом за монеты.
+        // Деньги и удовольствие связаны: потратишь монеты — клиент подобреет (и заплатит лучше).
+        if (newStored < _satisfiedThreshold)
+        {
+            float boosted = newStored;
+            yield return StartCoroutine(_craftingSystem.TryCompliment(newStored, v => boosted = v));
+            if (!Mathf.Approximately(boosted, newStored))
+            {
+                newStored = boosted;
+                GameManager.Instance?.SetClientSatisfaction(entry.characterType, newStored);
+                _customerController.SetSatisfaction(newStored);
+                yield return new WaitForSeconds(0.4f);
+            }
+        }
 
         // 8. Экономика (пункт 5): платит по качеству напитка (в первые дни — щедро),
         //    с бонусом за хорошие отношения с клиентом (пункт 4.3).

@@ -315,11 +315,15 @@ public class GameManager : MonoBehaviour
     {
         _currentPhase = GamePhase.GameComplete;
 
+        // Пункт 2.1: эхо ушло на рассвете и забрало накопленные монеты — касса пуста.
+        _saveData.totalCoins = 0;
+        SaveGame();
+
         if (_dialogue != null)
         {
             _dialogue.ShowMessage(
-                Loc.T("«Междумирье» снова живёт. Кай рядом. Границы запечатаны навсегда.\n\nСПАСИБО ЗА ИГРУ!",
-                      "The Inbetween lives again. Kai is by your side. The borders are sealed forever.\n\nTHANK YOU FOR PLAYING!"),
+                Loc.T("Эхо ушло на рассвете, забрав последние монеты. Границы запечатаны — а Кая больше нет.\n\nОсталась лишь кофейня. И ты. Может быть, однажды кто-то настоящий снова постучит в дверь «Междумирья».\n\nСПАСИБО ЗА ИГРУ!",
+                      "The echo left at dawn, taking the last of the coins. The borders are sealed — but Kai is gone. Only the coffee house remains. And you. Maybe one day someone real will knock on the Inbetween's door again.\n\nTHANK YOU FOR PLAYING!"),
                 0f // 0 = не автоматически, ждёт клика
             );
         }

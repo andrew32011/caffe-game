@@ -58,6 +58,11 @@ public class CoffeeCraftingSystem : MonoBehaviour
     [Header("Подсказка за рекламу (доступна после 2 провалов подряд, пункт 4.1)")]
     [SerializeField] private Button _adHintButton;
 
+    [Header("Комплимент за деньги (пункт 2): поднять настроение огорчённого клиента")]
+    [SerializeField] private Button _complimentButton;
+    [SerializeField] private int    _complimentCost  = 50;
+    [Range(0f, 1f)] [SerializeField] private float _complimentBoost = 0.3f;
+
     [Header("Допуск совпадения ползунков (0..1)")]
     [SerializeField] private float _tolerance = 0.15f;
 
@@ -271,6 +276,54 @@ public class CoffeeCraftingSystem : MonoBehaviour
     public IEnumerator HandCupToCustomer(Transform customer)
     {
         if (_cup != null) yield return StartCoroutine(_cup.HandToCustomer(customer));
+    }
+
+    /// <summary>Пункт 2: если клиент огорчён, предлагаем поднять ему настроение
+    /// комплиментом за монеты. Показываем кнопку на пару секунд; при нажатии —
+    /// списываем монеты и возвращаем улучшенное настроение через result.</summary>
+    public IEnumerator TryCompliment(float mood, System.Action<float> result)
+    {
+        float newMood = mood;
+        bool canOffer = _complimentButton != null
+            && GameManager.Instance != null
+            && GameManager.Instance.TotalCoins >= _complimentCost;
+
+        if (canOffer)
+        {
+            bool clicked = false;
+            UnityEngine.Events.UnityAction handler = () => clicked = true;
+            _complimentButton.onClick.AddListener(handler);
+            SetComplimentLabel();
+            _complimentButton.gameObject.SetActive(true);
+
+            float t = 0f;
+            while (t < 4f && !clicked) { t += Time.deltaTime; yield return null; }
+
+            _complimentButton.gameObject.SetActive(false);
+            _complimentButton.onClick.RemoveListener(handler);
+
+            if (clicked)
+            {
+                GameManager.Instance.AddCoins(-_complimentCost);
+                newMood = Mathf.Clamp01(mood + _complimentBoost);
+                if (_commentText != null)
+                {
+                    _commentText.text = Loc.T("Комплимент от души ☕", "A heartfelt compliment ☕");
+                    if (_commentCo != null) StopCoroutine(_commentCo);
+                    _commentCo = StartCoroutine(CommentRoutine());
+                }
+            }
+        }
+
+        result?.Invoke(newMood);
+    }
+
+    private void SetComplimentLabel()
+    {
+        if (_complimentButton == null) return;
+        var label = _complimentButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (label != null)
+            label.text = Loc.T($"Комплимент ({_complimentCost})", $"Compliment ({_complimentCost})");
     }
 
     private void ResetState()

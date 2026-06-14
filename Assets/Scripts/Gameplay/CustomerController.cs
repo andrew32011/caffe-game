@@ -40,6 +40,14 @@ public class CustomerController : MonoBehaviour
     [SerializeField] private SatisfactionBar _satisfactionBarPrefab;
     [SerializeField] private float _barHeightOffset = 2.2f;
 
+    [Header("Аура существ (пункт 1): партиклы над головой гостей-существ")]
+    [Tooltip("Префабы эффектов: [0]искры, [1]дым, [2]пламя, [3]щит/вода, [4]портал.")]
+    [SerializeField] private GameObject[] _creatureAuraPrefabs;
+    [SerializeField] private float _auraHeadOffset = 2.5f;
+    [SerializeField] private float _auraScale = 0.5f;
+
+    private GameObject _auraInstance;
+
     [Header("Удовлетворённость")]
     [SerializeField] private float _satisfactionDrainPerSec = 4f; // % в секунду пока гость ждёт
 
@@ -79,8 +87,9 @@ public class CustomerController : MonoBehaviour
 
     // ─── Модель гостя ────────────────────────────────────────────────────────
 
-    /// <summary>Ставит модель гостя (stickman) на VisitorBasis. Старую убирает.</summary>
-    public void SpawnModel(GameObject stickmanPrefab)
+    /// <summary>Ставит модель гостя (stickman) на VisitorBasis. Старую убирает.
+    /// type — для ауры существ (пункт 1).</summary>
+    public void SpawnModel(GameObject stickmanPrefab, CharacterType type = CharacterType.Traveler)
     {
         RemoveModel();
 
@@ -122,18 +131,53 @@ public class CustomerController : MonoBehaviour
             _satisfactionBar.gameObject.SetActive(false);
         }
 
+        // Пункт 1: аура-партиклы над головой, если гость — вымышленное существо.
+        int auraIdx = AuraIndexFor(type);
+        if (auraIdx >= 0 && _creatureAuraPrefabs != null && auraIdx < _creatureAuraPrefabs.Length
+            && _creatureAuraPrefabs[auraIdx] != null)
+        {
+            _auraInstance = Instantiate(
+                _creatureAuraPrefabs[auraIdx],
+                _visitorRoot.position + Vector3.up * _auraHeadOffset,
+                Quaternion.identity,
+                _visitorRoot);
+            _auraInstance.transform.localScale = Vector3.one * _auraScale;
+        }
+
         _satisfactionValue   = 50f;
         _satisfactionRunning = false;
     }
 
-    /// <summary>Убирает модель гостя и полоску.</summary>
+    // Какой эффект-ауру дать существу (или -1 — обычный человек, без ауры).
+    private int AuraIndexFor(CharacterType t)
+    {
+        switch (t)
+        {
+            case CharacterType.FireAlchemist:  return 2; // пламя
+            case CharacterType.WaterGuard:     return 3; // щит/вода
+            case CharacterType.ShadowMerchant:
+            case CharacterType.FogHunter:      return 1; // дым
+            case CharacterType.TimeCourier:
+            case CharacterType.MirrorThief:
+            case CharacterType.EchoTwin:       return 4; // портал
+            case CharacterType.StarShepherd:
+            case CharacterType.CrystalSinger:
+            case CharacterType.MoonSmith:
+            case CharacterType.Lamplighter:    return 0; // искры
+            default:                           return -1; // обычные люди — без ауры
+        }
+    }
+
+    /// <summary>Убирает модель гостя, полоску и ауру.</summary>
     public void RemoveModel()
     {
         _satisfactionRunning = false;
 
+        if (_auraInstance != null)    Destroy(_auraInstance);
         if (_satisfactionBar != null) Destroy(_satisfactionBar.gameObject);
-        if (_currentModel != null) Destroy(_currentModel);
+        if (_currentModel != null)    Destroy(_currentModel);
 
+        _auraInstance    = null;
         _satisfactionBar = null;
         _currentModel    = null;
         _animator        = null;

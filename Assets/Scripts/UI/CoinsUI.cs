@@ -12,6 +12,9 @@ public class CoinsUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _text;
 
+    // Пункт 2.1: цель — накопить 10000 монет на путешествие за возлюбленным.
+    public const int JourneyGoal = 10000;
+
     private int _last = int.MinValue;
 
     private void Reset() { _text = GetComponent<TextMeshProUGUI>(); }
@@ -22,6 +25,6 @@ public class CoinsUI : MonoBehaviour
         int coins = GameManager.Instance.TotalCoins;
         if (coins == _last) return;
         _last = coins;
-        _text.text = Loc.T("Касса: ", "Cash: ") + coins;
+        _text.text = Loc.T("Касса: ", "Cash: ") + coins + " / " + JourneyGoal;
     }
 }
