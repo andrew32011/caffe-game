@@ -41,13 +41,14 @@ public class GameManager : MonoBehaviour
 
     [Header("Сохранение")]
     [SerializeField] private int _startDay = 1; // 0 — показывать туториал
-    [Tooltip("Всегда показывать обучение при старте (игнорируя сохранение). Удобно при разработке.")]
-    [SerializeField] private bool _forceTutorial = true;
+    [Tooltip("Всегда показывать обучение при старте (игнорируя сохранение). ТОЛЬКО для разработки — в релизе false.")]
+    [SerializeField] private bool _forceTutorial = false;
 
     // ─── Состояние ───────────────────────────────────────────────────────────
 
     private GamePhase _currentPhase = GamePhase.Tutorial;
-    private GameSaveData _saveData  = new GameSaveData();
+    // Прогресс хранится в облачном сейве Яндекс Игр (YG2.saves). Поля — в SavesYG.Game.cs.
+    private SavesYG _saveData => YG2.saves;
 
     // ─── Публичные свойства ───────────────────────────────────────────────────
 
@@ -69,8 +70,11 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
 
-        // Подписываемся на события видимости (требование YG2 — пауза звука)
+        // Звук останавливается при сворачивании окна (требование 1.3) и при показе
+        // любой рекламы (требование 4.7).
         YG2.onFocusWindowGame += OnWindowFocusChanged;
+        YG2.onOpenAnyAdv      += OnAdOpened;
+        YG2.onCloseAnyAdv     += OnAdClosed;
 
         // Этапами управляет DayController — отключаем автозапуск этапа 0,
         // иначе гость пойдёт к стойке до начала дня
@@ -80,15 +84,27 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        LoadGame();
-        YG2.GameReadyAPI(); // Сообщаем Яндексу что игра готова
-
         StartCoroutine(StartGameFlow());
     }
 
     private void OnDestroy()
     {
         YG2.onFocusWindowGame -= OnWindowFocusChanged;
+        YG2.onOpenAnyAdv      -= OnAdOpened;
+        YG2.onCloseAnyAdv     -= OnAdClosed;
+    }
+
+    // Пауза звука и геймплея на время полноэкранной рекламы (требование 4.7).
+    private void OnAdOpened()
+    {
+        _audioController?.SetMuted(true);
+        Time.timeScale = 0f;
+    }
+
+    private void OnAdClosed()
+    {
+        Time.timeScale = 1f;
+        _audioController?.SetMuted(false);
     }
 
     // ─── Основной поток игры ──────────────────────────────────────────────────
@@ -96,7 +112,13 @@ public class GameManager : MonoBehaviour
     private IEnumerator StartGameFlow()
     {
         GameInput.Locked = true;             // на старте управление выключено
-        yield return new WaitForSeconds(0.3f); // Ждём инициализации всех систем
+
+        // Требование 1.9/2.6: ждём инициализацию SDK и загрузку сейвов (облако/локально),
+        // только потом читаем прогресс. Обновление страницы не теряет данные.
+        yield return new WaitUntil(() => YG2.isSDKEnabled);
+        LoadGame();
+        YG2.GameReadyAPI();                  // 1.19.2: игрок может начинать
+        yield return new WaitForSeconds(0.2f); // Ждём инициализации всех систем
 
         if (_forceTutorial || !_saveData.tutorialDone)
         {
@@ -411,23 +433,17 @@ public class GameManager : MonoBehaviour
 
     // ─── Сохранение / Загрузка ───────────────────────────────────────────────
 
-    private void SaveGame()
+    /// <summary>Сохраняет прогресс в облако/локально (Яндекс). Вызывается после действий
+    /// игрока: после каждого гостя, дня, обучения, покупки (требования 1.9, 1.13.3).</summary>
+    public void SaveGame()
     {
-        string json = JsonUtility.ToJson(_saveData);
-        PlayerPrefs.SetString("GameSave", json);
-        PlayerPrefs.Save();
+        if (YG2.isSDKEnabled) YG2.SaveProgress();
     }
 
     private void LoadGame()
     {
-        string json = PlayerPrefs.GetString("GameSave", "");
-        if (!string.IsNullOrEmpty(json))
-        {
-            try { _saveData = JsonUtility.FromJson<GameSaveData>(json); }
-            catch { _saveData = new GameSaveData(); }
-        }
-
-        // Если установлен startDay в инспекторе — используем его для отладки
+        // Данные уже загружены плагином YG2 в YG2.saves (облако/локально).
+        // Здесь — только отладочный override стартового дня из инспектора.
         if (_startDay > 1 && _saveData.currentDay < _startDay)
         {
             _saveData.currentDay   = _startDay;
@@ -440,8 +456,8 @@ public class GameManager : MonoBehaviour
     [ContextMenu("DEBUG: Reset Save")]
     public void DebugResetSave()
     {
-        PlayerPrefs.DeleteKey("GameSave");
-        _saveData = new GameSaveData();
+        YG2.SetDefaultSaves();
+        if (YG2.isSDKEnabled) YG2.SaveProgress();
         Debug.Log("GameManager: прогресс сброшен.");
     }
 

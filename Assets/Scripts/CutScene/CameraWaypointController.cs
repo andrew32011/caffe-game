@@ -9,11 +9,11 @@ public class SmoothCameraWaypointController : MonoBehaviour
     public class WaypointSettings
     {
         public Transform waypoint;
-        [Range(0.1f, 50f), Tooltip("Скорость перемещения к точке")]
+        [Range(0.1f, 50f), Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ")]
         public float moveSpeed = 5f;
-        [Range(0.1f, 50f), Tooltip("Скорость поворота к точке")]
+        [Range(0.1f, 50f), Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ")]
         public float rotationSpeed = 5f;
-        [Range(0.1f, 5f), Tooltip("Плавность входа/выхода из точки")]
+        [Range(0.1f, 5f), Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
         public float smoothness = 1f;
 
         public WaypointSettings(Transform wp)
@@ -25,34 +25,34 @@ public class SmoothCameraWaypointController : MonoBehaviour
         }
     }
 
-    [Header("Основные настройки")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
     public bool autoSwitchWaypoints = false;
-    [Tooltip("Время удержания на каждой точке перед переходом к следующей")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
     public float holdTime = 2f;
 
-    [Header("Контрольные точки")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
     public List<WaypointSettings> waypoints = new List<WaypointSettings>();
 
-    [Header("Параметры плавности")]
-    [Tooltip("Минимальное расстояние для считывания достижения точки")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
     public float arrivalThreshold = 0.1f;
-    [Tooltip("Минимальный угол для считывания достижения ориентации")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
     public float rotationThreshold = 1f;
 
-    [Header("Настройки FOV для последней точки")]
-    [Tooltip("Активировать плавное изменение FOV на последней точке")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
     public bool enableFinalFovControl = true;
-    [Tooltip("Начальное значение FOV при прибытии на последнюю точку")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
     public float initialFov = 60f;
-    [Tooltip("Целевое значение FOV на последней точке")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
     public float targetFov = 40f;
-    [Tooltip("Скорость изменения FOV")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV")]
     [Range(0.1f, 10f)]
     public float fovChangeSpeed = 2f;
-    [Tooltip("Время задержки перед началом изменения FOV")]
+    [Tooltip("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV")]
     public float fovDelay = 1f;
 
-    [Header("Текущее состояние")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
     public int currentWaypointIndex = 0;
     public bool isEnabled = true;
     public bool isAtFinalWaypoint = false;
@@ -70,6 +70,7 @@ public class SmoothCameraWaypointController : MonoBehaviour
     private float currentFov = 60f;
     private float fovTimer = 0f;
     private bool isChangingFov = false;
+    private bool _endTriggered = false; // С„РёРЅР°Р» Р·Р°РїСѓСЃРєР°РµРј РѕРґРёРЅ СЂР°Р·
 
     private void Awake()
     {
@@ -81,7 +82,7 @@ public class SmoothCameraWaypointController : MonoBehaviour
     {
         if (waypoints.Count == 0)
         {
-            Debug.LogWarning("Нет контрольных точек. Добавьте их в инспекторе.");
+            Debug.LogWarning("пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.");
             return;
         }
 
@@ -129,46 +130,46 @@ public class SmoothCameraWaypointController : MonoBehaviour
         targetPosition = waypoints[currentWaypointIndex].waypoint.position;
         targetRotation = waypoints[currentWaypointIndex].waypoint.rotation;
 
-        // Расчет расстояния до цели
+        // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
         float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
         float angleToTarget = Quaternion.Angle(transform.rotation, targetRotation);
 
-        // Динамическое изменение скорости в зависимости от расстояния
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         float moveProgress = Mathf.InverseLerp(0f, lastDistanceToTarget, distanceToTarget);
         float rotationProgress = Mathf.InverseLerp(0f, 180f, angleToTarget);
 
-        // Плавное ускорение и замедление
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         float speedMultiplier = Mathf.SmoothStep(0.1f, 1f, moveProgress);
         float rotationMultiplier = Mathf.SmoothStep(0.1f, 1f, rotationProgress);
 
-        // Применение ускорения/замедления
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         speedMultiplier = Mathf.Lerp(0.1f, 1f, Mathf.Pow(speedMultiplier, currentSettings.smoothness));
         rotationMultiplier = Mathf.Lerp(0.1f, 1f, Mathf.Pow(rotationMultiplier, currentSettings.smoothness));
 
-        // Вычисление текущих скоростей
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         float effectiveMoveSpeed = currentMoveSpeed * speedMultiplier;
         float effectiveRotationSpeed = currentRotationSpeed * rotationMultiplier;
 
-        // Плавное перемещение с использованием SmoothDamp
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SmoothDamp
         Vector3 smoothedPosition = Vector3.SmoothDamp(
             transform.position,
             targetPosition,
             ref currentVelocity,
-            1f / (effectiveMoveSpeed + 0.0001f) // Избегаем деления на ноль
+            1f / (effectiveMoveSpeed + 0.0001f) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
         );
 
-        // Плавный поворот с использованием Slerp
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Slerp
         Quaternion smoothedRotation = Quaternion.Slerp(
             transform.rotation,
             targetRotation,
             effectiveRotationSpeed * Time.deltaTime
         );
 
-        // Применение позиции и вращения
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         transform.position = smoothedPosition;
         transform.rotation = smoothedRotation;
 
-        // Проверка достижения цели с учетом пороговых значений
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         bool reachedPosition = distanceToTarget < arrivalThreshold;
         bool reachedRotation = angleToTarget < rotationThreshold;
 
@@ -179,23 +180,23 @@ public class SmoothCameraWaypointController : MonoBehaviour
 
             if (isAtFinalWaypoint && enableFinalFovControl)
             {
-                // Сохраняем начальное FOV и начинаем таймер задержки
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 currentFov = cam.fieldOfView;
                 fovTimer = 0f;
                 isChangingFov = false;
-                Debug.Log("Достигнута последняя точка. Ожидание перед изменением FOV...");
+                Debug.Log("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV...");
             }
 
-            Debug.Log($"Достигнута точка {currentWaypointIndex + 1}/{waypoints.Count}");
+            Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ {currentWaypointIndex + 1}/{waypoints.Count}");
         }
 
-        // Сохраняем последнее расстояние для плавности
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         lastDistanceToTarget = distanceToTarget;
     }
 
     private void HandleFinalFov()
     {
-        // Задержка перед началом изменения FOV
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV
         if (!isChangingFov)
         {
             fovTimer += Time.deltaTime;
@@ -203,21 +204,24 @@ public class SmoothCameraWaypointController : MonoBehaviour
             {
                 isChangingFov = true;
                 currentFov = cam.fieldOfView;
-                Debug.Log($"Начало плавного изменения FOV с {currentFov} до {targetFov}");
+                Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV пїЅ {currentFov} пїЅпїЅ {targetFov}");
             }
             return;
         }
 
-        // Плавное изменение FOV
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV
         currentFov = Mathf.Lerp(currentFov, targetFov, fovChangeSpeed * Time.deltaTime);
         cam.fieldOfView = currentFov;
 
-        // Проверка достижения целевого FOV
-        if (Mathf.Abs(currentFov - targetFov) < 8f)
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV
+        if (!_endTriggered && Mathf.Abs(currentFov - targetFov) < 8f)
         {
             cam.fieldOfView = targetFov;
             currentFov = targetFov;
-            Invoke(nameof (LoadMainLevel), 0f);
+            _endTriggered = true;
+            // РљР°РјРµСЂР° РґРѕРµС…Р°Р»Р°: РїРѕРєР°Р·С‹РІР°РµРј РёСЃС‚РѕСЂРёСЋ РњРёСЂС‹. РљРЅРѕРїРєР° В«РџСЂРѕРґРѕР»Р¶РёС‚СЊВ» РіСЂСѓР·РёС‚ СЃС†РµРЅСѓ.
+            if (IntroStoryUI.Instance != null) IntroStoryUI.Instance.Begin();
+            else LoadMainLevel();
         }
     }
 
@@ -229,11 +233,11 @@ public class SmoothCameraWaypointController : MonoBehaviour
     {
         if (index < 0 || index >= waypoints.Count || waypoints[index].waypoint == null)
         {
-            Debug.LogError($"Некорректный индекс точки: {index}");
+            Debug.LogError($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: {index}");
             return;
         }
 
-        // Сбрасываем состояние последней точки
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         isAtFinalWaypoint = false;
         isChangingFov = false;
 
@@ -244,14 +248,14 @@ public class SmoothCameraWaypointController : MonoBehaviour
         currentRotationSpeed = waypoints[index].rotationSpeed;
         currentSmoothness = waypoints[index].smoothness;
 
-        // Сброс скорости при новом пути
+        // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         currentVelocity = Vector3.zero;
         lastDistanceToTarget = Vector3.Distance(transform.position, targetPosition);
 
         isMoving = true;
         currentHoldTime = 0f;
 
-        Debug.Log($"Начало движения к точке {index + 1}");
+        Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ {index + 1}");
     }
 
     public void NextWaypoint()
@@ -263,7 +267,7 @@ public class SmoothCameraWaypointController : MonoBehaviour
         }
         else
         {
-            // Достигли конца — просто останавливаемся
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             isMoving = false;
             isAtFinalWaypoint = true;
 
@@ -272,11 +276,11 @@ public class SmoothCameraWaypointController : MonoBehaviour
                 currentFov = initialFov;
                 fovTimer = 0f;
                 isChangingFov = false;
-                Debug.Log("Достигнута последняя контрольная точка. Готов к изменению FOV.");
+                Debug.Log("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV.");
             }
             else
             {
-                Debug.Log("Достигнута последняя контрольная точка. Движение остановлено.");
+                Debug.Log("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.");
             }
         }
     }
@@ -290,7 +294,7 @@ public class SmoothCameraWaypointController : MonoBehaviour
         }
         else
         {
-            Debug.Log("Уже на первой точке.");
+            Debug.Log("пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.");
         }
     }
 
@@ -323,7 +327,7 @@ public class SmoothCameraWaypointController : MonoBehaviour
             cam.fieldOfView = initialFov;
             fovTimer = 0f;
             isChangingFov = false;
-            Debug.Log("FOV сброшен к начальному значению");
+            Debug.Log("FOV пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
         }
     }
 
@@ -332,7 +336,7 @@ public class SmoothCameraWaypointController : MonoBehaviour
         targetFov = Mathf.Clamp(newTargetFov, 10f, 120f);
         if (isAtFinalWaypoint && isChangingFov)
         {
-            Debug.Log($"Целевое FOV изменено на {targetFov}");
+            Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FOV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ {targetFov}");
         }
     }
 
@@ -341,21 +345,21 @@ public class SmoothCameraWaypointController : MonoBehaviour
     {
         if (!Application.isPlaying && waypoints != null)
         {
-            // Рисуем точки маршрута
+            // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             for (int i = 0; i < waypoints.Count; i++)
             {
                 if (waypoints[i] != null && waypoints[i].waypoint != null)
                 {
-                    // Основная точка
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                     Gizmos.color = Color.green;
                     Gizmos.DrawWireSphere(waypoints[i].waypoint.position, 0.2f);
 
-                    // Направление взгляда
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     Vector3 forward = waypoints[i].waypoint.forward * 0.5f;
                     Gizmos.color = Color.blue;
                     Gizmos.DrawLine(waypoints[i].waypoint.position, waypoints[i].waypoint.position + forward);
 
-                    // Соединение с предыдущей точкой
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                     if (i > 0 && waypoints[i - 1] != null && waypoints[i - 1].waypoint != null)
                     {
                         Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.5f);
@@ -364,14 +368,14 @@ public class SmoothCameraWaypointController : MonoBehaviour
                 }
             }
 
-            // Выделение последней точки
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             if (waypoints.Count > 0 && waypoints[waypoints.Count - 1] != null && waypoints[waypoints.Count - 1].waypoint != null)
             {
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(waypoints[waypoints.Count - 1].waypoint.position, 0.4f);
             }
 
-            // Выделение текущей точки в редакторе
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (currentWaypointIndex >= 0 && currentWaypointIndex < waypoints.Count &&
                 waypoints[currentWaypointIndex] != null && waypoints[currentWaypointIndex].waypoint != null)
             {

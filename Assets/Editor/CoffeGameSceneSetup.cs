@@ -125,6 +125,9 @@ public static class CoffeGameSceneSetup
         var scaler = canvasGO.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
+        // Адаптив под ПК и горизонтальный телефон, без деформации (требования 1.6/1.10).
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
         var ct = canvasGO.transform;
 
         // ── Диалоговая панель (низ экрана) ──────────────────────────────────

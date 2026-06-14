@@ -133,6 +133,7 @@ public class StoryDatabase : ScriptableObject
         { "Эхо", "Echo" },
         { "Бард", "Bard" },
         { "Гадалка", "Fortune Teller" },
+        { "Наблюдательница", "Observer" },
         { "Фонарщик", "Lamplighter" },
         { "Контрабандист", "Smuggler" },
         { "Перебежчик", "Defector" },
@@ -1019,13 +1020,13 @@ public class StoryDatabase : ScriptableObject
         });
 
         // ═══════════════════════════════════════════════════════════════
-        // ДЕНЬ 25 — Гадалка: предсказание предательства
+        // ДЕНЬ 25 — Наблюдательница: замечает лазутчика
         // ═══════════════════════════════════════════════════════════════
         days.Add(new DayData
         {
             dayNumber = 25, coinsPerCorrectOrder = 35,
-            dayEndText   = "Карты легли дурно: среди тех, кому ты доверяешь, есть лазутчик. Пора проверить завсегдатаев мёдом правды.",
-            dayEndTextEn = "The cards fell ill: among those you trust there is an informant. Time to test the regulars with the truth honey.",
+            dayEndText   = "Зоркий глаз заметил неладное: среди тех, кому ты доверяешь, есть лазутчик. Пора проверить завсегдатаев мёдом правды.",
+            dayEndTextEn = "A sharp eye spotted trouble: among those you trust there is an informant. Time to test the regulars with the truth honey.",
             customers = new List<DayCustomerEntry>
             {
                 new DayCustomerEntry
@@ -1033,18 +1034,18 @@ public class StoryDatabase : ScriptableObject
                     characterType = CharacterType.Cartomancer, stickmanIndex = 8,
                     order = Order(CoffeeType.Americano, Volume.Medium),
                     greetingLines = L(
-                        ("Гадалка", "Американо. Чёрный, как закрытая карта. Сядь, я раскину для тебя.",
-                                    "Americano. Black as a face-down card. Sit, I'll lay them out for you."),
-                        ("Мира",    "Я не люблю гаданий.",
-                                    "I don't care for fortunes.")
+                        ("Наблюдательница", "Американо, чёрный. Я подолгу сижу в углах и подмечаю то, что другие пропускают.",
+                                            "Americano, black. I sit in corners a long while and notice what others miss."),
+                        ("Мира",            "И что же вы подметили?",
+                                            "And what have you noticed?")
                     ),
                     wrongOrderLines = L(
-                        ("Гадалка", "Средний американо. И не спорь с картами.",
-                                    "A medium americano. And don't argue with the cards.")
+                        ("Наблюдательница", "Средний американо. Чёрный, как всегда.",
+                                            "A medium americano. Black, as always.")
                     ),
                     storyRevealLines = L(
-                        ("Гадалка", "(Переворачивает карту с тремя кругами.) Близкий стол. Знакомое лицо. Кто-то из твоих завсегдатаев носит весть Ордену. Найди его прежде, чем он найдёт твою тайну.",
-                                    "(Turns over a card with three circles.) A nearby table. A familiar face. One of your regulars carries word to the Order. Find them before they find your secret.")
+                        ("Наблюдательница", "(Кивает на тихий столик.) Вон тот завсегдатай косится на дверь и спешит уйти, едва ты заговоришь об Ордене. Кто-то из своих носит им вести. Найди его прежде, чем он найдёт твою тайну.",
+                                            "(Nods toward a quiet table.) That regular keeps glancing at the door and hurries off the moment you mention the Order. One of your own carries word to them. Find them before they find your secret.")
                     )
                 }
             }

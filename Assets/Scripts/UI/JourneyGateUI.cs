@@ -73,6 +73,7 @@ public class JourneyGateUI : MonoBehaviour
 #else
         // Модуль Payments не установлен — для теста начисляем монеты напрямую.
         GameManager.Instance?.AddCoins(_coinAmountPerPurchase);
+        GameManager.Instance?.SaveGame();
         Debug.Log("JourneyGate: модуль Payments YG2 не установлен — монеты начислены напрямую (тест). " +
                   "Установите модуль Payments и создайте товар в консоли Яндекс Игр для реальных покупок.");
 #endif
@@ -82,7 +83,10 @@ public class JourneyGateUI : MonoBehaviour
     private void OnPurchaseSuccess(string id)
     {
         if (id == _coinProductId)
+        {
             GameManager.Instance?.AddCoins(_coinAmountPerPurchase);
+            GameManager.Instance?.SaveGame(); // сохраняем покупку сразу (требование 1.13.3)
+        }
     }
 #endif
 
