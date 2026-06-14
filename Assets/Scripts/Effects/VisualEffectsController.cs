@@ -117,6 +117,16 @@ public class VisualEffectsController : MonoBehaviour
                 yield return StartCoroutine(FadeOverlay(_whiteOverlay, 0.5f, 0f, 1.2f));
                 break;
 
+            case VignetteEffectType.WhiteFlash:
+                yield return StartCoroutine(FadeOverlay(_blackOverlay, 0.8f, 0f, 0.3f));
+                yield return StartCoroutine(WhiteFlashEffect(3));
+                break;
+
+            case VignetteEffectType.SlowVeil:
+                yield return StartCoroutine(FadeOverlay(_blackOverlay, 0.8f, 0.35f, 0.6f));
+                yield return StartCoroutine(SlowVeilEffect(3));
+                break;
+
             default:
                 yield return StartCoroutine(FadeOverlay(_blackOverlay, 0.8f, 0f, 0.4f));
                 break;
@@ -191,6 +201,29 @@ public class VisualEffectsController : MonoBehaviour
             yield return StartCoroutine(FadeOverlay(_redOverlay, 0.45f, 0f, 0.35f));
             yield return new WaitForSeconds(0.1f);
         }
+    }
+
+    // Короткие белые вспышки (пункт 4) — без красного, для разнообразия снов.
+    private IEnumerator WhiteFlashEffect(int flashes)
+    {
+        for (int i = 0; i < flashes; i++)
+        {
+            yield return StartCoroutine(FadeOverlay(_whiteOverlay, 0f, 0.7f, 0.08f));
+            yield return StartCoroutine(FadeOverlay(_whiteOverlay, 0.7f, 0f, 0.25f));
+            yield return new WaitForSeconds(0.2f + Random.Range(0f, 0.3f));
+        }
+    }
+
+    // Медленное «дыхание» темноты с лёгкой тряской (пункт 4).
+    private IEnumerator SlowVeilEffect(int pulses)
+    {
+        for (int i = 0; i < pulses; i++)
+        {
+            ShakeCamera(0.6f, 0.08f);
+            yield return StartCoroutine(FadeOverlay(_blackOverlay, 0.35f, 0.75f, 0.7f));
+            yield return StartCoroutine(FadeOverlay(_blackOverlay, 0.75f, 0.35f, 0.7f));
+        }
+        yield return StartCoroutine(FadeOverlay(_blackOverlay, 0.35f, 0f, 0.5f));
     }
 
     private IEnumerator DarknessFlashEffect(int flashes)

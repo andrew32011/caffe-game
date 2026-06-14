@@ -90,7 +90,9 @@ public enum VignetteEffectType
     VisionLoss,
     RedPulse,
     DarknessFlash,
-    BrightRestore
+    BrightRestore,
+    WhiteFlash,   // короткие белые вспышки (пункт 4)
+    SlowVeil      // медленное «дыхание» темноты + лёгкая тряска (пункт 4)
 }
 
 // ─── Главная база данных сюжета ───────────────────────────────────────────────

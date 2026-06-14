@@ -136,10 +136,12 @@ public static class CoffeGameSceneSetup
 
         // ── Заставка дня (центр) ────────────────────────────────────────────
         var dayIntroPanel = Panel("DayIntroPanel", ct, new Vector2(0.3f, 0.4f), new Vector2(0.7f, 0.6f), new Color(0f, 0f, 0f, 0.8f));
-        var dayIntroText  = Text("DayIntroText", dayIntroPanel.transform, "ДЕНЬ 1", 64, TextAlignmentOptions.Center, new Vector2(0f, 0f), new Vector2(1f, 0.62f));
-        // Иконка сна (луна/звёзды) — видна только на заставке «Сон» (пункт 1)
+        // Текст дня занимает всю панель и центрируется (пункт 5: больше не уезжает вниз).
+        var dayIntroText  = Text("DayIntroText", dayIntroPanel.transform, "ДЕНЬ 1", 64, TextAlignmentOptions.Center, new Vector2(0f, 0f), new Vector2(1f, 1f));
+        // Иконка сна (луна/звёзды) — видна только на заставке «Сон»; висит НАД панелью,
+        // чтобы не сдвигать надпись (пункт 1, пункт 5).
         var sleepIcon = IconImage("SleepIcon", dayIntroPanel.transform, "Assets/Mini UI/UI Icons/MoonStars.png",
-            new Vector2(0.38f, 0.6f), new Vector2(0.62f, 0.98f));
+            new Vector2(0.4f, 1.02f), new Vector2(0.6f, 1.4f));
         sleepIcon.gameObject.SetActive(false);
 
         // ── Сообщение (центр, CanvasGroup) ──────────────────────────────────
@@ -272,6 +274,23 @@ public static class CoffeGameSceneSetup
         var btnContinue = Btn("BtnContinue", resultPanel.transform, "Продолжить");
         SetRect(btnContinue.GetComponent<RectTransform>(), new Vector2(0.35f, 0.03f), new Vector2(0.65f, 0.15f));
 
+        // ── Гейт путешествия (пункт 1): не хватило денег — начать заново / купить ──
+        var journeyPanel = Panel("JourneyGatePanel", ct, new Vector2(0.25f, 0.28f), new Vector2(0.75f, 0.72f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
+        var journeyText  = Text("JourneyGateText", journeyPanel.transform, "Не хватает на путешествие…", 28, TextAlignmentOptions.Top, new Vector2(0.06f, 0.42f), new Vector2(0.94f, 0.94f));
+        var btnRestart   = Btn("BtnJourneyRestart", journeyPanel.transform, "Начать заново");
+        SetRect(btnRestart.GetComponent<RectTransform>(), new Vector2(0.1f, 0.24f), new Vector2(0.9f, 0.38f));
+        var btnBuy       = Btn("BtnJourneyBuy", journeyPanel.transform, "Купить монеты");
+        SetRect(btnBuy.GetComponent<RectTransform>(), new Vector2(0.1f, 0.07f), new Vector2(0.9f, 0.21f));
+        var journeyGate  = journeyPanel.AddComponent<JourneyGateUI>();
+        new W(journeyGate)
+            .Ref("_panel", journeyPanel)
+            .Ref("_text", journeyText)
+            .Ref("_restartButton", btnRestart)
+            .Ref("_buyButton", btnBuy)
+            .Apply();
+        ApplyPanelSprite(journeyPanel);
+        journeyPanel.SetActive(false);
+
         // ── Оверлеи эффектов (на весь экран, поверх всего) ──────────────────
         var blackOverlay = Overlay("BlackOverlay", ct, Color.black);
         var redOverlay   = Overlay("RedOverlay", ct, Color.red);
@@ -306,6 +325,7 @@ public static class CoffeGameSceneSetup
             .Ref("_audioController", audio)
             .Ref("_hintManager", hint)
             .Ref("_stages", stages)
+            .Ref("_journeyGate", journeyGate) // пункт 1
             .Apply();
 
         // DayController

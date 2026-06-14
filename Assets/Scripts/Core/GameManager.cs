@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviour
     [Header("Машина этапов (существующая, объект StagesScripts)")]
     [SerializeField] private Stages _stages;
 
+    [Header("Гейт путешествия (пункт 1): не хватило денег — начать заново / купить монеты")]
+    [SerializeField] private JourneyGateUI _journeyGate;
+
     [Header("Свет для «сна» (приглушается между днями; можно не задавать — найдётся сам)")]
     [SerializeField] private Light _sceneLight;
 
@@ -156,14 +159,9 @@ public class GameManager : MonoBehaviour
             yield return StartCoroutine(_dialogue.ShowTitleCardRoutine(Loc.T("СОН", "DREAM"), true, 2.2f));
 
         // 2) Кошмар: эффект + текст (PlayVignette сам затемняет вход и открывает сцену).
-        // Пункт 1: во сне НЕ используем красные вспышки (RedPulse) — только
-        // тьма, тряска и потеря зрения. Сон должен быть мрачным, а не «алым».
-        var effects = new[]
-        {
-            VignetteEffectType.CameraShake,
-            VignetteEffectType.VisionLoss,  VignetteEffectType.DarknessFlash
-        };
-        var effect = effects[day % effects.Length];
+        // Пункт 4: разнообразим сны — берём эффект из перетасованного «мешка» без
+        // повторов подряд (красный RedPulse не используем — сон мрачный, не «алый»).
+        var effect = NextDreamEffect();
         string text = Loc.IsRu ? DreamLines[day % DreamLines.Length][0]
                                : DreamLines[day % DreamLines.Length][1];
 
@@ -174,6 +172,43 @@ public class GameManager : MonoBehaviour
             yield return StartCoroutine(FadeLight(_sceneLight, _sceneLight.intensity, origIntensity, 0.6f));
 
         CoffeeCraftingSystem.Instance?.SetHeroVisible(false);
+    }
+
+    // Пул эффектов сна (без красного) + «мешок» для выдачи без повторов подряд.
+    private static readonly VignetteEffectType[] DreamEffects =
+    {
+        VignetteEffectType.CameraShake,
+        VignetteEffectType.VisionLoss,
+        VignetteEffectType.DarknessFlash,
+        VignetteEffectType.BrightRestore,
+        VignetteEffectType.WhiteFlash,
+        VignetteEffectType.SlowVeil
+    };
+    private readonly System.Collections.Generic.List<VignetteEffectType> _dreamBag
+        = new System.Collections.Generic.List<VignetteEffectType>();
+    private VignetteEffectType _lastDreamEffect = VignetteEffectType.None;
+
+    private VignetteEffectType NextDreamEffect()
+    {
+        if (_dreamBag.Count == 0)
+        {
+            _dreamBag.AddRange(DreamEffects);
+            // перетасовка
+            for (int i = _dreamBag.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                var tmp = _dreamBag[i]; _dreamBag[i] = _dreamBag[j]; _dreamBag[j] = tmp;
+            }
+            // избегаем повтора того же эффекта на стыке мешков
+            if (_dreamBag[0] == _lastDreamEffect && _dreamBag.Count > 1)
+            {
+                _dreamBag[0] = _dreamBag[1];
+                _dreamBag[1] = _lastDreamEffect;
+            }
+        }
+        _lastDreamEffect = _dreamBag[0];
+        _dreamBag.RemoveAt(0);
+        return _lastDreamEffect;
     }
 
     private IEnumerator FadeLight(Light light, float from, float to, float dur)
@@ -225,6 +260,23 @@ public class GameManager : MonoBehaviour
         while (_saveData.currentDay <= 40)
         {
             int day = _saveData.currentDay;
+
+            // Пункт 1: перед финальным днём проверяем «цель путешествия» (10000 монет).
+            // Не хватило — даём выбор: начать заново с 1-го дня (копить) или купить монеты.
+            if (day >= 40 && _journeyGate != null && _saveData.totalCoins < CoinsUI.JourneyGoal)
+            {
+                GameInput.Locked = true;
+                yield return StartCoroutine(_journeyGate.Run(CoinsUI.JourneyGoal));
+                if (_journeyGate.RestartChosen)
+                {
+                    _saveData.currentDay = 1;
+                    SaveGame();
+                    yield return StartCoroutine(Transition());
+                    continue; // начинаем сначала, монеты сохранены
+                }
+                // иначе монеты докуплены до цели — продолжаем в финал
+            }
+
             DayData dayData = _storyDatabase?.GetDay(day);
 
             if (dayData == null)

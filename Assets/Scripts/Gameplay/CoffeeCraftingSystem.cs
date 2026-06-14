@@ -151,39 +151,18 @@ public class CoffeeCraftingSystem : MonoBehaviour
         string vol = _target.volume == Volume.Small ? Loc.T("совсем чуть-чуть", "just a little")
             : _target.volume == Volume.Large ? Loc.T("да побольше", "and plenty of it")
             : Loc.T("в самый раз", "just right");
-        // Пункт 7: намёк про основу теперь привязан к реальному напитку (а не к
-        // абстрактному «необычное/привычное»), чтобы был понятен в связке с ингредиентами.
-        string baseHint = BaseHintWord();
+        // Пункт 3: намёк опирается на РЕАЛЬНЫЙ сосуд-ингредиент в игре (его магическое
+        // имя), чтобы заказ согласовывался с тем, по чему игрок кликает.
+        string baseHint = IngredientName(TargetIngredientIndex());
         string top = _target.topping != Topping.None
             ? Loc.T(", и чтоб с изюминкой", ", with a little something extra")
             : "";
         return Loc.T("«Хочется ", "\"I'd like ") + baseHint + ", " + temp + ", " + vol + top + "…»";
     }
 
-    // Намёк по основе напитка — по категории типа кофе (пункт 7).
-    private string BaseHintWord()
-    {
-        switch (_target.type)
-        {
-            case CoffeeType.Espresso:
-            case CoffeeType.Americano:
-            case CoffeeType.BlackCoffee:
-            case CoffeeType.TruthBrew:
-                return Loc.T("крепкого кофе", "a strong coffee");
-            case CoffeeType.Cappuccino:
-            case CoffeeType.Latte:
-            case CoffeeType.Mocha:
-            case CoffeeType.HotChocolate:
-                return Loc.T("чего-то мягкого, молочного", "something soft and milky");
-            case CoffeeType.HerbalTea:
-            case CoffeeType.GreenTea:
-                return Loc.T("чего-то чайного, травяного", "something tea-like and herbal");
-            case CoffeeType.Water:
-                return Loc.T("просто воды", "just some water");
-            default:
-                return Loc.T("чего-нибудь на твой вкус", "something to your taste");
-        }
-    }
+    /// <summary>Описание желания гостя для панели подсказок (по реальному сосуду,
+    /// с локализованным топпингом). Пункты 2,3.</summary>
+    public string DescribeOrderForHint() => _target != null ? DescribeTarget() : "";
 
     // Точное описание желания (только после рекламной подсказки, пункт 4.1)
     private string DescribeTarget()
@@ -202,11 +181,18 @@ public class CoffeeCraftingSystem : MonoBehaviour
         return Loc.T("основа ", "base ") + (index + 1);
     }
 
+    // Пункт 2: имя топпинга всегда на текущем языке (а не английское имя объекта).
     private string ToppingName(Topping t)
     {
-        var it = FindTopping(t);
-        if (it != null && !string.IsNullOrEmpty(it.displayName)) return it.displayName;
-        return t.ToString();
+        switch (t)
+        {
+            case Topping.Cream:     return Loc.T("Сливки", "Cream");
+            case Topping.Cinnamon:  return Loc.T("Корица", "Cinnamon");
+            case Topping.Caramel:   return Loc.T("Карамель", "Caramel");
+            case Topping.Chocolate: return Loc.T("Шоколад", "Chocolate");
+            case Topping.Mint:      return Loc.T("Мята", "Mint");
+            default:                return Loc.T("без топпинга", "no topping");
+        }
     }
 
     private string TempWord(float v) =>

@@ -147,7 +147,14 @@ public class HintManager : MonoBehaviour
             return;
         }
 
-        string hint = Loc.T("Гость хочет:", "The guest wants:") + $"\n<b>{_currentOrder.GetDisplayName()}</b>";
+        // Пункты 2,3: описываем заказ по РЕАЛЬНОМУ сосуду-ингредиенту и с топпингом
+        // на текущем языке (берём готовое описание из системы готовки).
+        string wish = CoffeeCraftingSystem.Instance != null
+            ? CoffeeCraftingSystem.Instance.DescribeOrderForHint()
+            : _currentOrder.GetDisplayName();
+        if (string.IsNullOrEmpty(wish)) wish = _currentOrder.GetDisplayName();
+
+        string hint = Loc.T("Гость хочет:", "The guest wants:") + $"\n<b>{wish}</b>";
         _resultText?.SetText(hint);
     }
 
