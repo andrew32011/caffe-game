@@ -127,6 +127,11 @@ public class DayController : MonoBehaviour
         yield return StartCoroutine(GoToStageAndWait(_stageServe));
         yield return new WaitForSeconds(0.3f);
 
+        // Пункт 3: кружка мягко переходит из руки ГГ в руку гостя и исчезает там.
+        // Делаем это на этапе подачи, где иначе «ничего не происходит».
+        yield return StartCoroutine(
+            _craftingSystem.HandCupToCustomer(_customerController.CurrentCustomer));
+
         // 7. Обновляем ЗАПОМНЕННУЮ шкалу клиента (среднее старого и нового) (пункт 4.3)
         float newStored = Mathf.Clamp01(stored * 0.5f + result * 0.5f);
         GameManager.Instance?.SetClientSatisfaction(entry.characterType, newStored);

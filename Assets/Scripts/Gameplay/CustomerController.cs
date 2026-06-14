@@ -46,6 +46,9 @@ public class CustomerController : MonoBehaviour
 
     public float SatisfactionValue => _satisfactionValue;
 
+    /// <summary>Текущая модель гостя (для передачи кружки в руку, пункт 3).</summary>
+    public Transform CurrentCustomer => _currentModel != null ? _currentModel.transform : _visitorRoot;
+
     // ─── Захват шаблона из существующего гостя ───────────────────────────────
 
     private void Awake()

@@ -35,7 +35,9 @@ public class UiEffects : MonoBehaviour
     {
         if (_coinSprite == null) yield break;
         int count = Mathf.Clamp(amount / 10 + 3, 3, 12);
-        Vector2 origin = new Vector2(0f, -60f); // центр-низ
+        // Пункт 4: монеты летят в верхнем-левом углу (к кассе), а НЕ в центре-низу —
+        // чтобы не перекрывать диалог (низ) и заказ/шкалу (центр-верх).
+        Vector2 origin = new Vector2(-760f, 300f);
 
         for (int i = 0; i < count; i++)
         {
@@ -46,7 +48,8 @@ public class UiEffects : MonoBehaviour
             rt.anchoredPosition = origin;
             var img = go.GetComponent<Image>();
             img.sprite = _coinSprite; img.preserveAspect = true; img.raycastTarget = false;
-            Vector2 vel = new Vector2(Random.Range(-220f, 220f), Random.Range(350f, 620f));
+            // Небольшой разлёт вверх, не уезжая в центр экрана.
+            Vector2 vel = new Vector2(Random.Range(-120f, 160f), Random.Range(300f, 520f));
             StartCoroutine(FlyCoin(rt, go.GetComponent<CanvasGroup>(), vel));
             yield return new WaitForSeconds(0.04f);
         }
@@ -75,7 +78,8 @@ public class UiEffects : MonoBehaviour
         go.transform.SetParent(Root, false);
         var rt = (RectTransform)go.transform;
         rt.sizeDelta = new Vector2(400, 90);
-        rt.anchoredPosition = new Vector2(0f, 40f);
+        // Пункт 4: «+N» всплывает в верхнем-левом углу у кассы, не на тексте/диалоге.
+        rt.anchoredPosition = new Vector2(-700f, 300f);
         var tmp = go.GetComponent<TextMeshProUGUI>();
         tmp.text = text; tmp.fontSize = 56; tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = color; tmp.fontStyle = FontStyles.Bold; tmp.raycastTarget = false;
@@ -106,7 +110,8 @@ public class UiEffects : MonoBehaviour
         go.transform.SetParent(Root, false);
         var rt = (RectTransform)go.transform;
         rt.sizeDelta = new Vector2(900, 160);
-        rt.anchoredPosition = Vector2.zero;
+        // Пункт 4: баннер дня — выше центра, чтобы не лёг поверх панели итогов дня.
+        rt.anchoredPosition = new Vector2(0f, 360f);
         var tmp = go.GetComponent<TextMeshProUGUI>();
         tmp.text = text; tmp.fontSize = 80; tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = new Color(1f, 0.95f, 0.7f); tmp.fontStyle = FontStyles.Bold; tmp.raycastTarget = false;

@@ -143,10 +143,12 @@ public static class CoffeGameSceneSetup
         var messageText  = Text("MessageText", messagePanel.transform, "Сообщение", 34, TextAlignmentOptions.Center, Vector2.zero, Vector2.one);
 
         // ── Заказ гостя (верх центр) ────────────────────────────────────────
-        var orderText = Text("OrderDisplayText", ct, "Заказ: ...", 30, TextAlignmentOptions.Center, new Vector2(0.3f, 0.9f), new Vector2(0.7f, 0.98f));
+        // Пункт 6: НИЖЕ шкалы удовлетворённости (она в 0.93–0.97), чтобы текст
+        // намёка/заказа не оказывался на заднем фоне шкалы.
+        var orderText = Text("OrderDisplayText", ct, "Заказ: ...", 30, TextAlignmentOptions.Center, new Vector2(0.28f, 0.865f), new Vector2(0.72f, 0.915f));
 
         // ── Ачивка («Отлично!»/«В точку!») сверху ───────────────────────────
-        var achievement = Text("AchievementText", ct, "В точку!", 48, TextAlignmentOptions.Center, new Vector2(0.25f, 0.78f), new Vector2(0.75f, 0.9f));
+        var achievement = Text("AchievementText", ct, "В точку!", 48, TextAlignmentOptions.Center, new Vector2(0.25f, 0.72f), new Vector2(0.75f, 0.79f));
         achievement.color = new Color(0.4f, 1f, 0.5f);
         achievement.gameObject.SetActive(false);
 
@@ -188,8 +190,9 @@ public static class CoffeGameSceneSetup
         satFill.fillAmount = 0.5f;
         satFill.raycastTarget = false;
 
-        // Комментарий после шага («Супер!/Не то»)
-        var commentText = Text("CommentText", ct, "", 34, TextAlignmentOptions.Center, new Vector2(0.3f, 0.86f), new Vector2(0.7f, 0.92f));
+        // Комментарий после шага («Супер!/Не то») — отдельной строкой ниже заказа,
+        // тоже не на фоне шкалы (пункт 6).
+        var commentText = Text("CommentText", ct, "", 34, TextAlignmentOptions.Center, new Vector2(0.28f, 0.80f), new Vector2(0.72f, 0.855f));
         commentText.color = new Color(1f, 0.95f, 0.6f);
         commentText.gameObject.SetActive(false);
 
@@ -555,9 +558,11 @@ public static class CoffeGameSceneSetup
             return null;
         }
 
-        // Пункт 2: открепляем от камеры (сохраняя мировую позицию), чтобы он не
-        // «ездил» с камерой. Позицию за стойкой пользователь поправит вручную.
+        // Пункт 2: открепляем от камеры и СТАВИМ НА ПОЛ за стойкой, чтобы герой
+        // не «летал» вместе с камерой (раньше он был ребёнком Main Camera и ездил
+        // с ней во время обучения и на этапах игры).
         hero.transform.SetParent(null, true);
+        PlaceHeroBehindCounter(hero);
 
         // Пункт 1: гуманоидная анимация Standing Idle с ретаргетом на риг героя
         bool animOk = SetupHeroAnimation(hero);
@@ -575,6 +580,56 @@ public static class CoffeGameSceneSetup
 
         Debug.Log($"CoffeGameSetup: главный герой '{hero.name}' откреплён от камеры, idle={(animOk ? "humanoid" : "procedural")}.");
         return hero;
+    }
+
+    // Ставит героя на фиксированное место за стойкой и опускает на пол (пункт 2).
+    // Приоритет позиции:
+    //   1) пустышка-маркер "HeroPoint"/"HeroStand"/"HeroAnchor" — берём её позицию и поворот
+    //      (создай такой объект там, где должна стоять хозяйка — это точная ручная настройка);
+    //   2) иначе — точка кассира (PointCashier) по X/Z + рейкаст вниз до пола;
+    //   3) герой разворачивается лицом к гостю (VisitorBasis).
+    static void PlaceHeroBehindCounter(GameObject hero)
+    {
+        if (hero == null) return;
+
+        var marker = FindMarker("HeroPoint", "HeroStand", "HeroAnchor");
+        if (marker != null)
+        {
+            hero.transform.SetPositionAndRotation(marker.position, marker.rotation);
+            Debug.Log("CoffeGameSetup: герой поставлен по маркеру " + marker.name + ".");
+            return;
+        }
+
+        // База — точка кассира за стойкой (X/Z), иначе оставляем текущие X/Z.
+        var cashier = FindMarker("PointCashier", "PointCashierForDialog");
+        Vector3 pos = hero.transform.position;
+        if (cashier != null) { pos.x = cashier.position.x; pos.z = cashier.position.z; }
+
+        // Опускаем на пол рейкастом сверху вниз (чтобы герой не висел в воздухе).
+        // Игнорируем собственные коллайдеры героя, чтобы не «приземлиться» на его макушку.
+        Vector3 from = pos + Vector3.up * 50f;
+        var hits = Physics.RaycastAll(from, Vector3.down, 200f);
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        foreach (var h in hits)
+        {
+            if (h.collider != null && h.collider.transform.IsChildOf(hero.transform)) continue;
+            pos.y = h.point.y;
+            break;
+        }
+        hero.transform.position = pos;
+
+        // Разворот лицом к гостю.
+        var guest = FindMarker("VisitorBasis");
+        if (guest != null)
+        {
+            Vector3 dir = guest.position - hero.transform.position;
+            dir.y = 0f;
+            if (dir.sqrMagnitude > 0.0001f)
+                hero.transform.rotation = Quaternion.LookRotation(dir.normalized, Vector3.up);
+        }
+
+        Debug.Log("CoffeGameSetup: герой поставлен у стойки и опущен на пол. " +
+                  "Для точной ручной настройки создай в сцене пустой объект 'HeroPoint' там, где должна стоять хозяйка — сборка подхватит его позицию.");
     }
 
     // Настраивает Female + Standing Idle как Humanoid, строит контроллер и вешает Animator.

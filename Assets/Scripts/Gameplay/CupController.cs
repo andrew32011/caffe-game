@@ -28,9 +28,23 @@ public class CupController : MonoBehaviour
     [SerializeField] private float _pourDuration = 0.6f;
     [SerializeField] private float _toppingScale = 0.35f;
 
+    [Header("Передача кружки клиенту (пункт 3)")]
+    [Tooltip("Высота, на которой кружка «зависает» в руке гостя перед исчезновением.")]
+    [SerializeField] private float _handoffHeight = 1.0f;
+    [SerializeField] private float _handoffDuration = 0.9f;
+
     private readonly List<GameObject> _contents = new List<GameObject>();
 
+    private Vector3 _baseScale = Vector3.one;
+    private bool    _baseScaleCaptured;
+
     public enum Zone { Ingredients, Machine, Toppings, Counter }
+
+    private void Awake()
+    {
+        _baseScale = transform.localScale;
+        _baseScaleCaptured = true;
+    }
 
     private Transform AnchorFor(Zone z)
     {
@@ -132,11 +146,58 @@ public class CupController : MonoBehaviour
         _contents.Add(clone);
     }
 
-    /// <summary>Очистка кружки и возврат на стол ингредиентов (пункт 3).</summary>
-    public void ResetCup()
+    /// <summary>
+    /// Пункт 3: кружка мягко переходит от руки ГГ (текущая позиция у стойки) к руке
+    /// гостя и исчезает там. Содержимое уезжает вместе с ней. Awaitable.
+    /// Новая кружка появится для следующего гостя в ResetCup().
+    /// </summary>
+    public IEnumerator HandToCustomer(Transform customer)
+    {
+        if (customer == null) { SetVisible(false); yield break; }
+
+        Vector3 startPos  = transform.position;
+        // Точка «в руке гостя»: чуть выше его основания и слегка в сторону стойки.
+        Vector3 handPos   = customer.position + Vector3.up * _handoffHeight
+                            + (startPos - customer.position).normalized * 0.15f;
+        Vector3 startScale = transform.localScale;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / Mathf.Max(0.01f, _handoffDuration);
+            float e = Mathf.SmoothStep(0f, 1f, t);
+            transform.position   = Vector3.Lerp(startPos, handPos, e);
+            // К концу пути кружка чуть уменьшается и тает.
+            transform.localScale = Vector3.Lerp(startScale, startScale * 0.6f, e);
+            yield return null;
+        }
+
+        // Исчезает в руке гостя.
+        SetVisible(false);
+        ClearContents();
+    }
+
+    /// <summary>Показать/скрыть визуал кружки (все рендеры в иерархии).</summary>
+    public void SetVisible(bool on)
+    {
+        foreach (var r in GetComponentsInChildren<Renderer>(true))
+            r.enabled = on;
+    }
+
+    private void ClearContents()
     {
         foreach (var c in _contents) if (c != null) Destroy(c);
         _contents.Clear();
+    }
+
+    /// <summary>Очистка кружки и возврат на стол ингредиентов (пункт 3).
+    /// Здесь же «создаётся» новая кружка для следующего гостя: визуал снова виден,
+    /// масштаб восстановлен.</summary>
+    public void ResetCup()
+    {
+        ClearContents();
+        if (_baseScaleCaptured) transform.localScale = _baseScale;
+        SetVisible(true);
         SnapTo(Zone.Ingredients);
     }
 }

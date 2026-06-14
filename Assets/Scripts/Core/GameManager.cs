@@ -158,9 +158,11 @@ public class GameManager : MonoBehaviour
         if (_vfxController != null)
             yield return StartCoroutine(_vfxController.FadeScreen(false, 0.5f)); // станет видно сцену в темноте
 
+        // Пункт 1: во сне НЕ используем красные вспышки (RedPulse) — только
+        // тьма, тряска и потеря зрения. Сон должен быть мрачным, а не «алым».
         var effects = new[]
         {
-            VignetteEffectType.CameraShake, VignetteEffectType.RedPulse,
+            VignetteEffectType.CameraShake,
             VignetteEffectType.VisionLoss,  VignetteEffectType.DarknessFlash
         };
         var effect = effects[day % effects.Length];

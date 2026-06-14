@@ -142,13 +142,38 @@ public class CoffeeCraftingSystem : MonoBehaviour
         string vol = _target.volume == Volume.Small ? Loc.T("совсем чуть-чуть", "just a little")
             : _target.volume == Volume.Large ? Loc.T("да побольше", "and plenty of it")
             : Loc.T("в самый раз", "just right");
-        string baseHint = ((int)_target.type % 2 == 0)
-            ? Loc.T("чего-то необычного", "something unusual")
-            : Loc.T("чего-то привычного", "something familiar");
+        // Пункт 7: намёк про основу теперь привязан к реальному напитку (а не к
+        // абстрактному «необычное/привычное»), чтобы был понятен в связке с ингредиентами.
+        string baseHint = BaseHintWord();
         string top = _target.topping != Topping.None
             ? Loc.T(", и чтоб с изюминкой", ", with a little something extra")
             : "";
         return Loc.T("«Хочется ", "\"I'd like ") + baseHint + ", " + temp + ", " + vol + top + "…»";
+    }
+
+    // Намёк по основе напитка — по категории типа кофе (пункт 7).
+    private string BaseHintWord()
+    {
+        switch (_target.type)
+        {
+            case CoffeeType.Espresso:
+            case CoffeeType.Americano:
+            case CoffeeType.BlackCoffee:
+            case CoffeeType.TruthBrew:
+                return Loc.T("крепкого кофе", "a strong coffee");
+            case CoffeeType.Cappuccino:
+            case CoffeeType.Latte:
+            case CoffeeType.Mocha:
+            case CoffeeType.HotChocolate:
+                return Loc.T("чего-то мягкого, молочного", "something soft and milky");
+            case CoffeeType.HerbalTea:
+            case CoffeeType.GreenTea:
+                return Loc.T("чего-то чайного, травяного", "something tea-like and herbal");
+            case CoffeeType.Water:
+                return Loc.T("просто воды", "just some water");
+            default:
+                return Loc.T("чего-нибудь на твой вкус", "something to your taste");
+        }
     }
 
     // Точное описание желания (только после рекламной подсказки, пункт 4.1)
@@ -221,6 +246,13 @@ public class CoffeeCraftingSystem : MonoBehaviour
     {
         ResetState();
         _cup?.ResetCup();
+    }
+
+    /// <summary>Пункт 3: кружка плавно переходит из руки ГГ в руку гостя и исчезает.
+    /// Вызывается на этапе подачи/реакции (где иначе «ничего не происходит»).</summary>
+    public IEnumerator HandCupToCustomer(Transform customer)
+    {
+        if (_cup != null) yield return StartCoroutine(_cup.HandToCustomer(customer));
     }
 
     private void ResetState()
@@ -334,7 +366,20 @@ public class CoffeeCraftingSystem : MonoBehaviour
         bool volOk  = Mathf.Abs(volume - VolumeTarget()) <= _tolerance;
         if (tempOk && volOk) ShowAchievement(Loc.T("В точку!", "Spot on!"));
 
-        StepFeedback(tempOk && volOk, partial: true);
+        // Пункт 5: удовлетворённость зависит ОТ КАЖДОЙ фичи отдельно — и температуры,
+        // и объёма. Шкала уже учитывает обе (Satisfaction()), а комментарий честно
+        // показывает, что именно угадано.
+        string msg;
+        if (tempOk && volOk)
+            msg = Loc.T("Температура и объём — идеально!", "Temperature and volume — perfect!");
+        else if (tempOk)
+            msg = Loc.T("Температура та, а объём мимо.", "Temperature is right, but the volume is off.");
+        else if (volOk)
+            msg = Loc.T("Объём верный, но температура не та.", "Volume is right, but the temperature is off.");
+        else
+            msg = Loc.T("И температура, и объём не угаданы.", "Both temperature and volume are off.");
+
+        StepFeedback(tempOk && volOk, partial: true, message: msg);
         StartCoroutine(ToToppings());
     }
 
@@ -385,14 +430,15 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
     private Coroutine _commentCo;
 
-    // partial=true — обновляем полосу по ходу готовки
-    private void StepFeedback(bool good, bool partial)
+    // partial=true — обновляем полосу по ходу готовки.
+    // message != null — показываем свой текст (например, отдельно по температуре/объёму).
+    private void StepFeedback(bool good, bool partial, string message = null)
     {
         UpdateSatisfactionUI();
         if (_commentText == null) return;
-        _commentText.text = good
+        _commentText.text = message ?? (good
             ? Loc.T("Супер!", "Great!")
-            : Loc.T("Не совсем то…", "Not quite…");
+            : Loc.T("Не совсем то…", "Not quite…"));
         if (_commentCo != null) StopCoroutine(_commentCo);
         _commentCo = StartCoroutine(CommentRoutine());
     }
