@@ -91,8 +91,10 @@ public class DayController : MonoBehaviour
 
     private IEnumerator ServeCustomer(DayCustomerEntry entry, int coinsPerOrder)
     {
-        // 1. Ставим модель гостя на VisitorBasis; ГГ пока скрыт (пункт 2)
-        _craftingSystem.SetHeroVisible(false);
+        // 1. Ставим модель гостя на VisitorBasis. ГГ остаётся за стойкой ВИДИМЫМ
+        //    (пункт 1: не пропадает на прощании/приходе — прячем его только в зонах
+        //    готовки, см. CoffeeCraftingSystem.HideHeroWhenCameraLeaves).
+        _craftingSystem.SetHeroVisible(true);
         _customerController.SpawnModel(GetCustomerPrefab(entry.stickmanIndex));
 
         // 2. Этап 0: гость идёт к стойке (Stage0 запускает ProcessVisitor)
@@ -160,8 +162,7 @@ public class DayController : MonoBehaviour
             yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.wrongOrderLines));
         }
 
-        // 10. Гость уходит. ГГ прячем ВНУТРИ LetCustomerLeave — уже после того, как
-        //     камера ушла от стойки (пункт 2: не исчезать в кадре).
+        // 10. Гость уходит. ГГ остаётся видимым за стойкой (пункт 1).
         yield return new WaitForSeconds(0.4f);
         yield return StartCoroutine(LetCustomerLeave());
     }
@@ -171,8 +172,9 @@ public class DayController : MonoBehaviour
     /// <summary>Этап 7: Stage7 запускает обратный маршрут; ждём ухода и убираем модель.</summary>
     private IEnumerator LetCustomerLeave()
     {
+        // Пункт 1: ГГ НЕ прячем — он остаётся за стойкой, пока гость уходит и пока
+        // подходит следующий (раньше он тут пропадал и появлялся вновь).
         yield return StartCoroutine(GoToStageAndWait(_stageGuestLeave));
-        _craftingSystem.SetHeroVisible(false); // пункт 2: прячем ГГ ПОСЛЕ ухода камеры
         yield return StartCoroutine(_customerController.WaitForRouteEnd());
         _customerController.RemoveModel();
     }

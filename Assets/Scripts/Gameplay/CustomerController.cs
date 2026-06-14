@@ -26,7 +26,15 @@ public class CustomerController : MonoBehaviour
     [Tooltip("Контроллер анимации (снимается с _existingGuest, либо задаётся вручную).")]
     [SerializeField] private RuntimeAnimatorController _botController;
 
+    [Header("Локомоция (пункт 2): покой при общении, ходьба при движении")]
+    [Tooltip("Контроллер покоя (idle) — включается, когда гость стоит у стойки и общается.")]
+    [SerializeField] private RuntimeAnimatorController _idleController;
+    [Tooltip("Контроллер ходьбы — когда гость идёт. Если пусто, берётся controller существующего гостя.")]
+    [SerializeField] private RuntimeAnimatorController _walkController;
+
     private Avatar _botAvatar; // аватар рига (для гуманоидов) — снимается с _existingGuest
+    private bool?  _appliedWalking; // последнее применённое состояние локомоции
+    private RuntimeAnimatorController _spawnDefaultController; // исходный контроллер модели (запасная ходьба)
 
     [Header("Полоска удовлетворённости")]
     [SerializeField] private SatisfactionBar _satisfactionBarPrefab;
@@ -93,8 +101,12 @@ public class CustomerController : MonoBehaviour
         _animator = _currentModel.GetComponentInChildren<Animator>();
         if (_animator != null)
         {
-            if (_botController != null) _animator.runtimeAnimatorController = _botController;
-            if (_botAvatar != null)     _animator.avatar = _botAvatar;
+            // Запоминаем исходный контроллер модели — это запасная анимация ходьбы.
+            _spawnDefaultController = _animator.runtimeAnimatorController;
+            if (_botAvatar != null) _animator.avatar = _botAvatar;
+            // Гость только появился и стоит — начинаем с покоя (idle), пункт 2.
+            _appliedWalking = null;
+            ApplyLocomotion(false);
         }
 
         // Полоска удовлетворённости над головой
@@ -143,14 +155,34 @@ public class CustomerController : MonoBehaviour
 
     private void Update()
     {
-        // Анимация ходьбы по состоянию ProcessVisitor
+        // Пункт 2: ходьба только когда гость реально движется по маршруту.
+        // Когда стоит у стойки и общается — переключаем на покой (idle), а не
+        // оставляем зацикленную анимацию ходьбы «на месте».
         if (_animator == null || _processVisitor == null) return;
 
         bool walking = _processVisitor.IsMoving;
-        if (_animator.HasParameter("Speed"))
-            _animator.SetFloat("Speed", walking ? 1f : 0f);
-        if (_animator.HasParameter("IsWalking"))
-            _animator.SetBool("IsWalking", walking);
+        if (_appliedWalking != walking)
+            ApplyLocomotion(walking);
+    }
+
+    // Переключает аниматор гостя между ходьбой и покоем.
+    private void ApplyLocomotion(bool walking)
+    {
+        if (_animator == null) return;
+        _appliedWalking = walking;
+
+        var ctrl = walking
+            ? (_walkController != null ? _walkController : (_botController != null ? _botController : _spawnDefaultController))
+            : (_idleController != null ? _idleController : _spawnDefaultController);
+        if (ctrl != null && _animator.runtimeAnimatorController != ctrl)
+        {
+            _animator.runtimeAnimatorController = ctrl;
+            if (_botAvatar != null) _animator.avatar = _botAvatar;
+        }
+
+        // Если контроллер всё же параметрический — поддержим и его.
+        if (_animator.HasParameter("Speed"))     _animator.SetFloat("Speed", walking ? 1f : 0f);
+        if (_animator.HasParameter("IsWalking")) _animator.SetBool("IsWalking", walking);
     }
 
     // ─── Удовлетворённость ───────────────────────────────────────────────────

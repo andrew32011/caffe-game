@@ -84,6 +84,10 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
     private bool _orderReady;
     public bool IsOrderReady       => _orderReady;
+
+    /// <summary>Пункт 3: в обучении гостя нет — не показываем оценку «правильно/неправильно»
+    /// (комментарии, ачивки, изменение шкалы удовлетворённости).</summary>
+    public bool TutorialMode { get; set; }
     public int  ChosenToppingCount => _chosenToppings.Count;
     public int  CurrentDrinkCost   => _currentDrinkCost;
 
@@ -448,6 +452,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
     // message != null — показываем свой текст (например, отдельно по температуре/объёму).
     private void StepFeedback(bool good, bool partial, string message = null)
     {
+        if (TutorialMode) return; // пункт 3: в обучении оценку не показываем
         UpdateSatisfactionUI();
         if (_commentText == null) return;
         _commentText.text = message ?? (good
@@ -554,6 +559,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
     private void ShowAchievement(string text)
     {
+        if (TutorialMode) return; // пункт 3: в обучении ачивок не показываем
         if (_achievementText == null) return;
         if (_achievementCo != null) StopCoroutine(_achievementCo);
         _achievementText.text = text;

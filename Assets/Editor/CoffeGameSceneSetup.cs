@@ -313,20 +313,27 @@ public static class CoffeGameSceneSetup
             .Arr("_customerPrefabs", stickmen)
             .Apply();
 
-        // ── Полировка панелей спрайтами Mini UI (пункт 7, балансно) ─────────
+        // ── Полировка панелей спрайтами Mini UI + ppuMultiplier=4 (пункты 4,5) ──
         ApplyPanelSprite(machinePanel);
         ApplyPanelSprite(hintPanel);
-        ApplyPanelSprite(resultPanel);
+        ApplyPanelSprite(resultPanel);   // пункт 4: UI итогов дня
         ApplyPanelSprite(dialoguePanel);
+        ApplyPanelSprite(dayIntroPanel);
+        ApplyPanelSprite(messagePanel);
 
         // CustomerController — переиспользуем существующего ходячего гостя.
         // Анимацию/размер с него снимет и исходную модель удалит сам CustomerController (Awake).
         var existingGuest = FindSceneStickman();
+        // Пункт 2: контроллер покоя для гостя, стоящего у стойки. Ходьбу оставляем
+        // исходную (снимается с существующего гостя в CustomerController.Awake).
+        var idleCtrl = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
+            "Assets/PrefsAll/Hyper Casual Characters/Animator controller/idle.controller");
         new W(custCtrl)
             .Ref("_processVisitor", pv)
             .Ref("_visitorRoot", visitorRoot)
             .Ref("_satisfactionBarPrefab", sbComp)
             .Ref("_existingGuest", existingGuest)
+            .Ref("_idleController", idleCtrl)   // покой, когда гость стоит
             .Apply();
 
         // MachineMinigame — UI вертикальных шкал
@@ -686,7 +693,8 @@ public static class CoffeGameSceneSetup
         return true;
     }
 
-    // Применяет красивый 9-slice спрайт Mini UI к панели (пункт 7, балансно)
+    // Применяет красивый 9-slice спрайт Mini UI к панели.
+    // Пункт 5: pixelsPerUnitMultiplier = 4 для всех UI-панелей.
     static Sprite _panelSprite;
     static void ApplyPanelSprite(GameObject panel)
     {
@@ -695,7 +703,34 @@ public static class CoffeGameSceneSetup
                 "Assets/Mini UI/9 Splice Panels/Dark Theme RoundEdge Panels/Dark Theme RoundEdge DARK.png");
         if (_panelSprite == null) return;
         var img = panel.GetComponent<Image>();
-        if (img != null) { img.sprite = _panelSprite; img.type = Image.Type.Sliced; img.color = Color.white; }
+        if (img != null)
+        {
+            img.sprite = _panelSprite;
+            img.type = Image.Type.Sliced;
+            img.color = Color.white;
+            img.pixelsPerUnitMultiplier = 4f; // пункт 5
+        }
+    }
+
+    // Применяет спрайт-кнопку Mini UI (пункт 4) с pixelsPerUnitMultiplier = 4 (пункт 5).
+    static Sprite _buttonSprite;
+    static void ApplyButtonSprite(Image img)
+    {
+        if (img == null) return;
+        if (_buttonSprite == null)
+            _buttonSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+                "Assets/Mini UI/Buttons/Dark Theme Border Buttons/192Px Round DarkBorder/Small Round Button DARK.png");
+        if (_buttonSprite != null)
+        {
+            img.sprite = _buttonSprite;
+            img.type = Image.Type.Sliced;
+            img.color = Color.white;
+            img.pixelsPerUnitMultiplier = 4f; // пункт 5
+        }
+        else
+        {
+            img.color = new Color(0.2f, 0.2f, 0.28f, 0.95f); // запасной вид, если спрайт не найден
+        }
     }
 
     // Иконка-картинка из ассета на Canvas
@@ -925,7 +960,7 @@ public static class CoffeGameSceneSetup
         var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
         go.transform.SetParent(parent, false);
         var img = go.GetComponent<Image>();
-        img.color = new Color(0.2f, 0.2f, 0.28f, 0.95f);
+        ApplyButtonSprite(img); // пункты 4,5: спрайт-кнопка + ppuMultiplier
         ((RectTransform)go.transform).sizeDelta = new Vector2(150, 48);
         var txt = Text("Label", go.transform, label, 20, TextAlignmentOptions.Center);
         var btn = go.GetComponent<Button>();

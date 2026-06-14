@@ -121,6 +121,8 @@ public class TutorialController : MonoBehaviour
         var craft = CoffeeCraftingSystem.Instance;
         if (craft == null) yield break;
 
+        craft.TutorialMode = true; // пункт 3: в обучении гостя нет — без оценки напитка
+
         // Пробный заказ — маленький эспрессо (тип + объём + заварка)
         var target = new CoffeeOrder { type = CoffeeType.Espresso, volume = Volume.Small };
         craft.SetTargetOrder(target);
@@ -145,6 +147,7 @@ public class TutorialController : MonoBehaviour
         GameInput.Locked = true;
         craft.Hide();
         craft.ResetCup();
+        craft.TutorialMode = false; // обучение закончено — дальше оценка нужна
     }
 
     // ─── Подсветка объекта ───────────────────────────────────────────────────
