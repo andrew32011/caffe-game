@@ -18,6 +18,8 @@ public class UiEffects : MonoBehaviour
     [SerializeField] private RectTransform _root;
     [Header("Спрайт монеты")]
     [SerializeField] private Sprite _coinSprite;
+    [Header("Шрифт UI")]
+    [SerializeField] private TMP_FontAsset _font;
 
     private void Awake() { Instance = this; }
 
@@ -81,6 +83,7 @@ public class UiEffects : MonoBehaviour
         // Пункт 4: «+N» всплывает в верхнем-левом углу у кассы, не на тексте/диалоге.
         rt.anchoredPosition = new Vector2(-700f, 300f);
         var tmp = go.GetComponent<TextMeshProUGUI>();
+        if (_font != null) tmp.font = _font;
         tmp.text = text; tmp.fontSize = 56; tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = color; tmp.fontStyle = FontStyles.Bold; tmp.raycastTarget = false;
         StartCoroutine(FloatRoutine(rt, go.GetComponent<CanvasGroup>()));
@@ -113,6 +116,7 @@ public class UiEffects : MonoBehaviour
         // Пункт 4: баннер дня — выше центра, чтобы не лёг поверх панели итогов дня.
         rt.anchoredPosition = new Vector2(0f, 360f);
         var tmp = go.GetComponent<TextMeshProUGUI>();
+        if (_font != null) tmp.font = _font;
         tmp.text = text; tmp.fontSize = 80; tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = new Color(1f, 0.95f, 0.7f); tmp.fontStyle = FontStyles.Bold; tmp.raycastTarget = false;
         StartCoroutine(BannerRoutine(rt, go.GetComponent<CanvasGroup>()));

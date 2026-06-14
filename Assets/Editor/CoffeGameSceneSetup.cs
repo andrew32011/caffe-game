@@ -179,6 +179,7 @@ public static class CoffeGameSceneSetup
         new W(uiFx)
             .Ref("_root", canvasGO.GetComponent<RectTransform>())
             .Ref("_coinSprite", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/Icons/Bronze Coin.png"))
+            .Ref("_font", UiFont())
             .Apply();
 
         // ── Панель машины: 2 вертикальных заполнения (температура, объём) ────
@@ -731,6 +732,17 @@ public static class CoffeGameSceneSetup
         return true;
     }
 
+    // Единый нормальный шрифт для всех UI-текстов (добавлен в Assets пользователем).
+    static TMP_FontAsset _uiFont;
+    static TMP_FontAsset UiFont()
+    {
+        if (_uiFont == null)
+            _uiFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/ofont.ru_Nunito SDF.asset");
+        if (_uiFont == null)
+            Debug.LogWarning("CoffeGameSetup: шрифт 'Assets/ofont.ru_Nunito SDF.asset' не найден — тексты останутся на стандартном шрифте.");
+        return _uiFont;
+    }
+
     // Применяет красивый 9-slice спрайт Mini UI к панели.
     // Пункт 5: pixelsPerUnitMultiplier = 4 для всех UI-панелей.
     static Sprite _panelSprite;
@@ -985,6 +997,8 @@ public static class CoffeGameSceneSetup
         go.transform.SetParent(parent, false);
         var t = go.AddComponent<TextMeshProUGUI>();
         t.text = content;
+        var uiFont = UiFont();
+        if (uiFont != null) t.font = uiFont; // единый нормальный шрифт во всех UI
         // Пункт 4: текст всегда аккуратно вписывается в свою область и не липнет к краям.
         t.fontSize = size;
         t.fontSizeMax = size;
