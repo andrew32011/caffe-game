@@ -66,6 +66,10 @@ public class CoffeeCraftingSystem : MonoBehaviour
     [Header("Допуск совпадения ползунков (0..1)")]
     [SerializeField] private float _tolerance = 0.15f;
 
+    /// <summary>Батч 3: апгрейд «профи-кофемашина» расширяет допуск — попасть в цель легче.</summary>
+    private float EffectiveTolerance =>
+        Mathf.Clamp(_tolerance + (GameManager.Instance != null ? GameManager.Instance.ToleranceBonus : 0f), 0.05f, 0.4f);
+
     // ─── Реестр предметов ─────────────────────────────────────────────────────
 
     private static readonly List<IngredientItem> _items = new List<IngredientItem>();
@@ -421,8 +425,8 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _machineDecided = true;
         _machine?.HidePanel();
 
-        bool tempOk = Mathf.Abs(temp   - TempTarget())   <= _tolerance;
-        bool volOk  = Mathf.Abs(volume - VolumeTarget()) <= _tolerance;
+        bool tempOk = Mathf.Abs(temp   - TempTarget())   <= EffectiveTolerance;
+        bool volOk  = Mathf.Abs(volume - VolumeTarget()) <= EffectiveTolerance;
         if (tempOk && volOk) ShowAchievement(Loc.T("В точку!", "Spot on!"));
 
         // Пункт 5: удовлетворённость зависит ОТ КАЖДОЙ фичи отдельно — и температуры,
@@ -479,8 +483,8 @@ public class CoffeeCraftingSystem : MonoBehaviour
         if (_ingredientDecided) { if (_chosenIngredient == TargetIngredientIndex()) matched++; else mismatched++; }
         if (_machineDecided)
         {
-            if (Mathf.Abs(_chosenTemp   - TempTarget())   <= _tolerance) matched++; else mismatched++;
-            if (Mathf.Abs(_chosenVolume - VolumeTarget()) <= _tolerance) matched++; else mismatched++;
+            if (Mathf.Abs(_chosenTemp   - TempTarget())   <= EffectiveTolerance) matched++; else mismatched++;
+            if (Mathf.Abs(_chosenVolume - VolumeTarget()) <= EffectiveTolerance) matched++; else mismatched++;
         }
         if (_toppingDecided) { if (ToppingMatches()) matched++; else mismatched++; }
 

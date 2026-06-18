@@ -51,6 +51,14 @@ public class DayController : MonoBehaviour
     [Tooltip("Порог удовлетворённости, ниже которого клиент недоволен.")]
     [Range(0f, 1f)] [SerializeField] private float _satisfiedThreshold = 0.5f;
 
+    [Header("Комбо за серию хороших напитков (Батч 3)")]
+    [Tooltip("Качество напитка, начиная с которого он засчитывается в серию.")]
+    [Range(0f, 1f)] [SerializeField] private float _comboGoodThreshold = 0.6f;
+    [Tooltip("Прибавка к оплате за каждый уровень комбо.")]
+    [SerializeField] private float _comboStep = 0.15f;
+    [Tooltip("Максимум уровней комбо (ограничение множителя).")]
+    [SerializeField] private int _comboMax = 5;
+
     // ─── Состояние ───────────────────────────────────────────────────────────
 
     private int  _coinsEarnedToday = 0;   // чистая прибыль за день (может быть < 0)
@@ -68,6 +76,8 @@ public class DayController : MonoBehaviour
         _coinsEarnedToday = 0;
         _currentDayNumber = dayData.dayNumber;
         _daySuccess       = false;
+        _comboCount       = 0;                 // Батч 3: серия начинается заново каждый день
+        UiEffects.Instance?.ShowCombo(0);
 
         _dialogue?.ShowDayIntro(dayData.dayNumber);
         yield return new WaitForSeconds(2f);
@@ -87,8 +97,9 @@ public class DayController : MonoBehaviour
             yield return new WaitForSeconds(1f); // Пауза между гостями
         }
 
-        // День завершён — сбрасываем внутридневной индекс.
+        // День завершён — сбрасываем внутридневной индекс и убираем индикатор комбо.
         GameManager.Instance?.SetCustomerIndex(0);
+        UiEffects.Instance?.ShowCombo(0);
 
         // Пункт 9: провала по «3 ошибкам» больше нет. День считается провальным
         // только если кофейня отработала в минус (экономика — см. _coinsEarnedToday).
@@ -98,6 +109,28 @@ public class DayController : MonoBehaviour
     // ─── Один гость ───────────────────────────────────────────────────────────
 
     private int _consecutiveFails = 0; // подряд полностью проваленных напитков (пункт 4.1)
+    private int _comboCount        = 0; // подряд хороших напитков (Батч 3)
+
+    /// <summary>Батч 3: обновляет серию по качеству напитка и возвращает множитель
+    /// оплаты (1 + уровень × шаг). Хороший напиток наращивает серию, плохой — сбрасывает.</summary>
+    private float UpdateCombo(float result)
+    {
+        if (result >= _comboGoodThreshold)
+        {
+            _comboCount++;
+            int level = Mathf.Clamp(_comboCount - 1, 0, _comboMax);
+            if (_comboCount >= 2)
+            {
+                UiEffects.Instance?.ShowCombo(_comboCount);
+                AudioController.Instance?.PlayStar();
+            }
+            return 1f + level * _comboStep;
+        }
+
+        _comboCount = 0;
+        UiEffects.Instance?.ShowCombo(0);
+        return 1f;
+    }
 
     private IEnumerator ServeCustomer(DayCustomerEntry entry, int coinsPerOrder)
     {
@@ -175,8 +208,13 @@ public class DayController : MonoBehaviour
 
         // 8. Экономика (пункт 5): платит по качеству напитка (в первые дни — щедро),
         //    с бонусом за хорошие отношения с клиентом (пункт 4.3).
-        float mult  = _currentDayNumber <= _earlyDayLimit ? _earlyDayMultiplier : 1f;
-        int payment = Mathf.RoundToInt(_basePrice * result * (0.5f + newStored) * mult);
+        //    Батч 3: апгрейд «зёрна» повышает оплату; «лояльность» добавляет чаевые
+        //    (только к оплате, не к запомненной шкале); комбо множит за серию.
+        float mult    = _currentDayNumber <= _earlyDayLimit ? _earlyDayMultiplier : 1f;
+        float upgMult = GameManager.Instance != null ? GameManager.Instance.PriceMultiplier : 1f;
+        float tipMood = Mathf.Clamp01(newStored + (GameManager.Instance != null ? GameManager.Instance.MoodBonus : 0f));
+        float combo   = UpdateCombo(result);
+        int payment = Mathf.RoundToInt(_basePrice * result * (0.5f + tipMood) * mult * upgMult * combo);
         GameManager.Instance?.AddCoins(payment);
         _coinsEarnedToday += payment - _craftingSystem.CurrentDrinkCost;
 

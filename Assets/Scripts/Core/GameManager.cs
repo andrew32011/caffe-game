@@ -446,6 +446,55 @@ public class GameManager : MonoBehaviour
         set => _saveData.dailyBonusStreak = value;
     }
 
+    // ─── Батч 3: апгрейды кофейни ──────────────────────────────────────────────
+
+    public const int UpgradeMaxLevel = 3;
+
+    /// <summary>Текущий уровень апгрейда (0..UpgradeMaxLevel).</summary>
+    public int GetUpgradeLevel(UpgradeType type)
+    {
+        switch (type)
+        {
+            case UpgradeType.Beans:   return _saveData.upgBeans;
+            case UpgradeType.Machine: return _saveData.upgMachine;
+            default:                  return _saveData.upgLoyalty;
+        }
+    }
+
+    /// <summary>Цена следующего уровня апгрейда; -1, если уже максимум.</summary>
+    public int GetUpgradeCost(UpgradeType type)
+    {
+        int level = GetUpgradeLevel(type);
+        if (level >= UpgradeMaxLevel) return -1;
+        // База за тип × (уровень+1): первое улучшение дешевле, следующие дороже.
+        int baseCost = type == UpgradeType.Beans   ? 300
+                     : type == UpgradeType.Machine ? 250
+                     :                                200;
+        return baseCost * (level + 1);
+    }
+
+    /// <summary>Покупает следующий уровень апгрейда, если хватает монет. Сохраняет сразу.</summary>
+    public bool TryBuyUpgrade(UpgradeType type)
+    {
+        int cost = GetUpgradeCost(type);
+        if (cost < 0 || _saveData.totalCoins < cost) return false;
+
+        _saveData.totalCoins -= cost;
+        switch (type)
+        {
+            case UpgradeType.Beans:   _saveData.upgBeans++;   break;
+            case UpgradeType.Machine: _saveData.upgMachine++; break;
+            default:                  _saveData.upgLoyalty++; break;
+        }
+        SaveGame();
+        return true;
+    }
+
+    // Множители эффектов апгрейдов (читают DayController / CoffeeCraftingSystem).
+    public float PriceMultiplier => 1f + GetUpgradeLevel(UpgradeType.Beans)   * 0.12f; // +12%/ур к оплате
+    public float ToleranceBonus  =>       GetUpgradeLevel(UpgradeType.Machine) * 0.04f; // шире допуск
+    public float MoodBonus       =>       GetUpgradeLevel(UpgradeType.Loyalty) * 0.06f; // лучше чаевые
+
     // ─── Память удовлетворённости по клиентам (пункт 4.3) ────────────────────
 
     public float GetClientSatisfaction(CharacterType type)

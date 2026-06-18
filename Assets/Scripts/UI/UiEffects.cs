@@ -214,4 +214,50 @@ public class UiEffects : MonoBehaviour
         while (t < 1f) { t += Time.deltaTime * 2f; if (cg != null) cg.alpha = 1f - t; yield return null; }
         Destroy(rt.gameObject);
     }
+
+    // ─── Индикатор комбо (Батч 3) ─────────────────────────────────────────────
+    // Постоянная надпись «Комбо ×N!» у верха экрана: растёт с серией, прячется при сбросе.
+
+    private TextMeshProUGUI _comboLabel;
+    private Coroutine _comboCo;
+
+    public void ShowCombo(int count)
+    {
+        if (count < 2)
+        {
+            if (_comboLabel != null) _comboLabel.gameObject.SetActive(false);
+            return;
+        }
+
+        if (_comboLabel == null)
+        {
+            var go = new GameObject("ComboLabelFx", typeof(RectTransform), typeof(TextMeshProUGUI));
+            go.transform.SetParent(Root, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(600, 100);
+            rt.anchoredPosition = new Vector2(0f, 250f);
+            _comboLabel = go.GetComponent<TextMeshProUGUI>();
+            if (_font != null) _comboLabel.font = _font;
+            _comboLabel.fontSize = 60;
+            _comboLabel.alignment = TextAlignmentOptions.Center;
+            _comboLabel.fontStyle = FontStyles.Bold;
+            _comboLabel.raycastTarget = false;
+        }
+
+        _comboLabel.gameObject.SetActive(true);
+        _comboLabel.text = Loc.T($"Комбо ×{count}!", $"Combo ×{count}!");
+        _comboLabel.color = new Color(1f, 0.7f, 0.2f);
+        if (_comboCo != null) StopCoroutine(_comboCo);
+        _comboCo = StartCoroutine(ComboPop(_comboLabel.rectTransform));
+    }
+
+    private IEnumerator ComboPop(RectTransform rt)
+    {
+        float t = 0f;
+        while (t < 1f) { t += Time.deltaTime * 6f; rt.localScale = Vector3.one * Mathf.SmoothStep(0.6f, 1.2f, Mathf.Min(1f, t)); yield return null; }
+        t = 0f;
+        while (t < 1f) { t += Time.deltaTime * 4f; rt.localScale = Vector3.one * (1.2f - 0.2f * t); yield return null; }
+        rt.localScale = Vector3.one;
+    }
 }

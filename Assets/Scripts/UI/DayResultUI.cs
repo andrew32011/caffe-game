@@ -31,6 +31,10 @@ public class DayResultUI : MonoBehaviour
     [SerializeField] private Button _btnDouble;
     [SerializeField] private TextMeshProUGUI _doubleLabel;
 
+    [Header("Магазин апгрейдов (Батч 3)")]
+    [SerializeField] private Button _btnShop;
+    [SerializeField] private UpgradeShopUI _upgradeShop;
+
     [Header("Дополнительно")]
     [SerializeField] private Image   _dayStarImage;    // Звёзда (полная/неполная)
     [SerializeField] private Sprite  _starFull;
@@ -52,6 +56,7 @@ public class DayResultUI : MonoBehaviour
         _resultPanel?.SetActive(false);
         _btnContinue?.onClick.AddListener(OnContinueClicked);
         _btnDouble?.onClick.AddListener(OnDoubleClicked);
+        _btnShop?.onClick.AddListener(OnShopClicked);
 #if RewardedAdv_yg
         YG2.onRewardAdv += OnReward;
 #else
@@ -128,6 +133,11 @@ public class DayResultUI : MonoBehaviour
         if (_doubleLabel != null) _doubleLabel.text = Loc.T("Удвоено!", "Doubled!");
     }
 #endif
+
+    private void OnShopClicked()
+    {
+        _upgradeShop?.Open(); // Батч 3: магазин апгрейдов кофейни
+    }
 
     private void OnContinueClicked()
     {

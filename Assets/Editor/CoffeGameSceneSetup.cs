@@ -276,7 +276,7 @@ public static class CoffeGameSceneSetup
         var resDayNum   = Text("DayNumberText", resultPanel.transform, "ДЕНЬ 1 ЗАВЕРШЁН", 38, TextAlignmentOptions.Top, new Vector2(0.05f, 0.78f), new Vector2(0.95f, 0.98f));
         var resCoins    = Text("CoinsEarnedText", resultPanel.transform, "+0 монет", 30, TextAlignmentOptions.Center, new Vector2(0.05f, 0.6f), new Vector2(0.95f, 0.76f));
         var resTotal    = Text("TotalCoinsText", resultPanel.transform, "Всего: 0 монет", 24, TextAlignmentOptions.Center, new Vector2(0.05f, 0.5f), new Vector2(0.95f, 0.6f));
-        var resEnd      = Text("DayEndText", resultPanel.transform, "Итоги дня...", 22, TextAlignmentOptions.Top, new Vector2(0.05f, 0.18f), new Vector2(0.95f, 0.48f));
+        var resEnd      = Text("DayEndText", resultPanel.transform, "Итоги дня...", 22, TextAlignmentOptions.Top, new Vector2(0.05f, 0.28f), new Vector2(0.95f, 0.48f));
         var btnContinue = Btn("BtnContinue", resultPanel.transform, "Продолжить");
         SetRect(btnContinue.GetComponent<RectTransform>(), new Vector2(0.08f, 0.03f), new Vector2(0.47f, 0.15f));
         // Батч 2: «Удвоить заработок — реклама» (rewarded)
@@ -284,6 +284,42 @@ public static class CoffeGameSceneSetup
         SetRect(btnDouble.GetComponent<RectTransform>(), new Vector2(0.53f, 0.03f), new Vector2(0.92f, 0.15f));
         var btnDoubleLabel = btnDouble.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         btnDouble.gameObject.SetActive(false);
+        // Батч 3: «Улучшить кофейню» — открывает магазин апгрейдов прямо с итогов дня.
+        var btnShop = Btn("BtnUpgradeShop", resultPanel.transform, "Улучшить кофейню");
+        SetRect(btnShop.GetComponent<RectTransform>(), new Vector2(0.25f, 0.165f), new Vector2(0.75f, 0.265f));
+
+        // ── Магазин апгрейдов кофейни (Батч 3) ──────────────────────────────
+        var shopPanel = Panel("UpgradeShopPanel", ct, new Vector2(0.2f, 0.14f), new Vector2(0.8f, 0.86f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
+        Text("UpgradeShopTitle", shopPanel.transform, "Кофейня · улучшения", 34, TextAlignmentOptions.Top, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.99f));
+        var shopTitles = new TextMeshProUGUI[3];
+        var shopInfos  = new TextMeshProUGUI[3];
+        var shopBuys   = new Button[3];
+        var shopBuyLbl = new TextMeshProUGUI[3];
+        for (int i = 0; i < 3; i++)
+        {
+            float top = 0.84f - i * 0.235f;
+            float bot = top - 0.205f;
+            var row = Panel($"UpgradeRow{i}", shopPanel.transform, new Vector2(0.05f, bot), new Vector2(0.95f, top), new Color(1f, 1f, 1f, 0.04f));
+            shopTitles[i] = Text($"UpgTitle{i}", row.transform, "—", 26, TextAlignmentOptions.TopLeft, new Vector2(0.03f, 0.52f), new Vector2(0.63f, 0.96f));
+            shopInfos[i]  = Text($"UpgInfo{i}",  row.transform, "—", 19, TextAlignmentOptions.TopLeft, new Vector2(0.03f, 0.04f), new Vector2(0.63f, 0.52f));
+            var buy = Btn($"BtnUpg{i}", row.transform, "Купить");
+            SetRect(buy.GetComponent<RectTransform>(), new Vector2(0.66f, 0.2f), new Vector2(0.97f, 0.8f));
+            shopBuys[i]   = buy;
+            shopBuyLbl[i] = buy.GetComponentInChildren<TextMeshProUGUI>();
+        }
+        var btnShopClose = Btn("BtnUpgradeShopClose", shopPanel.transform, "Закрыть");
+        SetRect(btnShopClose.GetComponent<RectTransform>(), new Vector2(0.35f, 0.02f), new Vector2(0.65f, 0.1f));
+        var upgradeShop = shopPanel.AddComponent<UpgradeShopUI>();
+        new W(upgradeShop)
+            .Ref("_panel", shopPanel)
+            .Ref("_closeButton", btnShopClose)
+            .Arr("_titleTexts", shopTitles)
+            .Arr("_infoTexts", shopInfos)
+            .Arr("_buyButtons", shopBuys)
+            .Arr("_buyLabels", shopBuyLbl)
+            .Apply();
+        ApplyPanelSprite(shopPanel);
+        shopPanel.SetActive(false);
 
         // ── Гейт путешествия (пункт 1): не хватило денег — начать заново / купить ──
         var journeyPanel = Panel("JourneyGatePanel", ct, new Vector2(0.25f, 0.28f), new Vector2(0.75f, 0.72f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
@@ -493,6 +529,8 @@ public static class CoffeGameSceneSetup
             .Ref("_btnContinue", btnContinue)
             .Ref("_btnDouble", btnDouble)               // Батч 2: ×2 за рекламу
             .Ref("_doubleLabel", btnDoubleLabel)
+            .Ref("_btnShop", btnShop)                   // Батч 3: магазин апгрейдов
+            .Ref("_upgradeShop", upgradeShop)
             .Apply();
 
         // AudioController
