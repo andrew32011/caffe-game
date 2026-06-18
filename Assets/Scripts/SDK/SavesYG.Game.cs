@@ -24,5 +24,12 @@ namespace YG
         // JsonUtility не умеет Dictionary).
         public List<int>   clientKeys = new List<int>();
         public List<float> clientSats = new List<float>();
+
+        // ─── Батч 2: ежедневный бонус ───────────────────────────────────────
+        public string dailyBonusLastDate = ""; // последняя выдача, формат yyyyMMdd
+        public int    dailyBonusStreak   = 0;  // сколько дней подряд заходили
+
+        // ─── Батч 2: продолжение посреди дня ────────────────────────────────
+        public int currentCustomerIndex = 0;   // с какого гостя продолжать день
     }
 }

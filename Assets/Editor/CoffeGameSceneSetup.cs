@@ -182,6 +182,8 @@ public static class CoffeGameSceneSetup
         new W(uiFx)
             .Ref("_root", canvasGO.GetComponent<RectTransform>())
             .Ref("_coinSprite", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/Icons/Bronze Coin.png"))
+            .Ref("_starSprite", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/Icons/Star Yellow.png"))
+            .Ref("_heartSprite", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/Icons/Heart.png"))
             .Ref("_font", UiFont())
             .Apply();
 
@@ -276,7 +278,12 @@ public static class CoffeGameSceneSetup
         var resTotal    = Text("TotalCoinsText", resultPanel.transform, "Всего: 0 монет", 24, TextAlignmentOptions.Center, new Vector2(0.05f, 0.5f), new Vector2(0.95f, 0.6f));
         var resEnd      = Text("DayEndText", resultPanel.transform, "Итоги дня...", 22, TextAlignmentOptions.Top, new Vector2(0.05f, 0.18f), new Vector2(0.95f, 0.48f));
         var btnContinue = Btn("BtnContinue", resultPanel.transform, "Продолжить");
-        SetRect(btnContinue.GetComponent<RectTransform>(), new Vector2(0.35f, 0.03f), new Vector2(0.65f, 0.15f));
+        SetRect(btnContinue.GetComponent<RectTransform>(), new Vector2(0.08f, 0.03f), new Vector2(0.47f, 0.15f));
+        // Батч 2: «Удвоить заработок — реклама» (rewarded)
+        var btnDouble = Btn("BtnDoubleEarnings", resultPanel.transform, "Удвоить — реклама");
+        SetRect(btnDouble.GetComponent<RectTransform>(), new Vector2(0.53f, 0.03f), new Vector2(0.92f, 0.15f));
+        var btnDoubleLabel = btnDouble.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        btnDouble.gameObject.SetActive(false);
 
         // ── Гейт путешествия (пункт 1): не хватило денег — начать заново / купить ──
         var journeyPanel = Panel("JourneyGatePanel", ct, new Vector2(0.25f, 0.28f), new Vector2(0.75f, 0.72f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
@@ -294,6 +301,31 @@ public static class CoffeGameSceneSetup
             .Apply();
         ApplyPanelSprite(journeyPanel);
         journeyPanel.SetActive(false);
+
+        // ── Ежедневный бонус (Батч 2) ───────────────────────────────────────
+        var bonusPanel = Panel("DailyBonusPanel", ct, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
+        var bonusGift  = IconImage("DailyBonusIcon", bonusPanel.transform, "Assets/Mini UI/Icons/Gift.png",
+            new Vector2(0.4f, 0.62f), new Vector2(0.6f, 0.9f));
+        var bonusTitle = Text("DailyBonusTitle", bonusPanel.transform, "Бонус за вход", 30, TextAlignmentOptions.Center, new Vector2(0.05f, 0.5f), new Vector2(0.95f, 0.62f));
+        var bonusReward= Text("DailyBonusReward", bonusPanel.transform, "+50 монет", 40, TextAlignmentOptions.Center, new Vector2(0.05f, 0.38f), new Vector2(0.95f, 0.5f));
+        var btnClaim   = Btn("BtnBonusClaim", bonusPanel.transform, "Забрать");
+        SetRect(btnClaim.GetComponent<RectTransform>(), new Vector2(0.15f, 0.22f), new Vector2(0.85f, 0.34f));
+        var btnClaimLabel = btnClaim.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        var btnBonusDouble = Btn("BtnBonusDouble", bonusPanel.transform, "Удвоить — реклама");
+        SetRect(btnBonusDouble.GetComponent<RectTransform>(), new Vector2(0.15f, 0.07f), new Vector2(0.85f, 0.19f));
+        var btnBonusDoubleLabel = btnBonusDouble.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        var dailyBonus = bonusPanel.AddComponent<DailyBonusUI>();
+        new W(dailyBonus)
+            .Ref("_panel", bonusPanel)
+            .Ref("_titleText", bonusTitle)
+            .Ref("_rewardText", bonusReward)
+            .Ref("_claimButton", btnClaim)
+            .Ref("_claimLabel", btnClaimLabel)
+            .Ref("_doubleButton", btnBonusDouble)
+            .Ref("_doubleLabel", btnBonusDoubleLabel)
+            .Apply();
+        ApplyPanelSprite(bonusPanel);
+        bonusPanel.SetActive(false);
 
         // ── Оверлеи эффектов (на весь экран, поверх всего) ──────────────────
         var blackOverlay = Overlay("BlackOverlay", ct, Color.black);
@@ -330,6 +362,7 @@ public static class CoffeGameSceneSetup
             .Ref("_hintManager", hint)
             .Ref("_stages", stages)
             .Ref("_journeyGate", journeyGate) // пункт 1
+            .Ref("_dailyBonus", dailyBonus)   // Батч 2
             .Apply();
 
         // DayController
@@ -368,6 +401,13 @@ public static class CoffeGameSceneSetup
             AssetDatabase.LoadAssetAtPath<GameObject>(fxDir + "vfx_Shield_01.prefab"),
             AssetDatabase.LoadAssetAtPath<GameObject>(fxDir + "vfx_Portal_01.prefab"),
         };
+        // Батч 1: эмоции гостя над головой. [0]грусть,[1]ок,[2]восторг (плейсхолдеры Mini UI).
+        var emoteSprites = new[]
+        {
+            AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/UI Icons/Thumbsdown.png"),
+            AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/UI Icons/Smiley.png"),
+            AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/UI Icons/ThumbsUp.png"),
+        };
         new W(custCtrl)
             .Ref("_processVisitor", pv)
             .Ref("_visitorRoot", visitorRoot)
@@ -375,6 +415,7 @@ public static class CoffeGameSceneSetup
             .Ref("_existingGuest", existingGuest)
             .Ref("_idleController", idleCtrl)   // покой, когда гость стоит
             .Arr("_creatureAuraPrefabs", auraPrefabs) // пункт 1: ауры существ
+            .Arr("_emoteSprites", emoteSprites) // Батч 1: эмоции гостя
             .Apply();
 
         // MachineMinigame — UI вертикальных шкал
@@ -450,6 +491,8 @@ public static class CoffeGameSceneSetup
             .Ref("_totalCoinsText", resTotal)
             .Ref("_dayEndText", resEnd)
             .Ref("_btnContinue", btnContinue)
+            .Ref("_btnDouble", btnDouble)               // Батч 2: ×2 за рекламу
+            .Ref("_doubleLabel", btnDoubleLabel)
             .Apply();
 
         // AudioController

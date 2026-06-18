@@ -10,6 +10,8 @@ using YG;
 
 public class AudioController : MonoBehaviour
 {
+    public static AudioController Instance { get; private set; }
+
     // ─── Инспектор ───────────────────────────────────────────────────────────
 
     [Header("Источники звука")]
@@ -25,6 +27,13 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioClip _correctOrderSound; // Правильный заказ
     [SerializeField] private AudioClip _customerInSound;   // Гость входит
 
+    [Header("Клипы — сочность (Батч 1; можно оставить пустыми — игра не упадёт)")]
+    [SerializeField] private AudioClip _pourSound;         // Налив ингредиента
+    [SerializeField] private AudioClip _serveDingSound;    // Подача напитка (динь)
+    [SerializeField] private AudioClip _perfectSound;      // «Идеально!» / 3 звезды
+    [SerializeField] private AudioClip _starSound;         // Появление звезды
+    [SerializeField] private AudioClip _bonusSound;        // Ежедневный бонус / награда
+
     [Header("Настройки")]
     [Range(0f, 1f)] [SerializeField] private float _musicVolume = 0.4f;
     [Range(0f, 1f)] [SerializeField] private float _sfxVolume   = 0.8f;
@@ -34,6 +43,12 @@ public class AudioController : MonoBehaviour
     private bool _isMuted = false;
 
     // ─── Жизненный цикл ──────────────────────────────────────────────────────
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(this); return; }
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -88,4 +103,11 @@ public class AudioController : MonoBehaviour
     public void PlayWrongOrder()    => PlaySFX(_wrongOrderSound);
     public void PlayCorrectOrder()  => PlaySFX(_correctOrderSound);
     public void PlayCustomerIn()    => PlaySFX(_customerInSound);
+
+    // Сочность (Батч 1)
+    public void PlayPour()          => PlaySFX(_pourSound);
+    public void PlayServeDing()     => PlaySFX(_serveDingSound);
+    public void PlayPerfect()       => PlaySFX(_perfectSound);
+    public void PlayStar()          => PlaySFX(_starSound);
+    public void PlayBonus()         => PlaySFX(_bonusSound);
 }

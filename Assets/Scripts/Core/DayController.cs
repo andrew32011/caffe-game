@@ -72,13 +72,23 @@ public class DayController : MonoBehaviour
         _dialogue?.ShowDayIntro(dayData.dayNumber);
         yield return new WaitForSeconds(2f);
 
-        foreach (DayCustomerEntry customerEntry in dayData.customers)
+        // Батч 2: продолжаем день с того гостя, на котором игрока прервали.
+        int startIndex = GameManager.Instance != null ? GameManager.Instance.ResumeCustomerIndex : 0;
+        if (startIndex < 0 || startIndex >= dayData.customers.Count) startIndex = 0;
+
+        for (int ci = startIndex; ci < dayData.customers.Count; ci++)
         {
             yield return StartCoroutine(
-                ServeCustomer(customerEntry, dayData.coinsPerCorrectOrder));
+                ServeCustomer(dayData.customers[ci], dayData.coinsPerCorrectOrder));
+
+            // Сохраняем прогресс внутри дня — обновление страницы продолжит со следующего гостя.
+            GameManager.Instance?.SetCustomerIndex(ci + 1);
 
             yield return new WaitForSeconds(1f); // Пауза между гостями
         }
+
+        // День завершён — сбрасываем внутридневной индекс.
+        GameManager.Instance?.SetCustomerIndex(0);
 
         // Пункт 9: провала по «3 ошибкам» больше нет. День считается провальным
         // только если кофейня отработала в минус (экономика — см. _coinsEarnedToday).
@@ -96,6 +106,7 @@ public class DayController : MonoBehaviour
         //    готовки, см. CoffeeCraftingSystem.HideHeroWhenCameraLeaves).
         _craftingSystem.SetHeroVisible(true);
         _customerController.SpawnModel(GetCustomerPrefab(entry.stickmanIndex), entry.characterType);
+        AudioController.Instance?.PlayCustomerIn();
 
         // 2. Этап 0: гость идёт к стойке (Stage0 запускает ProcessVisitor)
         yield return StartCoroutine(GoToStageAndWait(_stageGuestEnter));
@@ -134,6 +145,13 @@ public class DayController : MonoBehaviour
         yield return StartCoroutine(
             _craftingSystem.HandCupToCustomer(_customerController.CurrentCustomer));
 
+        // Батч 1 (сочность): оценка напитка 1–3⭐ + празднование + динь/идеально.
+        int stars = result >= 0.8f ? 3 : result >= 0.5f ? 2 : 1;
+        AudioController.Instance?.PlayServeDing();
+        if (stars == 3) AudioController.Instance?.PlayPerfect();
+        UiEffects.Instance?.Celebrate(stars);
+        yield return new WaitForSeconds(0.5f);
+
         // 7. Обновляем ЗАПОМНЕННУЮ шкалу клиента (среднее старого и нового) (пункт 4.3)
         float newStored = Mathf.Clamp01(stored * 0.5f + result * 0.5f);
         GameManager.Instance?.SetClientSatisfaction(entry.characterType, newStored);
@@ -167,13 +185,18 @@ public class DayController : MonoBehaviour
         bool happy = newStored >= _satisfiedThreshold;
         if (happy)
         {
+            _customerController.ShowEmote(newStored >= 0.8f ? 2 : 1); // 😍 / 🙂
             UiEffects.Instance?.CoinBurst(payment); // пункт 5
             _vfxController?.PlayCoinEffect(payment);
+            AudioController.Instance?.PlayCoin();
+            AudioController.Instance?.PlayCorrectOrder();
             yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.storyRevealLines));
         }
         else
         {
+            _customerController.ShowEmote(0); // 😞
             _vfxController?.ShakeCamera(0.3f, 0.15f);
+            AudioController.Instance?.PlayWrongOrder();
             yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.wrongOrderLines));
         }
 

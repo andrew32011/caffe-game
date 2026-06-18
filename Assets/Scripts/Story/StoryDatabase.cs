@@ -1541,8 +1541,8 @@ public class StoryDatabase : ScriptableObject
         days.Add(new DayData
         {
             dayNumber = 40, coinsPerCorrectOrder = 50,
-            dayEndText   = "«Якорь» приготовлен, границы запечатаны. Но за стойкой пусто, а касса пуста. Кая больше нет — было лишь эхо.",
-            dayEndTextEn = "The Anchor is brewed, the borders sealed. But the counter is empty, and so is the till. Kai is gone — there was only an echo.",
+            dayEndText   = "«Якорь» приготовлен, границы запечатаны навсегда. Кай снова дома, рядом с тобой. «Междумирье» — снова дом.",
+            dayEndTextEn = "The Anchor is brewed, the borders sealed forever. Kai is home again, by your side. The Inbetween is home once more.",
             customers = new List<DayCustomerEntry>
             {
                 new DayCustomerEntry
@@ -1566,21 +1566,14 @@ public class StoryDatabase : ScriptableObject
                                 "Espresso. Small. I remember you know how to make it.")
                     ),
                     storyRevealLines = L(
-                        ("Мира",     "(Поднимает чашку.) За «Междумирье». За дом.",
-                                     "(Raises her cup.) To the Inbetween. To home."),
+                        ("Кай",      "(Тихо, только ей.) Я слышал твою песню даже сквозь цепи. Каждую чашку, что ты варила, — я чувствовал. Ты привела меня домой, Мира.",
+                                     "(Softly, just to her.) I heard your song even through the chains. Every cup you brewed — I felt it. You brought me home, Mira."),
+                        ("Мира",     "(Поднимает чашку.) За «Междумирье». За дом. За то, что ты снова рядом.",
+                                     "(Raises her cup.) To the Inbetween. To home. To you being here again."),
                         ("Все",      "За дом!",
                                      "To home!"),
-                        ("...",      "(В чашках у всех на секунду отражается спокойный пейзаж их родного мира. Потом всё возвращается в норму.)",
-                                     "(For a second, every cup reflects the calm landscape of its owner's home world. Then everything returns to normal.)"),
-                        // ── Мрачная кода (пункт 2.1): спасение было, но цена — горькая ──
-                        ("Теневой торговец", "(У самой двери, тихо.) Мира… пока ты не привыкла к счастью. Тот, кто стоит за твоей стойкой, — не Кай. Настоящий Кай погиб ещё в ту первую ночь у Ущелья.",
-                                             "(At the door, quietly.) Mira… before you grow used to happiness. The one standing behind your counter is not Kai. The real Kai died that very first night by the Gorge."),
-                        ("Мира",     "Нет. Я слышала его голос. Читала его письма. Я его спасла.",
-                                     "No. I heard his voice. I read his letters. I saved him."),
-                        ("Теневой торговец", "Эхо. Орден оставил тебе эхо, чтобы ты перестала искать. А десять тысяч, что ты копила на дорогу за ним, — он забрал их этой ночью и ушёл.",
-                                             "An echo. The Order left you an echo so you'd stop searching. And the ten thousand you saved for the road after him — he took it all this night and left."),
-                        ("Мира",     "(Оборачивается — за стойкой пусто. Касса пуста.) …Значит, всё это время я варила кофе призраку.",
-                                     "(She turns — the counter is empty. The till is empty.) …So all this time I was brewing coffee for a ghost.")
+                        ("...",      "(В чашках у всех на секунду отражается спокойный пейзаж их родного мира. Кай берёт Миру за руку. Граница запечатана — и впервые за долгое время в кофейне просто тепло.)",
+                                     "(For a second, every cup reflects the calm landscape of its owner's home world. Kai takes Mira's hand. The border is sealed — and for the first time in a long while, the coffee house is simply warm.)")
                     )
                 }
             }

@@ -18,6 +18,9 @@ public class UiEffects : MonoBehaviour
     [SerializeField] private RectTransform _root;
     [Header("Спрайт монеты")]
     [SerializeField] private Sprite _coinSprite;
+    [Header("Спрайты празднования (Батч 1)")]
+    [SerializeField] private Sprite _starSprite;
+    [SerializeField] private Sprite _heartSprite;
     [Header("Шрифт UI")]
     [SerializeField] private TMP_FontAsset _font;
 
@@ -99,6 +102,86 @@ public class UiEffects : MonoBehaviour
             float k = t / life;
             rt.anchoredPosition = start + Vector2.up * (120f * k);
             rt.localScale = Vector3.one * Mathf.Lerp(0.6f, 1.1f, Mathf.Min(1f, k * 3f));
+            if (cg != null) cg.alpha = 1f - k;
+            yield return null;
+        }
+        Destroy(rt.gameObject);
+    }
+
+    // ─── Празднование подачи: звёзды + сердечки + надпись (Батч 1) ─────────────
+
+    public void Celebrate(int stars)
+    {
+        stars = Mathf.Clamp(stars, 1, 3);
+        StartCoroutine(CelebrateRoutine(stars));
+        string label = stars == 3 ? Loc.T("Идеально!", "Perfect!")
+            : stars == 2 ? Loc.T("Отлично!", "Great!")
+            : Loc.T("Готово!", "Done!");
+        Color col = stars == 3 ? new Color(1f, 0.85f, 0.25f)
+            : stars == 2 ? new Color(0.6f, 1f, 0.6f) : Color.white;
+        FloatingText(label, col);
+    }
+
+    private IEnumerator CelebrateRoutine(int stars)
+    {
+        // Ряд звёзд по центру-верху, с поп-анимацией и звоном.
+        float spacing = 130f;
+        float startX = -spacing * (stars - 1) / 2f;
+        for (int i = 0; i < stars; i++)
+        {
+            if (_starSprite != null)
+            {
+                var go = new GameObject("StarFx", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
+                go.transform.SetParent(Root, false);
+                var rt = (RectTransform)go.transform;
+                rt.sizeDelta = new Vector2(110, 110);
+                rt.anchoredPosition = new Vector2(startX + i * spacing, 150f);
+                var img = go.GetComponent<Image>();
+                img.sprite = _starSprite; img.preserveAspect = true; img.raycastTarget = false;
+                StartCoroutine(PopStar(rt, go.GetComponent<CanvasGroup>()));
+            }
+            AudioController.Instance?.PlayStar();
+            yield return new WaitForSeconds(0.18f);
+        }
+
+        // 3 звезды — дополнительный фонтан сердечек.
+        if (stars >= 3 && _heartSprite != null)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                var go = new GameObject("HeartFx", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
+                go.transform.SetParent(Root, false);
+                var rt = (RectTransform)go.transform;
+                rt.sizeDelta = new Vector2(60, 60);
+                rt.anchoredPosition = new Vector2(Random.Range(-120f, 120f), 60f);
+                var img = go.GetComponent<Image>();
+                img.sprite = _heartSprite; img.preserveAspect = true; img.raycastTarget = false;
+                StartCoroutine(FloatHeart(rt, go.GetComponent<CanvasGroup>()));
+                yield return new WaitForSeconds(0.05f);
+            }
+        }
+    }
+
+    private IEnumerator PopStar(RectTransform rt, CanvasGroup cg)
+    {
+        float t = 0f;
+        while (t < 1f) { t += Time.deltaTime * 5f; rt.localScale = Vector3.one * Mathf.SmoothStep(0.1f, 1.15f, Mathf.Min(1f, t)); yield return null; }
+        yield return new WaitForSeconds(0.9f);
+        t = 0f;
+        while (t < 1f) { t += Time.deltaTime * 2.5f; if (cg != null) cg.alpha = 1f - t; rt.localScale = Vector3.one * (1.15f - 0.3f * t); yield return null; }
+        Destroy(rt.gameObject);
+    }
+
+    private IEnumerator FloatHeart(RectTransform rt, CanvasGroup cg)
+    {
+        float t = 0f, life = 1.2f;
+        Vector2 start = rt.anchoredPosition;
+        float drift = Random.Range(-40f, 40f);
+        while (t < life)
+        {
+            t += Time.deltaTime;
+            float k = t / life;
+            rt.anchoredPosition = start + new Vector2(drift * k, 220f * k);
             if (cg != null) cg.alpha = 1f - k;
             yield return null;
         }

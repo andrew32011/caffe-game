@@ -8,6 +8,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using YG;
 
 public class DayResultUI : MonoBehaviour
 {
@@ -26,6 +27,10 @@ public class DayResultUI : MonoBehaviour
     [Header("Кнопки")]
     [SerializeField] private Button _btnContinue;
 
+    [Header("×2 заработок за рекламу (Батч 2)")]
+    [SerializeField] private Button _btnDouble;
+    [SerializeField] private TextMeshProUGUI _doubleLabel;
+
     [Header("Дополнительно")]
     [SerializeField] private Image   _dayStarImage;    // Звёзда (полная/неполная)
     [SerializeField] private Sprite  _starFull;
@@ -35,12 +40,30 @@ public class DayResultUI : MonoBehaviour
 
     public bool IsShowing { get; private set; } = false;
 
+    private const string RewardId = "day_double";
+    private int  _lastEarned;
+    private bool _doubled;
+    private bool _waitingAd;
+
     // ─── Инициализация ───────────────────────────────────────────────────────
 
     private void Awake()
     {
         _resultPanel?.SetActive(false);
         _btnContinue?.onClick.AddListener(OnContinueClicked);
+        _btnDouble?.onClick.AddListener(OnDoubleClicked);
+#if RewardedAdv_yg
+        YG2.onRewardAdv += OnReward;
+#else
+        if (_btnDouble != null) _btnDouble.gameObject.SetActive(false);
+#endif
+    }
+
+    private void OnDestroy()
+    {
+#if RewardedAdv_yg
+        YG2.onRewardAdv -= OnReward;
+#endif
     }
 
     // ─── Публичное API ───────────────────────────────────────────────────────
@@ -58,9 +81,53 @@ public class DayResultUI : MonoBehaviour
         if (_dayStarImage != null && _starFull != null)
             _dayStarImage.sprite = coinsEarned > 0 ? _starFull : _starEmpty;
 
+        // ×2 за рекламу: доступно только если за день заработано > 0 (Батч 2).
+        _lastEarned = coinsEarned;
+        _doubled = false;
+        _waitingAd = false;
+        if (_btnDouble != null)
+        {
+#if RewardedAdv_yg
+            _btnDouble.gameObject.SetActive(coinsEarned > 0);
+            _btnDouble.interactable = coinsEarned > 0;
+            if (_doubleLabel != null)
+                _doubleLabel.text = Loc.T($"Удвоить (+{coinsEarned}) — реклама", $"Double (+{coinsEarned}) — ad");
+#else
+            _btnDouble.gameObject.SetActive(false);
+#endif
+        }
+
         _resultPanel?.SetActive(true);
         StartCoroutine(FadeIn());
     }
+
+    private void OnDoubleClicked()
+    {
+#if RewardedAdv_yg
+        if (_doubled || _waitingAd || _lastEarned <= 0) return;
+        _waitingAd = true;
+        YG2.RewardedAdvShow(RewardId);
+#endif
+    }
+
+#if RewardedAdv_yg
+    private void OnReward(string id)
+    {
+        if (id != RewardId || !_waitingAd) return;
+        _waitingAd = false;
+        _doubled = true;
+
+        GameManager.Instance?.AddCoins(_lastEarned);   // удваиваем дневной заработок
+        GameManager.Instance?.SaveGame();              // сохраняем сразу (требование 1.9)
+        AudioController.Instance?.PlayCoin();
+        UiEffects.Instance?.CoinBurst(_lastEarned);
+
+        if (_totalCoinsText != null)
+            _totalCoinsText.text = Loc.T("Всего: ", "Total: ") + (GameManager.Instance?.TotalCoins ?? 0) + Loc.T(" монет", " coins");
+        if (_btnDouble != null) _btnDouble.interactable = false;
+        if (_doubleLabel != null) _doubleLabel.text = Loc.T("Удвоено!", "Doubled!");
+    }
+#endif
 
     private void OnContinueClicked()
     {

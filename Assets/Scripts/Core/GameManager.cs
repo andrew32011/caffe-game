@@ -36,6 +36,9 @@ public class GameManager : MonoBehaviour
     [Header("Гейт путешествия (пункт 1): не хватило денег — начать заново / купить монеты")]
     [SerializeField] private JourneyGateUI _journeyGate;
 
+    [Header("Ежедневный бонус (Батч 2)")]
+    [SerializeField] private DailyBonusUI _dailyBonus;
+
     [Header("Свет для «сна» (приглушается между днями; можно не задавать — найдётся сам)")]
     [SerializeField] private Light _sceneLight;
 
@@ -127,6 +130,10 @@ public class GameManager : MonoBehaviour
             // Затемнение между обучением и первым днём (пункт 5)
             yield return StartCoroutine(Transition());
         }
+
+        // Батч 2: ежедневный бонус за вход (если сегодня ещё не получали).
+        if (_dailyBonus != null)
+            yield return StartCoroutine(_dailyBonus.RunIfDue());
 
         yield return StartCoroutine(RunGameDays());
     }
@@ -323,6 +330,7 @@ public class GameManager : MonoBehaviour
                 if (!dayCompleted)
                 {
                     // Рестарт дня — пауза, потом снова
+                    AudioController.Instance?.PlayDayFail();
                     _dialogue.ShowMessage(
                         Loc.T("День не засчитан. Начинаем заново...",
                               "The day doesn't count. Starting over..."), 2f);
@@ -338,6 +346,7 @@ public class GameManager : MonoBehaviour
             _currentPhase = GamePhase.DayResult;
 
             // 2D-баннер конца дня (пункт 5)
+            AudioController.Instance?.PlayDayClear();
             UiEffects.Instance?.DayEndBanner(Loc.T($"День {day} завершён", $"Day {day} complete"));
 
             if (_dayResultUI != null)
@@ -389,15 +398,15 @@ public class GameManager : MonoBehaviour
     {
         _currentPhase = GamePhase.GameComplete;
 
-        // Пункт 2.1: эхо ушло на рассвете и забрало накопленные монеты — касса пуста.
-        _saveData.totalCoins = 0;
-        SaveGame();
+        // Светлый финал: Кай спасён, кофейня живёт, дом снова полон. Монеты не трогаем.
+        UiEffects.Instance?.Celebrate(3);
+        AudioController.Instance?.PlayDayClear();
 
         if (_dialogue != null)
         {
             _dialogue.ShowMessage(
-                Loc.T("Эхо ушло на рассвете, забрав последние монеты. Границы запечатаны — а Кая больше нет.\n\nОсталась лишь кофейня. И ты. Может быть, однажды кто-то настоящий снова постучит в дверь «Междумирья».\n\nСПАСИБО ЗА ИГРУ!",
-                      "The echo left at dawn, taking the last of the coins. The borders are sealed — but Kai is gone. Only the coffee house remains. And you. Maybe one day someone real will knock on the Inbetween's door again.\n\nTHANK YOU FOR PLAYING!"),
+                Loc.T("Граница запечатана. Кай дома — и каждое утро снова варит кофе рядом с тобой.\n\n«Междумирье» больше не край миров, а просто тёплое место, куда хочется вернуться.\n\nСПАСИБО ЗА ИГРУ!",
+                      "The border is sealed. Kai is home — and every morning he brews coffee by your side again.\n\nThe Inbetween is no longer the edge of worlds, just a warm place worth coming back to.\n\nTHANK YOU FOR PLAYING!"),
                 0f // 0 = не автоматически, ждёт клика
             );
         }
@@ -410,6 +419,31 @@ public class GameManager : MonoBehaviour
     public void AddCoins(int amount)
     {
         _saveData.totalCoins += amount;
+    }
+
+    // ─── Батч 2: продолжение посреди дня ───────────────────────────────────────
+
+    /// <summary>С какого гостя продолжать текущий день (0 — с начала).</summary>
+    public int ResumeCustomerIndex => _saveData.currentCustomerIndex;
+
+    /// <summary>Сохранить прогресс внутри дня (после каждого гостя).</summary>
+    public void SetCustomerIndex(int index)
+    {
+        _saveData.currentCustomerIndex = index;
+        SaveGame();
+    }
+
+    // ─── Батч 2: ежедневный бонус (доступ к сейву для DailyBonusUI) ─────────────
+
+    public string DailyBonusLastDate
+    {
+        get => _saveData.dailyBonusLastDate;
+        set => _saveData.dailyBonusLastDate = value;
+    }
+    public int DailyBonusStreak
+    {
+        get => _saveData.dailyBonusStreak;
+        set => _saveData.dailyBonusStreak = value;
     }
 
     // ─── Память удовлетворённости по клиентам (пункт 4.3) ────────────────────

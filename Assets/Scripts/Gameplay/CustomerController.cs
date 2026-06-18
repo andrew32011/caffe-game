@@ -46,6 +46,12 @@ public class CustomerController : MonoBehaviour
     [SerializeField] private float _auraHeadOffset = 2.5f;
     [SerializeField] private float _auraScale = 0.5f;
 
+    [Header("Эмоция гостя (Батч 1): спрайты-реакции над головой")]
+    [Tooltip("[0] грусть/недовольство, [1] нейтрально/ок, [2] восторг.")]
+    [SerializeField] private Sprite[] _emoteSprites;
+    [SerializeField] private float _emoteHeadOffset = 2.9f;
+    [SerializeField] private float _emoteScale = 0.6f;
+
     private GameObject _auraInstance;
 
     [Header("Удовлетворённость")]
@@ -166,6 +172,47 @@ public class CustomerController : MonoBehaviour
             case CharacterType.Lamplighter:    return 0; // искры
             default:                           return -1; // обычные люди — без ауры
         }
+    }
+
+    /// <summary>Батч 1: показывает эмоцию-реакцию над головой гостя (mood: 0 грусть,
+    /// 1 ок, 2 восторг). Спрайт смотрит в камеру и плавно растворяется.</summary>
+    public void ShowEmote(int mood)
+    {
+        if (_visitorRoot == null || _emoteSprites == null || _emoteSprites.Length == 0) return;
+        int idx = Mathf.Clamp(mood, 0, _emoteSprites.Length - 1);
+        var sprite = _emoteSprites[idx];
+        if (sprite == null) return;
+
+        var go = new GameObject("CustomerEmote");
+        go.transform.SetParent(_visitorRoot, false);
+        go.transform.localPosition = Vector3.up * _emoteHeadOffset;
+        go.transform.localScale = Vector3.one * _emoteScale;
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = sprite;
+        StartCoroutine(EmoteRoutine(go, sr));
+    }
+
+    private IEnumerator EmoteRoutine(GameObject go, SpriteRenderer sr)
+    {
+        var cam = Camera.main;
+        float t = 0f, life = 1.8f;
+        Vector3 baseLocal = go.transform.localPosition;
+        while (t < life && go != null)
+        {
+            t += Time.deltaTime;
+            // лёгкое всплытие + биллборд к камере
+            go.transform.localPosition = baseLocal + Vector3.up * (0.3f * (t / life));
+            if (cam != null) go.transform.rotation = Quaternion.LookRotation(go.transform.position - cam.transform.position);
+            // поп в начале, угасание в конце
+            float scale = _emoteScale * Mathf.SmoothStep(0.2f, 1f, Mathf.Min(1f, t * 5f));
+            go.transform.localScale = Vector3.one * scale;
+            if (sr != null && t > life - 0.5f)
+            {
+                var c = sr.color; c.a = Mathf.Clamp01((life - t) / 0.5f); sr.color = c;
+            }
+            yield return null;
+        }
+        if (go != null) Destroy(go);
     }
 
     /// <summary>Убирает модель гостя, полоску и ауру.</summary>

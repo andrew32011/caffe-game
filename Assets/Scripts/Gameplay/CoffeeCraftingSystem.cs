@@ -361,6 +361,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
             }
             item.FlashSelected();
             _cup?.DropTopping(item);
+            AudioController.Instance?.PlayStar();
             StepFeedback(_target != null && item.topping == _target.topping, partial: true);
             ShowButton(_serveButton);
         }
@@ -395,6 +396,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
     private IEnumerator IngredientThenMachine(IngredientItem vessel)
     {
         GameInput.Locked = true;
+        AudioController.Instance?.PlayPour();
         if (_cup != null) yield return StartCoroutine(_cup.PourIngredient(vessel));
 
         _stage = Stage.Machine;
