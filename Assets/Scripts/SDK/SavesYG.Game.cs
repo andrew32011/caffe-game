@@ -36,5 +36,9 @@ namespace YG
         public int upgBeans   = 0;  // зёрна высшего сорта (повышают оплату)
         public int upgMachine = 0;  // профи-кофемашина (шире допуск минигейма)
         public int upgLoyalty = 0;  // программа лояльности (щедрее чаевые)
+
+        // ─── Батч 4: настройки громкости (сохраняются между сессиями) ───────
+        public float musicVolume = 0.4f; // громкость музыки 0..1
+        public float sfxVolume   = 0.8f; // громкость эффектов 0..1
     }
 }

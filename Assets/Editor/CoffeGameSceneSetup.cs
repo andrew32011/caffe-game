@@ -363,6 +363,62 @@ public static class CoffeGameSceneSetup
         ApplyPanelSprite(bonusPanel);
         bonusPanel.SetActive(false);
 
+        // ── Меню/настройки + пауза (Батч 4) ─────────────────────────────────
+        // Кнопка-«Меню» в правом верхнем углу (всегда видна). Открывает настройки и паузу.
+        var settingsBtn = Btn("BtnSettings", ct, "Меню");
+        SetRect(settingsBtn.GetComponent<RectTransform>(), new Vector2(0.915f, 0.9f), new Vector2(0.99f, 0.975f));
+
+        var settingsPanel = Panel("SettingsPanel", ct, new Vector2(0.3f, 0.22f), new Vector2(0.7f, 0.82f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
+        Text("SettingsTitle", settingsPanel.transform, "Настройки", 34, TextAlignmentOptions.Top, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.99f));
+        Text("MusicLabel", settingsPanel.transform, "Музыка", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.75f), new Vector2(0.5f, 0.83f));
+        var musicSlider = MakeSlider("MusicSlider", settingsPanel.transform, new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.74f), 0.4f);
+        Text("SfxLabel", settingsPanel.transform, "Звуки", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.57f), new Vector2(0.5f, 0.65f));
+        var sfxSlider = MakeSlider("SfxSlider", settingsPanel.transform, new Vector2(0.08f, 0.48f), new Vector2(0.92f, 0.56f), 0.8f);
+        var fullscreenBtn = Btn("BtnFullscreen", settingsPanel.transform, "Полный экран: выкл");
+        SetRect(fullscreenBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.355f), new Vector2(0.9f, 0.45f));
+        var fullscreenLabel = fullscreenBtn.GetComponentInChildren<TextMeshProUGUI>();
+        var leaderboardBtn = Btn("BtnLeaderboard", settingsPanel.transform, "Таблица лидеров");
+        SetRect(leaderboardBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.235f), new Vector2(0.9f, 0.33f));
+        var settingsClose = Btn("BtnSettingsClose", settingsPanel.transform, "Закрыть");
+        SetRect(settingsClose.GetComponent<RectTransform>(), new Vector2(0.3f, 0.06f), new Vector2(0.7f, 0.16f));
+        ApplyPanelSprite(settingsPanel);
+        settingsPanel.SetActive(false);
+
+        // ── Таблица лидеров (Батч 4): компонент YG2 LeaderboardYG, счёт = монеты ──
+        var lbPanel = Panel("LeaderboardPanel", ct, new Vector2(0.3f, 0.16f), new Vector2(0.7f, 0.86f), new Color(0.05f, 0.05f, 0.12f, 0.98f));
+        Text("LeaderboardTitle", lbPanel.transform, "Таблица лидеров", 32, TextAlignmentOptions.Top, new Vector2(0.05f, 0.9f), new Vector2(0.95f, 0.99f));
+        var lbEntries = LegacyText("LBEntries", lbPanel.transform, new Vector2(0.08f, 0.18f), new Vector2(0.92f, 0.88f));
+        var lbClose = Btn("BtnLeaderboardClose", lbPanel.transform, "Закрыть");
+        SetRect(lbClose.GetComponent<RectTransform>(), new Vector2(0.35f, 0.04f), new Vector2(0.65f, 0.14f));
+        var lbComp = lbPanel.AddComponent<YG.LeaderboardYG>();
+        lbComp.nameLB          = GameManager.LeaderboardName; // "coins" — создать таблицу в консоли Яндекса
+        lbComp.entriesText     = lbEntries;
+        lbComp.advanced        = false;
+        lbComp.updateLBMethod  = YG.LeaderboardYG.UpdateLBMethod.OnEnable; // грузит при открытии
+        lbComp.quantityTop     = 3;
+        lbComp.quantityAround  = 6;
+        lbComp.maxQuantityPlayers = 20;
+        lbComp.playerPhoto     = YG.LeaderboardYG.PlayerPhoto.NonePhoto;   // без фото — без ассетов
+        EditorUtility.SetDirty(lbComp);
+        ApplyPanelSprite(lbPanel);
+        lbPanel.SetActive(false);
+
+        // SettingsUI вешаем на ВСЕГДА АКТИВНЫЙ Canvas (иначе кнопка «Меню» не подпишется,
+        // пока панель скрыта). Панели он включает/выключает сам.
+        var settings = canvasGO.AddComponent<SettingsUI>();
+        new W(settings)
+            .Ref("_panel", settingsPanel)
+            .Ref("_openButton", settingsBtn)
+            .Ref("_closeButton", settingsClose)
+            .Ref("_musicSlider", musicSlider)
+            .Ref("_sfxSlider", sfxSlider)
+            .Ref("_fullscreenButton", fullscreenBtn)
+            .Ref("_fullscreenLabel", fullscreenLabel)
+            .Ref("_leaderboardButton", leaderboardBtn)
+            .Ref("_leaderboardPanel", lbPanel)
+            .Ref("_leaderboardCloseButton", lbClose)
+            .Apply();
+
         // ── Оверлеи эффектов (на весь экран, поверх всего) ──────────────────
         var blackOverlay = Overlay("BlackOverlay", ct, Color.black);
         var redOverlay   = Overlay("RedOverlay", ct, Color.red);
@@ -1008,6 +1064,67 @@ public static class CoffeGameSceneSetup
         img.fillAmount = 0.5f;
         img.raycastTarget = false;
         return img;
+    }
+
+    // Функциональный ползунок UnityEngine.UI.Slider (фон + заполнение + ручка), 0..1.
+    static Slider MakeSlider(string name, Transform parent, Vector2 aMin, Vector2 aMax, float value)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Slider));
+        go.transform.SetParent(parent, false);
+        SetRect((RectTransform)go.transform, aMin, aMax);
+        var slider = go.GetComponent<Slider>();
+
+        // Фон (тёмная дорожка)
+        var bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
+        bg.transform.SetParent(go.transform, false);
+        SetRect((RectTransform)bg.transform, new Vector2(0f, 0.3f), new Vector2(1f, 0.7f));
+        var bgImg = bg.GetComponent<Image>(); bgImg.color = new Color(0f, 0f, 0f, 0.5f); bgImg.sprite = WhiteSprite();
+
+        // Зона заполнения → Заполнение (зелёное)
+        var fillArea = new GameObject("Fill Area", typeof(RectTransform));
+        fillArea.transform.SetParent(go.transform, false);
+        SetRect((RectTransform)fillArea.transform, new Vector2(0f, 0.3f), new Vector2(1f, 0.7f));
+        var fill = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+        fill.transform.SetParent(fillArea.transform, false);
+        SetRect((RectTransform)fill.transform, Vector2.zero, Vector2.one);
+        var fillImg = fill.GetComponent<Image>(); fillImg.color = new Color(0.3f, 0.8f, 0.4f); fillImg.sprite = WhiteSprite();
+
+        // Зона ручки → Ручка (белый кружок)
+        var handleArea = new GameObject("Handle Slide Area", typeof(RectTransform));
+        handleArea.transform.SetParent(go.transform, false);
+        SetRect((RectTransform)handleArea.transform, Vector2.zero, Vector2.one);
+        var handle = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+        handle.transform.SetParent(handleArea.transform, false);
+        var handleRt = (RectTransform)handle.transform;
+        handleRt.sizeDelta = new Vector2(28, 0);
+        var handleImg = handle.GetComponent<Image>(); handleImg.color = Color.white; handleImg.sprite = WhiteSprite();
+
+        slider.fillRect      = (RectTransform)fill.transform;
+        slider.handleRect    = handleRt;
+        slider.targetGraphic = handleImg;
+        slider.direction     = Slider.Direction.LeftToRight;
+        slider.minValue = 0f; slider.maxValue = 1f;
+        slider.value    = value;
+        return slider;
+    }
+
+    // Legacy UnityEngine.UI.Text (нужен компоненту LeaderboardYG в простом режиме).
+    static UnityEngine.UI.Text LegacyText(string name, Transform parent, Vector2 aMin, Vector2 aMax)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(UnityEngine.UI.Text));
+        go.transform.SetParent(parent, false);
+        SetRect((RectTransform)go.transform, aMin, aMax);
+        var t = go.GetComponent<UnityEngine.UI.Text>();
+        var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (font == null) font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        t.font = font;
+        t.color = Color.white;
+        t.alignment = TextAnchor.UpperLeft;
+        t.fontSize = 26;
+        t.lineSpacing = 1.1f;
+        t.horizontalOverflow = HorizontalWrapMode.Wrap;
+        t.verticalOverflow = VerticalWrapMode.Overflow;
+        return t;
     }
 
     // Находит ходячего гостя (НЕ главного героя!). Приоритет — stickman под VisitorBasis,

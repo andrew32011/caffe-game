@@ -95,6 +95,34 @@ public class AudioController : MonoBehaviour
         _sfxSource.PlayOneShot(clip, _sfxVolume);
     }
 
+    // ─── Батч 4: настройки громкости ─────────────────────────────────────────
+
+    public float MusicVolume => _musicVolume;
+    public float SfxVolume   => _sfxVolume;
+
+    /// <summary>Меняет громкость музыки вживую и сохраняет (через GameManager → облако).</summary>
+    public void SetMusicVolume(float v)
+    {
+        _musicVolume = Mathf.Clamp01(v);
+        if (_musicSource != null) _musicSource.volume = _musicVolume;
+        GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume);
+    }
+
+    /// <summary>Меняет громкость эффектов (применится к следующим звукам) и сохраняет.</summary>
+    public void SetSfxVolume(float v)
+    {
+        _sfxVolume = Mathf.Clamp01(v);
+        GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume);
+    }
+
+    /// <summary>Применяет сохранённую громкость без записи в сейв (вызывает GameManager после загрузки).</summary>
+    public void ApplySavedVolumes(float music, float sfx)
+    {
+        _musicVolume = Mathf.Clamp01(music);
+        _sfxVolume   = Mathf.Clamp01(sfx);
+        if (_musicSource != null) _musicSource.volume = _musicVolume;
+    }
+
     // ─── Игровые события ─────────────────────────────────────────────────────
 
     public void PlayDayClear()      => PlaySFX(_dayClearSound);

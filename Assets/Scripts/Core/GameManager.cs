@@ -120,6 +120,7 @@ public class GameManager : MonoBehaviour
         // только потом читаем прогресс. Обновление страницы не теряет данные.
         yield return new WaitUntil(() => YG2.isSDKEnabled);
         LoadGame();
+        _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume); // Батч 4
         YG2.GameReadyAPI();                  // 1.19.2: игрок может начинать
         yield return new WaitForSeconds(0.2f); // Ждём инициализации всех систем
 
@@ -381,6 +382,7 @@ public class GameManager : MonoBehaviour
             // ─── Переход к следующему дню ────────────────────────────────────
             _saveData.currentDay++;
             SaveGame();
+            SubmitLeaderboard(); // Батч 4: обновляем место в таблице по монетам
 
             if (_saveData.currentDay > 40)
                 break;
@@ -494,6 +496,32 @@ public class GameManager : MonoBehaviour
     public float PriceMultiplier => 1f + GetUpgradeLevel(UpgradeType.Beans)   * 0.12f; // +12%/ур к оплате
     public float ToleranceBonus  =>       GetUpgradeLevel(UpgradeType.Machine) * 0.04f; // шире допуск
     public float MoodBonus       =>       GetUpgradeLevel(UpgradeType.Loyalty) * 0.06f; // лучше чаевые
+
+    // ─── Батч 4: настройки громкости (хранятся в облачном сейве) ────────────────
+
+    public float SavedMusicVolume => _saveData.musicVolume;
+    public float SavedSfxVolume   => _saveData.sfxVolume;
+
+    /// <summary>Записывает громкость в сейв и сохраняет (вызывает AudioController при изменении).</summary>
+    public void SetVolumes(float music, float sfx)
+    {
+        _saveData.musicVolume = Mathf.Clamp01(music);
+        _saveData.sfxVolume   = Mathf.Clamp01(sfx);
+        SaveGame();
+    }
+
+    // ─── Батч 4: лидерборд по монетам ──────────────────────────────────────────
+
+    /// <summary>Техническое имя таблицы лидеров в консоли Яндекс Игр (счёт = всего монет).</summary>
+    public const string LeaderboardName = "coins";
+
+    /// <summary>Отправляет текущий баланс монет в таблицу лидеров (если модуль установлен).</summary>
+    public void SubmitLeaderboard()
+    {
+#if Leaderboards_yg
+        if (YG2.isSDKEnabled) YG2.SetLeaderboard(LeaderboardName, _saveData.totalCoins);
+#endif
+    }
 
     // ─── Память удовлетворённости по клиентам (пункт 4.3) ────────────────────
 

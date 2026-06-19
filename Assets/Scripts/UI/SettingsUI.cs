@@ -1,0 +1,127 @@
+/// <summary>
+/// Батч 4: меню настроек + пауза. Кнопка-шестерёнка открывает панель и ставит игру
+/// на паузу (Time.timeScale = 0). Внутри: громкость музыки и звуков (ползунки,
+/// сохраняются в облаке через AudioController → GameManager), переключатель полного
+/// экрана (YG2 Fullscreen) и кнопка таблицы лидеров (счёт = монеты).
+/// Сцена: MainScene (UI на Canvas)
+/// Зависимости: AudioController, GameManager, Loc, UnityEngine.UI, TMPro
+/// SDK: YG2 (Fullscreen, Leaderboards — опциональные модули)
+/// </summary>
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using YG;
+
+public class SettingsUI : MonoBehaviour
+{
+    [Header("Открытие/закрытие (шестерёнка = пауза)")]
+    [SerializeField] private GameObject _panel;
+    [SerializeField] private Button _openButton;
+    [SerializeField] private Button _closeButton;
+
+    [Header("Громкость")]
+    [SerializeField] private Slider _musicSlider;
+    [SerializeField] private Slider _sfxSlider;
+
+    [Header("Полный экран")]
+    [SerializeField] private Button _fullscreenButton;
+    [SerializeField] private TextMeshProUGUI _fullscreenLabel;
+
+    [Header("Таблица лидеров")]
+    [SerializeField] private Button _leaderboardButton;
+    [SerializeField] private GameObject _leaderboardPanel;
+    [SerializeField] private Button _leaderboardCloseButton;
+
+    private bool _ready;
+    private bool _prevInputLocked;
+
+    private void Awake()
+    {
+        if (_openButton  != null) _openButton.onClick.AddListener(Open);
+        if (_closeButton != null) _closeButton.onClick.AddListener(Close);
+        if (_fullscreenButton != null) _fullscreenButton.onClick.AddListener(ToggleFullscreen);
+        if (_leaderboardButton != null) _leaderboardButton.onClick.AddListener(OpenLeaderboard);
+        if (_leaderboardCloseButton != null) _leaderboardCloseButton.onClick.AddListener(CloseLeaderboard);
+
+        if (_musicSlider != null) _musicSlider.onValueChanged.AddListener(OnMusicChanged);
+        if (_sfxSlider   != null) _sfxSlider.onValueChanged.AddListener(OnSfxChanged);
+
+        if (_panel != null) _panel.SetActive(false);
+        if (_leaderboardPanel != null) _leaderboardPanel.SetActive(false);
+    }
+
+    public void Open()
+    {
+        // Синхронизируем ползунки с текущей громкостью БЕЗ записи в сейв.
+        _ready = false;
+        var audio = AudioController.Instance;
+        if (audio != null)
+        {
+            if (_musicSlider != null) _musicSlider.value = audio.MusicVolume;
+            if (_sfxSlider   != null) _sfxSlider.value   = audio.SfxVolume;
+        }
+        _ready = true;
+
+        UpdateFullscreenLabel();
+        if (_panel != null) _panel.SetActive(true);
+
+        // Пауза: морозим время (корутины дня) и блокируем клики по предметам.
+        Time.timeScale = 0f;
+        _prevInputLocked = GameInput.Locked;
+        GameInput.Locked = true;
+    }
+
+    public void Close()
+    {
+        if (_panel != null) _panel.SetActive(false);
+        if (_leaderboardPanel != null) _leaderboardPanel.SetActive(false);
+        Time.timeScale = 1f; // снять паузу
+        GameInput.Locked = _prevInputLocked; // вернуть прежнее состояние ввода
+    }
+
+    private void OnMusicChanged(float v)
+    {
+        if (!_ready) return; // не пишем сейв при программной синхронизации
+        AudioController.Instance?.SetMusicVolume(v);
+    }
+
+    private void OnSfxChanged(float v)
+    {
+        if (!_ready) return;
+        AudioController.Instance?.SetSfxVolume(v);
+    }
+
+    // ─── Полный экран ─────────────────────────────────────────────────────────
+
+    private void ToggleFullscreen()
+    {
+#if Fullscreen_yg
+        YG2.SetFullscreen(!YG2.isFullscreen);
+#endif
+        UpdateFullscreenLabel();
+    }
+
+    private void UpdateFullscreenLabel()
+    {
+        if (_fullscreenLabel == null) return;
+        bool on = false;
+#if Fullscreen_yg
+        on = YG2.isFullscreen;
+#endif
+        _fullscreenLabel.text = on ? Loc.T("Полный экран: вкл", "Fullscreen: on")
+                                   : Loc.T("Полный экран: выкл", "Fullscreen: off");
+    }
+
+    // ─── Таблица лидеров ──────────────────────────────────────────────────────
+
+    private void OpenLeaderboard()
+    {
+        GameManager.Instance?.SubmitLeaderboard(); // обновляем свой счёт перед показом
+        if (_leaderboardPanel != null) _leaderboardPanel.SetActive(true); // LeaderboardYG сам загрузит данные (OnEnable)
+    }
+
+    private void CloseLeaderboard()
+    {
+        if (_leaderboardPanel != null) _leaderboardPanel.SetActive(false);
+    }
+}
