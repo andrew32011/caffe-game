@@ -63,12 +63,18 @@ public class CoffeeCraftingSystem : MonoBehaviour
     [SerializeField] private int    _complimentCost  = 50;
     [Range(0f, 1f)] [SerializeField] private float _complimentBoost = 0.3f;
 
-    [Header("Допуск совпадения ползунков (0..1)")]
-    [SerializeField] private float _tolerance = 0.15f;
-
-    /// <summary>Батч 3: апгрейд «профи-кофемашина» расширяет допуск — попасть в цель легче.</summary>
-    private float EffectiveTolerance =>
-        Mathf.Clamp(_tolerance + (GameManager.Instance != null ? GameManager.Instance.ToleranceBonus : 0f), 0.05f, 0.4f);
+    /// <summary>Допуск совпадения ползунков кофемашины (0..1). Батч 5: базовый допуск
+    /// зависит от дня (Difficulty.Tolerance — шире в начале, у́же к финалу). Батч 3:
+    /// апгрейд «профи-кофемашина» дополнительно расширяет его (ToleranceBonus).</summary>
+    private float EffectiveTolerance
+    {
+        get
+        {
+            int day = GameManager.Instance != null ? GameManager.Instance.CurrentDay : 1;
+            float bonus = GameManager.Instance != null ? GameManager.Instance.ToleranceBonus : 0f;
+            return Mathf.Clamp(Difficulty.Tolerance(day) + bonus, 0.05f, 0.4f);
+        }
+    }
 
     // ─── Реестр предметов ─────────────────────────────────────────────────────
 

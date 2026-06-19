@@ -41,13 +41,10 @@ public class DayController : MonoBehaviour
     [SerializeField] private int _stageReaction   = 6;
     [SerializeField] private int _stageGuestLeave = 7;
 
-    [Header("Экономика (пункт 5)")]
-    [Tooltip("Сколько платит полностью довольный клиент в обычный день.")]
-    [SerializeField] private int _basePrice = 40;
-    [Tooltip("Множитель оплаты в первые дни (чтобы деньги не были проблемой сразу).")]
-    [SerializeField] private float _earlyDayMultiplier = 3f;
-    [Tooltip("До какого дня (включительно) действует повышенная оплата.")]
-    [SerializeField] private int _earlyDayLimit = 3;
+    [Header("Экономика (Батч 5: база = авторская кривая дня × масштаб)")]
+    [Tooltip("Множитель к авторской базе оплаты дня (DayData.coinsPerCorrectOrder, 10..50). " +
+             "Главный рычаг баланса под цель путешествия (CoinsUI.JourneyGoal).")]
+    [SerializeField] private float _payScale = 4f;
     [Tooltip("Порог удовлетворённости, ниже которого клиент недоволен.")]
     [Range(0f, 1f)] [SerializeField] private float _satisfiedThreshold = 0.5f;
 
@@ -206,15 +203,17 @@ public class DayController : MonoBehaviour
             }
         }
 
-        // 8. Экономика (пункт 5): платит по качеству напитка (в первые дни — щедро),
-        //    с бонусом за хорошие отношения с клиентом (пункт 4.3).
+        // 8. Экономика (Батч 5): база оплаты = авторская кривая дня (coinsPerOrder, 10..50)
+        //    × масштаб, с мягким ранним разгоном (Difficulty.EarlyEase) вместо обрыва.
+        //    Дальше — по качеству напитка и отношениям с клиентом (пункт 4.3).
         //    Батч 3: апгрейд «зёрна» повышает оплату; «лояльность» добавляет чаевые
         //    (только к оплате, не к запомненной шкале); комбо множит за серию.
-        float mult    = _currentDayNumber <= _earlyDayLimit ? _earlyDayMultiplier : 1f;
+        float dayBase = coinsPerOrder * _payScale;
+        float early   = Difficulty.EarlyEase(_currentDayNumber);
         float upgMult = GameManager.Instance != null ? GameManager.Instance.PriceMultiplier : 1f;
         float tipMood = Mathf.Clamp01(newStored + (GameManager.Instance != null ? GameManager.Instance.MoodBonus : 0f));
         float combo   = UpdateCombo(result);
-        int payment = Mathf.RoundToInt(_basePrice * result * (0.5f + tipMood) * mult * upgMult * combo);
+        int payment = Mathf.RoundToInt(dayBase * result * (0.5f + tipMood) * early * upgMult * combo);
         GameManager.Instance?.AddCoins(payment);
         _coinsEarnedToday += payment - _craftingSystem.CurrentDrinkCost;
 
