@@ -7,8 +7,8 @@
         false,
         false
     ],
-    "idSave": 221,
-    "totalCoins": 290,
+    "idSave": 361,
+    "totalCoins": 279,
     "currentDay": 2,
     "tutorialDone": true,
     "clientKeys": [
@@ -16,7 +16,7 @@
         1
     ],
     "clientSats": [
-        0.8125,
+        0.65625,
         0.625
     ],
     "dailyBonusLastDate": "20260708",
@@ -25,6 +25,6 @@
     "upgBeans": 1,
     "upgMachine": 1,
     "upgLoyalty": 0,
-    "musicVolume": 0.0,
-    "sfxVolume": 0.0
+    "musicVolume": 1.0,
+    "sfxVolume": 1.0
 }
