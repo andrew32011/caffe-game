@@ -7,22 +7,24 @@
         false,
         false
     ],
-    "idSave": 13,
-    "totalCoins": 73,
+    "idSave": 221,
+    "totalCoins": 290,
     "currentDay": 2,
     "tutorialDone": true,
     "clientKeys": [
-        0
+        0,
+        1
     ],
     "clientSats": [
-        0.8125
+        0.8125,
+        0.625
     ],
-    "dailyBonusLastDate": "20260621",
-    "dailyBonusStreak": 1,
-    "currentCustomerIndex": 0,
+    "dailyBonusLastDate": "20260708",
+    "dailyBonusStreak": 2,
+    "currentCustomerIndex": 1,
     "upgBeans": 1,
     "upgMachine": 1,
     "upgLoyalty": 0,
-    "musicVolume": 0.4000000059604645,
-    "sfxVolume": 0.800000011920929
+    "musicVolume": 0.0,
+    "sfxVolume": 0.0
 }
