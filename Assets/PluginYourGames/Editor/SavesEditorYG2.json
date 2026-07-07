@@ -1,0 +1,28 @@
+{
+    "intExample": 5,
+    "strExample": "Hello!",
+    "boolExample": [
+        false,
+        false,
+        false,
+        false
+    ],
+    "idSave": 13,
+    "totalCoins": 73,
+    "currentDay": 2,
+    "tutorialDone": true,
+    "clientKeys": [
+        0
+    ],
+    "clientSats": [
+        0.8125
+    ],
+    "dailyBonusLastDate": "20260621",
+    "dailyBonusStreak": 1,
+    "currentCustomerIndex": 0,
+    "upgBeans": 1,
+    "upgMachine": 1,
+    "upgLoyalty": 0,
+    "musicVolume": 0.4000000059604645,
+    "sfxVolume": 0.800000011920929
+}
