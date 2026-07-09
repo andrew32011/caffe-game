@@ -23,6 +23,8 @@ public class SpeechMixer : MonoBehaviour
 
     private AudioSource audioSource;
     private float[] audioData;
+    // Перф: кэш готовых клипов по фрагменту — создаём каждый максимум один раз (без GC на каждый показ реплики).
+    private readonly Dictionary<SpeechFragment, AudioClip> _clipCache = new Dictionary<SpeechFragment, AudioClip>();
 
     void Awake()
     {
@@ -99,18 +101,23 @@ public class SpeechMixer : MonoBehaviour
 
         if (length <= 0) return;
 
-        // ������ ��������� ���� ��� ���������
-        AudioClip fragmentClip = AudioClip.Create(
-            "Fragment_" + fragment.name,
-            length,
-            compressedMurmur.channels,
-            compressedMurmur.frequency,
-            false
-        );
+        // Перф: берём клип из кэша; создаём и наполняем только при первом обращении.
+        if (!_clipCache.TryGetValue(fragment, out AudioClip fragmentClip) || fragmentClip == null)
+        {
+            fragmentClip = AudioClip.Create(
+                "Fragment_" + fragment.name,
+                length,
+                compressedMurmur.channels,
+                compressedMurmur.frequency,
+                false
+            );
 
-        float[] fragmentData = new float[length * compressedMurmur.channels];
-        System.Array.Copy(audioData, startSample * compressedMurmur.channels, fragmentData, 0, fragmentData.Length);
-        fragmentClip.SetData(fragmentData, 0);
+            float[] fragmentData = new float[length * compressedMurmur.channels];
+            System.Array.Copy(audioData, startSample * compressedMurmur.channels, fragmentData, 0, fragmentData.Length);
+            fragmentClip.SetData(fragmentData, 0);
+
+            _clipCache[fragment] = fragmentClip;
+        }
 
         // Громкость бубнежа подчиняется ползунку «Звуки» (AudioController.SfxVolume),
         // т.к. это фактически единственный слышимый SFX в игре.

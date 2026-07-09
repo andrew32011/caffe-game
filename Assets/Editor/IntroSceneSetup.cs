@@ -70,7 +70,7 @@ public static class IntroSceneSetup
         // (одинаковая толщина рамок у всех кнопок и панелей).
         foreach (var img in Object.FindObjectsOfType<Image>(true))
             if (img != null && img.type == Image.Type.Sliced)
-                img.pixelsPerUnitMultiplier = 4f;
+                img.pixelsPerUnitMultiplier = 8f;
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         var cam = Object.FindObjectOfType<SmoothCameraWaypointController>();
@@ -99,7 +99,7 @@ public static class IntroSceneSetup
         var img = panel.GetComponent<Image>();
         if (_panelSprite != null && img != null)
         {
-            img.sprite = _panelSprite; img.type = Image.Type.Sliced; img.color = Color.white; img.pixelsPerUnitMultiplier = 4f;
+            img.sprite = _panelSprite; img.type = Image.Type.Sliced; img.color = Color.white; img.pixelsPerUnitMultiplier = 8f;
         }
     }
 
@@ -112,7 +112,7 @@ public static class IntroSceneSetup
                 "Assets/Mini UI/Buttons/Dark Theme Border Buttons/192Px Round DarkBorder/Small Round Button DARK.png");
         if (_buttonSprite != null)
         {
-            img.sprite = _buttonSprite; img.type = Image.Type.Sliced; img.color = Color.white; img.pixelsPerUnitMultiplier = 4f;
+            img.sprite = _buttonSprite; img.type = Image.Type.Sliced; img.color = Color.white; img.pixelsPerUnitMultiplier = 8f;
         }
         else img.color = new Color(0.2f, 0.2f, 0.28f, 0.95f);
     }

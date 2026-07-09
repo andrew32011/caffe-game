@@ -657,12 +657,15 @@ public static class CoffeGameSceneSetup
         SetRect(resetBtn.GetComponent<RectTransform>(), new Vector2(0.88f, 0.02f), new Vector2(0.99f, 0.08f));
         AddPersistentClick(resetBtn, gameMgr, "ResetProgressAndRestart");
 
+        // ── Перф: облегчённые настройки качества под слабые устройства ───────
+        Child(root, "PerformanceSetup").AddComponent<PerformanceSetup>();
+
         // ── ВСЕ кнопки/панели ВСЕЙ сцены → pixelsPerUnitMultiplier = 4 ──────
         //  Ищем по всей сцене (а не только по этому канвасу), чтобы одинаковую
         //  «толщину» рамок получили абсолютно все мини-кнопки и панели.
         foreach (var img in Object.FindObjectsOfType<Image>(true))
             if (img != null && img.type == Image.Type.Sliced)
-                img.pixelsPerUnitMultiplier = 4f;
+                img.pixelsPerUnitMultiplier = 8f;
 
         // ── Готово ──────────────────────────────────────────────────────────
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -967,7 +970,7 @@ public static class CoffeGameSceneSetup
             img.sprite = _panelSprite;
             img.type = Image.Type.Sliced;
             img.color = Color.white;
-            img.pixelsPerUnitMultiplier = 4f; // пункт 5
+            img.pixelsPerUnitMultiplier = 8f; // пункт 5
         }
     }
 
@@ -984,7 +987,7 @@ public static class CoffeGameSceneSetup
             img.sprite = _buttonSprite;
             img.type = Image.Type.Sliced;
             img.color = Color.white;
-            img.pixelsPerUnitMultiplier = 4f; // пункт 5
+            img.pixelsPerUnitMultiplier = 8f; // пункт 5
         }
         else
         {
@@ -1372,6 +1375,7 @@ public static class CoffeGameSceneSetup
         t.color = Color.white;
         t.enableWordWrapping = true;
         t.margin = new Vector4(12, 6, 12, 6); // отступы от краёв
+        t.raycastTarget = false; // Перф: надписи не нужны как цели рейкаста (клики ловят кнопки)
         SetRect(t.rectTransform, aMin, aMax);
         return t;
     }
