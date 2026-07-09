@@ -255,7 +255,11 @@ public class CoffeeCraftingSystem : MonoBehaviour
     private string IngredientName(int index)
     {
         var it = FindIngredient(index);
-        if (it != null && !string.IsNullOrEmpty(it.displayName)) return it.displayName;
+        if (it != null)
+        {
+            if (!Loc.IsRu && !string.IsNullOrEmpty(it.displayNameEn)) return it.displayNameEn;
+            if (!string.IsNullOrEmpty(it.displayName))                return it.displayName;
+        }
         return Loc.T("основа ", "base ") + (index + 1);
     }
 

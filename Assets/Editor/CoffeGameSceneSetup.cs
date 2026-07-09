@@ -29,6 +29,43 @@ public static class CoffeGameSceneSetup
     const string SystemsRootName = "--- GAME SYSTEMS ---";
     const string CanvasName       = "GameCanvas";
 
+    // Перевод статических подписей: ru → en. Фабрика Text() авто-вешает LocalizeYG,
+    // если исходный текст есть в этом словаре (кнопки тоже — их подпись идёт через Text()).
+    // Динамические тексты (счётчики, диалоги) сюда НЕ вносим — их переводит рантайм-код (Loc.T).
+    static readonly System.Collections.Generic.Dictionary<string, string> RuEn =
+        new System.Collections.Generic.Dictionary<string, string>
+    {
+        { "Подать ☕", "Serve ☕" },
+        { "Подтвердить ✓", "Confirm ✓" },
+        { "Смотреть рекламу (+60)", "Watch ad (+60)" },
+        { "Закрыть", "Close" },
+        { "Подсказка", "Hint" },
+        { "За монеты", "For coins" },
+        { "За рекламу", "For an ad" },
+        { "Продолжить", "Continue" },
+        { "Улучшить кофейню", "Upgrade café" },
+        { "Начать заново", "Start over" },
+        { "Купить монеты", "Buy coins" },
+        { "Меню", "Menu" },
+        { "Таблица лидеров", "Leaderboard" },
+        { "Журнал", "Journal" },
+        { "Сброс", "Reset" },
+        { "Не хватает монет на ингредиент!", "Not enough coins for the ingredient!" },
+        { "Нужна подсказка?", "Need a hint?" },
+        { "Кофейня · улучшения", "Café · upgrades" },
+        { "Настройки", "Settings" },
+        { "Музыка", "Music" },
+        { "Звуки", "Sound" },
+        { "Журнал гостей · Завсегдатаи", "Guest journal · Regulars" },
+    };
+
+    // Вешает LocalizeYG на надпись, если её исходный русский текст есть в словаре RuEn.
+    static void TryLocalize(GameObject go, string ru)
+    {
+        if (go != null && ru != null && RuEn.TryGetValue(ru, out string en))
+            go.AddComponent<LocalizeYG>().Set(ru, en);
+    }
+
     [MenuItem("Tools/CoffeGame/Build Scene Systems + UI")]
     public static void Build()
     {
@@ -738,7 +775,8 @@ public static class CoffeGameSceneSetup
             if (it == null) it = child.gameObject.AddComponent<IngredientItem>();
             it.kind = IngredientItem.ItemKind.Ingredient;
             it.ingredientIndex = i;
-            it.displayName = MagicIngredientName(child.name); // имя из объекта (пункт 1)
+            it.displayName   = MagicIngredientName(child.name);   // RU
+            it.displayNameEn = MagicIngredientNameEn(child.name); // EN
             RemoveWorldLabel(child.gameObject);               // убираем парящие подписи (пункт 2)
             i++;
         }
@@ -787,6 +825,19 @@ public static class CoffeGameSceneSetup
         if (n.Contains("jar_full")|| n.Contains("jarfull"))return "Полная склянка лун";
         if (n.Contains("jar"))         return "Сосуд странствий";
         return objName; // запасной вариант — как назван объект
+    }
+
+    // Английское магическое имя ингредиента (перевод названий выше).
+    static string MagicIngredientNameEn(string objName)
+    {
+        string n = objName.ToLower();
+        if (n.Contains("goblet"))      return "Goblet of Oblivion";
+        if (n.Contains("inkwell"))     return "Inkwell Brew";
+        if (n.Contains("drinkinghorn"))return "Runic Horn";
+        if (n.Contains("jar_big") || n.Contains("jarbig")) return "Great Vessel of Dawns";
+        if (n.Contains("jar_full")|| n.Contains("jarfull"))return "Full Flask of Moons";
+        if (n.Contains("jar"))         return "Vessel of Wanderings";
+        return objName;
     }
 
     // Находит главного героя (Female 1 Smooth Prefab — ребёнок Main Camera),
@@ -1377,6 +1428,7 @@ public static class CoffeGameSceneSetup
         t.margin = new Vector4(12, 6, 12, 6); // отступы от краёв
         t.raycastTarget = false; // Перф: надписи не нужны как цели рейкаста (клики ловят кнопки)
         SetRect(t.rectTransform, aMin, aMax);
+        TryLocalize(t.gameObject, content); // авто-локализация статических подписей (ru→en)
         return t;
     }
 

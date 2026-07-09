@@ -47,9 +47,10 @@ public static class IntroSceneSetup
         var story = Text("IntroStoryText", panel.transform, "…", 40, TextAlignmentOptions.Center,
             new Vector2(0.1f, 0.2f), new Vector2(0.9f, 0.86f));
 
-        // ── Заголовок (имя кофейни) сверху ──────────────────────────────────────
-        Text("IntroTitle", panel.transform, "Междумирье", 64, TextAlignmentOptions.Center,
+        // ── Заголовок (имя кофейни) сверху — бренд, транслитерация ──────────────
+        var title = Text("IntroTitle", panel.transform, "Междумирье", 64, TextAlignmentOptions.Center,
             new Vector2(0.1f, 0.86f), new Vector2(0.9f, 0.96f));
+        title.gameObject.AddComponent<LocalizeYG>().Set("Междумирье", "The Inbetween");
 
         // ── Кнопка «Продолжить» (низ по центру) ────────────────────────────────
         var btn = Btn("BtnContinueIntro", panel.transform, "Продолжить");
