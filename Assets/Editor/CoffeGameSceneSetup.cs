@@ -657,9 +657,10 @@ public static class CoffeGameSceneSetup
         SetRect(resetBtn.GetComponent<RectTransform>(), new Vector2(0.88f, 0.02f), new Vector2(0.99f, 0.08f));
         AddPersistentClick(resetBtn, gameMgr, "ResetProgressAndRestart");
 
-        // ── Все нарезанные (Sliced) спрайты канваса → pixelsPerUnitMultiplier = 4 ──
-        //  Гарантирует одинаковую «толщину» рамок у ВСЕХ мини-кнопок и панелей.
-        foreach (var img in canvasGO.GetComponentsInChildren<Image>(true))
+        // ── ВСЕ кнопки/панели ВСЕЙ сцены → pixelsPerUnitMultiplier = 4 ──────
+        //  Ищем по всей сцене (а не только по этому канвасу), чтобы одинаковую
+        //  «толщину» рамок получили абсолютно все мини-кнопки и панели.
+        foreach (var img in Object.FindObjectsOfType<Image>(true))
             if (img != null && img.type == Image.Type.Sliced)
                 img.pixelsPerUnitMultiplier = 4f;
 
