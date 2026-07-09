@@ -84,6 +84,7 @@ public static class CoffeGameSceneSetup
         var goYandex  = Child(root, "YandexManager");
         var goSpeech  = Child(root, "SpeechMixer");
         var goAudio   = Child(root, "AudioController");
+        var goChallenge = Child(root, "DailyChallenge"); // Батч 6
 
         var gameMgr   = goGame.AddComponent<GameManager>();
         var dayCtrl   = goDay.AddComponent<DayController>();
@@ -98,6 +99,7 @@ public static class CoffeGameSceneSetup
         goYandex.AddComponent<YandexManager>();
         var speech    = goSpeech.AddComponent<SpeechMixer>();
         var audio     = goAudio.AddComponent<AudioController>();
+        var dailyChallenge = goChallenge.AddComponent<DailyChallenge>(); // Батч 6
 
         // ── Аудио-источники ─────────────────────────────────────────────────
         var music = goAudio.AddComponent<AudioSource>(); music.playOnAwake = false; music.loop = true;
@@ -156,6 +158,10 @@ public static class CoffeGameSceneSetup
         // Пункт 6: НИЖЕ шкалы удовлетворённости (она в 0.93–0.97), чтобы текст
         // намёка/заказа не оказывался на заднем фоне шкалы.
         var orderText = Text("OrderDisplayText", ct, "Заказ: ...", 30, TextAlignmentOptions.Center, new Vector2(0.28f, 0.865f), new Vector2(0.72f, 0.915f));
+
+        // ── HUD «Заказ дня» (Батч 6, слева под кассой) ──────────────────────
+        var challengeHud = Text("DailyChallengeHud", ct, "", 20, TextAlignmentOptions.Left, new Vector2(0.02f, 0.83f), new Vector2(0.34f, 0.89f));
+        challengeHud.color = new Color(0.9f, 0.85f, 0.5f);
 
         // ── Ачивка («Отлично!»/«В точку!») сверху ───────────────────────────
         var achievement = Text("AchievementText", ct, "В точку!", 48, TextAlignmentOptions.Center, new Vector2(0.25f, 0.72f), new Vector2(0.75f, 0.79f));
@@ -271,22 +277,39 @@ public static class CoffeGameSceneSetup
         SetRect(btnHintClose.GetComponent<RectTransform>(), new Vector2(0.35f, 0.02f), new Vector2(0.65f, 0.14f));
 
         // ── Экран результатов дня (центр, CanvasGroup) ──────────────────────
-        var resultPanel = Panel("DayResultPanel", ct, new Vector2(0.25f, 0.25f), new Vector2(0.75f, 0.75f), new Color(0.05f, 0.05f, 0.12f, 0.95f));
+        var resultPanel = Panel("DayResultPanel", ct, new Vector2(0.22f, 0.20f), new Vector2(0.78f, 0.80f), new Color(0.05f, 0.05f, 0.12f, 0.95f));
         var resultGroup = resultPanel.AddComponent<CanvasGroup>();
-        var resDayNum   = Text("DayNumberText", resultPanel.transform, "ДЕНЬ 1 ЗАВЕРШЁН", 38, TextAlignmentOptions.Top, new Vector2(0.05f, 0.78f), new Vector2(0.95f, 0.98f));
-        var resCoins    = Text("CoinsEarnedText", resultPanel.transform, "+0 монет", 30, TextAlignmentOptions.Center, new Vector2(0.05f, 0.6f), new Vector2(0.95f, 0.76f));
-        var resTotal    = Text("TotalCoinsText", resultPanel.transform, "Всего: 0 монет", 24, TextAlignmentOptions.Center, new Vector2(0.05f, 0.5f), new Vector2(0.95f, 0.6f));
-        var resEnd      = Text("DayEndText", resultPanel.transform, "Итоги дня...", 22, TextAlignmentOptions.Top, new Vector2(0.05f, 0.28f), new Vector2(0.95f, 0.48f));
+        var resDayNum   = Text("DayNumberText", resultPanel.transform, "ДЕНЬ 1 ЗАВЕРШЁН", 36, TextAlignmentOptions.Top, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.99f));
+        var resCoins    = Text("CoinsEarnedText", resultPanel.transform, "+0 монет", 28, TextAlignmentOptions.Center, new Vector2(0.05f, 0.79f), new Vector2(0.95f, 0.875f));
+
+        // Батч 6: предупреждение о сгорании daily-стрика (loss aversion)
+        var resStreak   = Text("StreakWarningText", resultPanel.transform, "", 18, TextAlignmentOptions.Center, new Vector2(0.05f, 0.745f), new Vector2(0.95f, 0.79f));
+        resStreak.color = new Color(1f, 0.6f, 0.3f);
+        resStreak.gameObject.SetActive(false);
+
+        // Батч 6: трекер «Путь к 10 000» с прогнозом темпа
+        var resJourneyProg = Text("JourneyProgressText", resultPanel.transform, "0 / 10000", 18, TextAlignmentOptions.Center, new Vector2(0.05f, 0.70f), new Vector2(0.95f, 0.745f));
+        var resJourneyFill = HorizontalFill("JourneyFill", resultPanel.transform, new Vector2(0.10f, 0.675f), new Vector2(0.90f, 0.70f), new Color(1f, 0.85f, 0.4f));
+        var resJourneyFore = Text("JourneyForecastText", resultPanel.transform, "", 18, TextAlignmentOptions.Center, new Vector2(0.05f, 0.63f), new Vector2(0.95f, 0.675f));
+
+        var resTotal    = Text("TotalCoinsText", resultPanel.transform, "Всего: 0 монет", 22, TextAlignmentOptions.Center, new Vector2(0.05f, 0.575f), new Vector2(0.95f, 0.63f));
+        var resEnd      = Text("DayEndText", resultPanel.transform, "Итоги дня...", 20, TextAlignmentOptions.Top, new Vector2(0.05f, 0.40f), new Vector2(0.95f, 0.565f));
+
         var btnContinue = Btn("BtnContinue", resultPanel.transform, "Продолжить");
-        SetRect(btnContinue.GetComponent<RectTransform>(), new Vector2(0.08f, 0.03f), new Vector2(0.47f, 0.15f));
+        SetRect(btnContinue.GetComponent<RectTransform>(), new Vector2(0.06f, 0.29f), new Vector2(0.48f, 0.385f));
         // Батч 2: «Удвоить заработок — реклама» (rewarded)
         var btnDouble = Btn("BtnDoubleEarnings", resultPanel.transform, "Удвоить — реклама");
-        SetRect(btnDouble.GetComponent<RectTransform>(), new Vector2(0.53f, 0.03f), new Vector2(0.92f, 0.15f));
+        SetRect(btnDouble.GetComponent<RectTransform>(), new Vector2(0.52f, 0.29f), new Vector2(0.94f, 0.385f));
         var btnDoubleLabel = btnDouble.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         btnDouble.gameObject.SetActive(false);
+        // Батч 6: «Сохранить комбо — реклама» (rewarded, перенос серии на завтра)
+        var btnSaveCombo = Btn("BtnSaveCombo", resultPanel.transform, "Сохранить комбо");
+        SetRect(btnSaveCombo.GetComponent<RectTransform>(), new Vector2(0.06f, 0.18f), new Vector2(0.48f, 0.275f));
+        var btnSaveComboLabel = btnSaveCombo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        btnSaveCombo.gameObject.SetActive(false);
         // Батч 3: «Улучшить кофейню» — открывает магазин апгрейдов прямо с итогов дня.
         var btnShop = Btn("BtnUpgradeShop", resultPanel.transform, "Улучшить кофейню");
-        SetRect(btnShop.GetComponent<RectTransform>(), new Vector2(0.25f, 0.165f), new Vector2(0.75f, 0.265f));
+        SetRect(btnShop.GetComponent<RectTransform>(), new Vector2(0.52f, 0.18f), new Vector2(0.94f, 0.275f));
 
         // ── Магазин апгрейдов кофейни (Батч 3) ──────────────────────────────
         var shopPanel = Panel("UpgradeShopPanel", ct, new Vector2(0.2f, 0.14f), new Vector2(0.8f, 0.86f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
@@ -419,6 +442,30 @@ public static class CoffeGameSceneSetup
             .Ref("_leaderboardCloseButton", lbClose)
             .Apply();
 
+        // ── Журнал гостей «Завсегдатаи» (Батч 6) ────────────────────────────
+        var journalOpenBtn = Btn("BtnJournal", ct, "Журнал");
+        SetRect(journalOpenBtn.GetComponent<RectTransform>(), new Vector2(0.02f, 0.75f), new Vector2(0.12f, 0.81f));
+
+        var journalPanel = Panel("GuestJournalPanel", ct, new Vector2(0.2f, 0.12f), new Vector2(0.8f, 0.88f), new Color(0.05f, 0.06f, 0.12f, 0.98f));
+        Text("GuestJournalTitle", journalPanel.transform, "Журнал гостей · Завсегдатаи", 32, TextAlignmentOptions.Top, new Vector2(0.05f, 0.9f), new Vector2(0.95f, 0.99f));
+        var journalProgress = Text("GuestJournalProgress", journalPanel.transform, "Знакомств: 0 / 0", 22, TextAlignmentOptions.Center, new Vector2(0.05f, 0.84f), new Vector2(0.95f, 0.9f));
+        var journalContent  = MakeScrollView("GuestJournalScroll", journalPanel.transform, new Vector2(0.04f, 0.14f), new Vector2(0.96f, 0.83f));
+        var journalCard     = MakeJournalCard(journalContent);
+        var journalClose = Btn("BtnJournalClose", journalPanel.transform, "Закрыть");
+        SetRect(journalClose.GetComponent<RectTransform>(), new Vector2(0.35f, 0.03f), new Vector2(0.65f, 0.12f));
+        ApplyPanelSprite(journalPanel);
+        journalPanel.SetActive(false);
+
+        var guestJournal = journalPanel.AddComponent<GuestJournalUI>();
+        new W(guestJournal)
+            .Ref("_panel", journalPanel)
+            .Ref("_content", journalContent)
+            .Ref("_cardTemplate", journalCard)
+            .Ref("_progressText", journalProgress)
+            .Ref("_btnOpen", journalOpenBtn)
+            .Ref("_btnClose", journalClose)
+            .Apply();
+
         // ── Оверлеи эффектов (на весь экран, поверх всего) ──────────────────
         var blackOverlay = Overlay("BlackOverlay", ct, Color.black);
         var redOverlay   = Overlay("RedOverlay", ct, Color.red);
@@ -465,8 +512,12 @@ public static class CoffeGameSceneSetup
             .Ref("_dialogue", dlg)
             .Ref("_hintManager", hint)
             .Ref("_vfxController", vfx)
+            .Ref("_dailyChallenge", dailyChallenge) // Батч 6
             .Arr("_customerPrefabs", stickmen)
             .Apply();
+
+        // DailyChallenge (Батч 6): HUD-строка «Заказ дня»
+        new W(dailyChallenge).Ref("_hudText", challengeHud).Apply();
 
         // ── Полировка панелей спрайтами Mini UI + ppuMultiplier=4 (пункты 4,5) ──
         ApplyPanelSprite(machinePanel);
@@ -587,6 +638,12 @@ public static class CoffeGameSceneSetup
             .Ref("_doubleLabel", btnDoubleLabel)
             .Ref("_btnShop", btnShop)                   // Батч 3: магазин апгрейдов
             .Ref("_upgradeShop", upgradeShop)
+            .Ref("_journeyProgressText", resJourneyProg) // Батч 6: трекер «Путь к 10 000»
+            .Ref("_journeyForecastText", resJourneyFore)
+            .Ref("_journeyFill", resJourneyFill)
+            .Ref("_streakWarningText", resStreak)        // Батч 6: предупреждение о стрике
+            .Ref("_btnSaveCombo", btnSaveCombo)          // Батч 6: сохранить комбо
+            .Ref("_saveComboLabel", btnSaveComboLabel)
             .Apply();
 
         // AudioController
@@ -594,6 +651,17 @@ public static class CoffeGameSceneSetup
             .Ref("_musicSource", music)
             .Ref("_sfxSource", sfx)
             .Apply();
+
+        // ── ВРЕМЕННО: кнопка сброса прогресса (для тестирования) ─────────────
+        var resetBtn = Btn("BtnDebugReset", ct, "Сброс");
+        SetRect(resetBtn.GetComponent<RectTransform>(), new Vector2(0.88f, 0.02f), new Vector2(0.99f, 0.08f));
+        AddPersistentClick(resetBtn, gameMgr, "ResetProgressAndRestart");
+
+        // ── Все нарезанные (Sliced) спрайты канваса → pixelsPerUnitMultiplier = 4 ──
+        //  Гарантирует одинаковую «толщину» рамок у ВСЕХ мини-кнопок и панелей.
+        foreach (var img in canvasGO.GetComponentsInChildren<Image>(true))
+            if (img != null && img.type == Image.Type.Sliced)
+                img.pixelsPerUnitMultiplier = 4f;
 
         // ── Готово ──────────────────────────────────────────────────────────
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -1064,6 +1132,100 @@ public static class CoffeGameSceneSetup
         img.fillAmount = 0.5f;
         img.raycastTarget = false;
         return img;
+    }
+
+    // Горизонтальная шкала-заполнение (Image: Filled, Horizontal). Батч 6.
+    static Image HorizontalFill(string name, Transform parent, Vector2 aMin, Vector2 aMax, Color color)
+    {
+        var bg = new GameObject(name + "_BG", typeof(RectTransform), typeof(Image));
+        bg.transform.SetParent(parent, false);
+        SetRect((RectTransform)bg.transform, aMin, aMax);
+        bg.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
+
+        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+        go.transform.SetParent(bg.transform, false);
+        SetRect((RectTransform)go.transform, Vector2.zero, Vector2.one);
+        var img = go.GetComponent<Image>();
+        img.color = color;
+        img.sprite = WhiteSprite();
+        img.type = Image.Type.Filled;
+        img.fillMethod = Image.FillMethod.Horizontal;
+        img.fillOrigin = (int)Image.OriginHorizontal.Left;
+        img.fillAmount = 0f;
+        img.raycastTarget = false;
+        return img;
+    }
+
+    // Прокручиваемый список (ScrollRect + Viewport(Mask) + Content с VerticalLayout).
+    // Возвращает Transform контейнера Content (куда класть карточки). Батч 6.
+    static Transform MakeScrollView(string name, Transform parent, Vector2 aMin, Vector2 aMax)
+    {
+        var root = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(ScrollRect));
+        root.transform.SetParent(parent, false);
+        SetRect((RectTransform)root.transform, aMin, aMax);
+        root.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.25f);
+
+        var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+        viewport.transform.SetParent(root.transform, false);
+        SetRect((RectTransform)viewport.transform, Vector2.zero, Vector2.one);
+        viewport.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.01f);
+        viewport.GetComponent<Mask>().showMaskGraphic = false;
+
+        var content = new GameObject("Content", typeof(RectTransform));
+        content.transform.SetParent(viewport.transform, false);
+        var crt = (RectTransform)content.transform;
+        crt.anchorMin = new Vector2(0f, 1f);
+        crt.anchorMax = new Vector2(1f, 1f);
+        crt.pivot     = new Vector2(0.5f, 1f);
+        crt.offsetMin = Vector2.zero;
+        crt.offsetMax = Vector2.zero;
+        var vlg = content.AddComponent<VerticalLayoutGroup>();
+        vlg.spacing = 8;
+        vlg.padding = new RectOffset(8, 8, 8, 8);
+        vlg.childForceExpandHeight = false;
+        vlg.childForceExpandWidth  = true;
+        vlg.childControlHeight = true;
+        vlg.childControlWidth  = true;
+        var fitter = content.AddComponent<ContentSizeFitter>();
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        var sr = root.GetComponent<ScrollRect>();
+        sr.viewport = (RectTransform)viewport.transform;
+        sr.content  = crt;
+        sr.horizontal = false;
+        sr.vertical   = true;
+        sr.movementType = ScrollRect.MovementType.Clamped;
+        sr.scrollSensitivity = 20f;
+        return content.transform;
+    }
+
+    // Шаблон-карточка гостя для журнала (JournalCard + поля). Батч 6.
+    static JournalCard MakeJournalCard(Transform content)
+    {
+        var card = Panel("JournalCardTemplate", content, Vector2.zero, Vector2.one, new Color(1f, 1f, 1f, 0.05f));
+        var le = card.AddComponent<LayoutElement>();
+        le.preferredHeight = 92f;
+        le.minHeight = 92f;
+
+        var nameText   = Text("Name",   card.transform, "Гость",  24, TextAlignmentOptions.TopLeft,     new Vector2(0.03f, 0.55f), new Vector2(0.62f, 0.97f));
+        var statusText = Text("Status", card.transform, "Статус", 18, TextAlignmentOptions.TopRight,    new Vector2(0.62f, 0.55f), new Vector2(0.97f, 0.97f));
+        statusText.color = new Color(0.8f, 0.9f, 1f);
+        var symFill    = HorizontalFill("SympathyFill", card.transform, new Vector2(0.03f, 0.30f), new Vector2(0.80f, 0.50f), new Color(0.3f, 0.85f, 0.4f));
+        var symText    = Text("SympathyPct", card.transform, "50%", 18, TextAlignmentOptions.Right,     new Vector2(0.81f, 0.28f), new Vector2(0.97f, 0.52f));
+        var visitsText = Text("Visits", card.transform, "Визитов: 0", 16, TextAlignmentOptions.BottomLeft, new Vector2(0.03f, 0.02f), new Vector2(0.55f, 0.28f));
+        var starsText  = Text("Stars",  card.transform, "☆☆☆", 20, TextAlignmentOptions.BottomRight,   new Vector2(0.55f, 0.02f), new Vector2(0.97f, 0.28f));
+        starsText.color = new Color(1f, 0.85f, 0.3f);
+
+        var jc = card.AddComponent<JournalCard>();
+        new W(jc)
+            .Ref("_nameText", nameText)
+            .Ref("_statusText", statusText)
+            .Ref("_visitsText", visitsText)
+            .Ref("_starsText", starsText)
+            .Ref("_sympathyFill", symFill)
+            .Ref("_sympathyText", symText)
+            .Apply();
+        return jc;
     }
 
     // Функциональный ползунок UnityEngine.UI.Slider (фон + заполнение + ручка), 0..1.

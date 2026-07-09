@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using YG;
 
 public class IntroStoryUI : MonoBehaviour
 {
@@ -42,12 +43,33 @@ public class IntroStoryUI : MonoBehaviour
         }
     }
 
-    /// <summary>Запускает показ истории. Вызывается камерой на финальной точке.</summary>
+    /// <summary>Запускает показ истории. Вызывается камерой на финальной точке.
+    /// При повторном входе (интро уже просмотрено) — сразу грузит игру без канваса.</summary>
     public void Begin()
     {
         if (_started) return;
         _started = true;
-        StartCoroutine(Routine());
+        StartCoroutine(BeginRoutine());
+    }
+
+    private IEnumerator BeginRoutine()
+    {
+        // Ждём инициализации SDK (с таймаутом), чтобы прочитать флаг «интро просмотрено».
+        float wait = 0f;
+        while (!YG2.isSDKEnabled && wait < 3f) { wait += Time.unscaledDeltaTime; yield return null; }
+
+        bool introSeen = YG2.isSDKEnabled && YG2.saves.introSeen;
+        if (introSeen)
+        {
+            // Повторный вход: канвас не показываем — сразу грузим основную сцену.
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(_mainSceneIndex);
+            yield break;
+        }
+
+        // Первый вход: помечаем флаг и показываем историю.
+        if (YG2.isSDKEnabled) { YG2.saves.introSeen = true; YG2.SaveProgress(); }
+        yield return StartCoroutine(Routine());
     }
 
     private IEnumerator Routine()
@@ -71,8 +93,18 @@ public class IntroStoryUI : MonoBehaviour
             _group.alpha = 1f;
         }
 
-        yield return new WaitForSecondsRealtime(_activateDelay);
-        SetButtonLit(true); // загорается через 2 секунды
+        // Обратный отсчёт прямо на кнопке — чтобы игрок видел, через сколько она активируется.
+        float remaining = _activateDelay;
+        while (remaining > 0f)
+        {
+            if (_continueLabel != null)
+                _continueLabel.text = Loc.T($"Продолжить ({Mathf.CeilToInt(remaining)})",
+                                            $"Continue ({Mathf.CeilToInt(remaining)})");
+            remaining -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+        if (_continueLabel != null) _continueLabel.text = Loc.T("Продолжить", "Continue");
+        SetButtonLit(true); // загорается после отсчёта
     }
 
     private void SetButtonLit(bool lit)

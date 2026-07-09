@@ -72,9 +72,14 @@ public class CoffeeCraftingSystem : MonoBehaviour
         {
             int day = GameManager.Instance != null ? GameManager.Instance.CurrentDay : 1;
             float bonus = GameManager.Instance != null ? GameManager.Instance.ToleranceBonus : 0f;
-            return Mathf.Clamp(Difficulty.Tolerance(day) + bonus, 0.05f, 0.4f);
+            // Батч 6: особый день сужает допуск (_extraToleranceDelta < 0).
+            return Mathf.Clamp(Difficulty.Tolerance(day) + bonus + _extraToleranceDelta, 0.05f, 0.4f);
         }
     }
+
+    // Батч 6: временный модификатор допуска (особый день ставит отрицательный).
+    private float _extraToleranceDelta = 0f;
+    public void SetExtraTolerance(float delta) => _extraToleranceDelta = delta;
 
     // ─── Реестр предметов ─────────────────────────────────────────────────────
 
@@ -100,6 +105,27 @@ public class CoffeeCraftingSystem : MonoBehaviour
     private bool _orderReady;
     public bool IsOrderReady       => _orderReady;
 
+    // Батч 6: скилл-бонус за попадание точно в ЦЕНТР зоны машины (обе оси ≤ PerfectTol).
+    // Превращает бинарный «попал/не попал» в градиент мастерства. Читается DayController.
+    private const float PerfectTol = 0.03f;
+    private float _precisionBonus = 1f;
+    public float PrecisionBonus => _precisionBonus;
+
+    // Батч 6: апселл «любимый топпинг» (из журнала «Завсегдатаи»). Ставит DayController.
+    private Topping _favoriteTopping = Topping.None;
+    private bool    _favoriteEligible;   // симпатия гостя достаточна, чтобы просить любимое
+    private bool    _favoriteAdded;      // игрок положил любимый топпинг
+    public  bool FavoriteAdded   => _favoriteAdded;
+    public  bool FavoriteIgnored => _favoriteEligible && _favoriteTopping != Topping.None && !_favoriteAdded;
+
+    /// <summary>Задаёт любимый топпинг гостя и доступность просьбы (симпатия ≥ порога).</summary>
+    public void SetFavorite(Topping fav, bool eligible)
+    {
+        _favoriteTopping  = fav;
+        _favoriteEligible = eligible;
+        _favoriteAdded    = false;
+    }
+
     /// <summary>Пункт 3: в обучении гостя нет — не показываем оценку «правильно/неправильно»
     /// (комментарии, ачивки, изменение шкалы удовлетворённости).</summary>
     public bool TutorialMode { get; set; }
@@ -108,7 +134,8 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
     // ─── Жизненный цикл ──────────────────────────────────────────────────────
 
-    private bool _adHintAllowed;
+    private bool _adHintHighlight;      // Батч 6: подсвечивать ли кнопку (после серии провалов)
+    private Coroutine _adHintPulseCo;
 
     private void Awake()
     {
@@ -118,8 +145,10 @@ public class CoffeeCraftingSystem : MonoBehaviour
         if (_adHintButton  != null) _adHintButton.onClick.AddListener(OnAdHintClicked);
     }
 
-    /// <summary>Разрешена ли реклама-подсказка для текущего клиента (ставит DayController).</summary>
-    public void SetAdHintAllowed(bool allowed) => _adHintAllowed = allowed;
+    /// <summary>Батч 6: точная подсказка теперь ДОБРОВОЛЬНАЯ rewarded — кнопка видна всегда,
+    /// на каждом заказе. Этот флаг лишь ПОДСВЕЧИВАЕТ её (пульсация) после 2 провалов подряд,
+    /// не запирая доступ. Так успешный игрок в потоке тоже может добровольно смотреть rewarded.</summary>
+    public void SetAdHintHighlight(bool highlight) => _adHintHighlight = highlight;
 
     private void OnAdHintClicked()
     {
@@ -128,7 +157,46 @@ public class CoffeeCraftingSystem : MonoBehaviour
         // награду ловим в HintManager/здесь? упрощённо — открываем сразу после показа
 #endif
         RevealPreciseHint();
+        StopAdHintPulse();
         if (_adHintButton != null) _adHintButton.gameObject.SetActive(false);
+    }
+
+    // Батч 6: единая настройка кнопки rewarded-подсказки при показе зоны заказа.
+    private void SetupAdHintButton()
+    {
+        if (_adHintButton == null) return;
+        _adHintButton.gameObject.SetActive(true);           // доступна всегда
+        var label = _adHintButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (label != null)
+            label.text = Loc.T("Уточнить заказ 📺", "Reveal order 📺");
+        StartAdHintPulse(_adHintHighlight);
+    }
+
+    private void StartAdHintPulse(bool on)
+    {
+        StopAdHintPulse();
+        if (_adHintButton != null) _adHintButton.transform.localScale = Vector3.one;
+        if (on && _adHintButton != null)
+            _adHintPulseCo = StartCoroutine(AdHintPulseRoutine());
+    }
+
+    private void StopAdHintPulse()
+    {
+        if (_adHintPulseCo != null) { StopCoroutine(_adHintPulseCo); _adHintPulseCo = null; }
+        if (_adHintButton != null) _adHintButton.transform.localScale = Vector3.one;
+    }
+
+    private IEnumerator AdHintPulseRoutine()
+    {
+        Transform tr = _adHintButton.transform;
+        float t = 0f;
+        while (true)
+        {
+            t += Time.deltaTime * 3f;
+            float s = 1f + 0.08f * Mathf.Sin(t);
+            tr.localScale = new Vector3(s, s, 1f);
+            yield return null;
+        }
     }
 
     // ─── Публичное API (DayController) ───────────────────────────────────────
@@ -228,7 +296,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         HideButton(_confirmButton);
         if (_selectedText != null) _selectedText.gameObject.SetActive(false);
         if (_noMoneyPanel != null) _noMoneyPanel.SetActive(false);
-        if (_adHintButton != null) _adHintButton.gameObject.SetActive(_adHintAllowed); // пункт 4.1
+        SetupAdHintButton(); // Батч 6: rewarded-подсказка доступна всегда, с подсветкой после провалов
         _machine?.HidePanel();
         UpdateSatisfactionUI();        // полоса в нейтраль (50%)
         _stages?.JumpToStage(_ingredientsStageIndex);
@@ -258,6 +326,8 @@ public class CoffeeCraftingSystem : MonoBehaviour
         if (_orderDisplayText != null) _orderDisplayText.gameObject.SetActive(false);
         HideButton(_serveButton);
         HideButton(_confirmButton);
+        StopAdHintPulse();                                          // Батч 6
+        if (_adHintButton != null) _adHintButton.gameObject.SetActive(false);
         _machine?.HidePanel();
     }
 
@@ -331,6 +401,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _pending = null;
         _currentDrinkCost = 0;
         _orderReady = false;
+        _precisionBonus = 1f; // Батч 6
     }
 
     /// <summary>Итоговая удовлетворённость 0..1 (старт 50%, ±за каждый параметр).</summary>
@@ -369,6 +440,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
                 _chosenToppings.Add(item.topping);
                 Spend(_toppingCost);                 // пункт 5: списываем за топпинг
             }
+            if (item.topping == _favoriteTopping) _favoriteAdded = true; // Батч 6: апселл
             item.FlashSelected();
             _cup?.DropTopping(item);
             AudioController.Instance?.PlayStar();
@@ -433,7 +505,14 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
         bool tempOk = Mathf.Abs(temp   - TempTarget())   <= EffectiveTolerance;
         bool volOk  = Mathf.Abs(volume - VolumeTarget()) <= EffectiveTolerance;
-        if (tempOk && volOk) ShowAchievement(Loc.T("В точку!", "Spot on!"));
+
+        // Батч 6: попадание точно в центр обеих осей → «✨ Идеально» + ×1.1 к оплате (скилл-градиент).
+        bool tempPerfect = Mathf.Abs(temp   - TempTarget())   <= PerfectTol;
+        bool volPerfect  = Mathf.Abs(volume - VolumeTarget()) <= PerfectTol;
+        _precisionBonus  = (tempPerfect && volPerfect) ? 1.1f : 1f;
+
+        if (tempPerfect && volPerfect) ShowAchievement(Loc.T("✨ Идеально!", "✨ Perfect!"));
+        else if (tempOk && volOk)      ShowAchievement(Loc.T("В точку!", "Spot on!"));
 
         // Пункт 5: удовлетворённость зависит ОТ КАЖДОЙ фичи отдельно — и температуры,
         // и объёма. Шкала уже учитывает обе (Satisfaction()), а комментарий честно
@@ -461,6 +540,15 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
         GameInput.Locked = false;
         ShowButton(_serveButton); // топпинги по желанию — можно сразу подать
+
+        // Батч 6: завсегдатай (симпатия ≥ порога) просит любимый топпинг — апселл.
+        if (_favoriteEligible && _favoriteTopping != Topping.None && !TutorialMode && _commentText != null)
+        {
+            _commentText.text = Loc.T($"Гость любит: {ToppingName(_favoriteTopping)} ☕",
+                                      $"Guest loves: {ToppingName(_favoriteTopping)} ☕");
+            if (_commentCo != null) StopCoroutine(_commentCo);
+            _commentCo = StartCoroutine(CommentRoutine());
+        }
     }
 
     private void OnServeClicked()

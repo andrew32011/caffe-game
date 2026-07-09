@@ -20,6 +20,9 @@ namespace YG
         // Пройдено ли обучение (показываем только при первом запуске).
         public bool tutorialDone = false;
 
+        // Показана ли вступительная история (интро-канвас в SampleScene) — только 1-й вход.
+        public bool introSeen = false;
+
         // Память удовлетворённости по уникальным клиентам (параллельные списки —
         // JsonUtility не умеет Dictionary).
         public List<int>   clientKeys = new List<int>();
@@ -40,5 +43,14 @@ namespace YG
         // ─── Батч 4: настройки громкости (сохраняются между сессиями) ───────
         public float musicVolume = 0.4f; // громкость музыки 0..1
         public float sfxVolume   = 0.8f; // громкость эффектов 0..1
+
+        // ─── Батч 6: журнал гостей (коллекция «Завсегдатаи») ────────────────
+        // Параллельные списки по ключу = (int)CharacterType. Независимы от clientKeys.
+        public List<int> journalKeys      = new List<int>(); // какие типы гостей встречены
+        public List<int> journalVisits    = new List<int>(); // сколько раз обслужен
+        public List<int> journalBestStars = new List<int>(); // лучшая оценка 1..3
+
+        // Одноразовые обучающие подсказки новых механик (id уже показанных).
+        public List<string> shownTips = new List<string>();
     }
 }

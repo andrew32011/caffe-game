@@ -6,20 +6,20 @@ using System.Collections;
 public class SpeechFragment
 {
     public string name = "replica";
-    [Range(0f, 1f)] public float startTime = 0f; // 0.0 = начало трека, 1.0 = конец
+    [Range(0f, 1f)] public float startTime = 0f; // 0.0 = пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, 1.0 = пїЅпїЅпїЅпїЅпїЅ
     [Range(0f, 1f)] public float endTime = 0.5f;
 }
 
 public class SpeechMixer : MonoBehaviour
 {
     [Header("Source")]
-    public AudioClip compressedMurmur; // Один ускоренный трек
+    public AudioClip compressedMurmur; // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
     [Header("Fragments")]
     public List<SpeechFragment> fragments = new List<SpeechFragment>();
 
     [Header("Playback")]
-    [Range(0.3f, 1f)] public float playbackSpeed = 0.66f; // Замедление в Unity
+    [Range(0.3f, 1f)] public float playbackSpeed = 0.66f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Unity
 
     private AudioSource audioSource;
     private float[] audioData;
@@ -31,7 +31,7 @@ public class SpeechMixer : MonoBehaviour
         audioSource.spatialBlend = 0f;
         audioSource.playOnAwake = false;
 
-        // Кэшируем аудио-данные для быстрого доступа
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (compressedMurmur != null)
         {
             audioData = new float[compressedMurmur.samples * compressedMurmur.channels];
@@ -39,7 +39,7 @@ public class SpeechMixer : MonoBehaviour
         }
     }
 
-    // Воспроизвести фрагмент по имени
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     public void PlayFragment(string fragmentName)
     {
         SpeechFragment fragment = fragments.Find(f => f.name == fragmentName);
@@ -49,7 +49,7 @@ public class SpeechMixer : MonoBehaviour
         }
     }
 
-    // Воспроизвести фрагмент по индексу
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public void PlayFragment(int index)
     {
         if (index >= 0 && index < fragments.Count)
@@ -58,7 +58,7 @@ public class SpeechMixer : MonoBehaviour
         }
     }
 
-    // Воспроизвести случайный фрагмент
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public void PlayRandomFragment()
     {
         if (fragments.Count > 0)
@@ -68,7 +68,7 @@ public class SpeechMixer : MonoBehaviour
         }
     }
 
-    // Воспроизвести последовательность фрагментов
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public void PlaySequence(params string[] fragmentNames)
     {
         StartCoroutine(PlaySequenceRoutine(fragmentNames));
@@ -83,23 +83,23 @@ public class SpeechMixer : MonoBehaviour
             {
                 yield return null;
             }
-            yield return new WaitForSeconds(0.1f); // Пауза между репликами
+            yield return new WaitForSeconds(0.1f); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         }
     }
 
-    // Основной метод воспроизведения
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private void PlayFragment(SpeechFragment fragment)
     {
         if (audioSource == null || audioData == null || compressedMurmur == null) return;
 
-        // Рассчитываем сэмплы для начала и конца
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
         int startSample = (int)(fragment.startTime * compressedMurmur.samples);
         int endSample = (int)(fragment.endTime * compressedMurmur.samples);
         int length = endSample - startSample;
 
         if (length <= 0) return;
 
-        // Создаём временный клип для фрагмента
+        // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         AudioClip fragmentClip = AudioClip.Create(
             "Fragment_" + fragment.name,
             length,
@@ -112,7 +112,12 @@ public class SpeechMixer : MonoBehaviour
         System.Array.Copy(audioData, startSample * compressedMurmur.channels, fragmentData, 0, fragmentData.Length);
         fragmentClip.SetData(fragmentData, 0);
 
-        // Воспроизводим
+        // Р“СЂРѕРјРєРѕСЃС‚СЊ Р±СѓР±РЅРµР¶Р° РїРѕРґС‡РёРЅСЏРµС‚СЃСЏ РїРѕР»Р·СѓРЅРєСѓ В«Р—РІСѓРєРёВ» (AudioController.SfxVolume),
+        // С‚.Рє. СЌС‚Рѕ С„Р°РєС‚РёС‡РµСЃРєРё РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ СЃР»С‹С€РёРјС‹Р№ SFX РІ РёРіСЂРµ.
+        audioSource.volume = AudioController.Instance != null
+            ? Mathf.Clamp01(AudioController.Instance.SfxVolume) : 1f;
+
+        // Р’РѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ
         audioSource.Stop();
         audioSource.clip = fragmentClip;
         audioSource.Play();

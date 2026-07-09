@@ -30,6 +30,7 @@ public class DayController : MonoBehaviour
     [SerializeField] private DialogueDisplayer      _dialogue;
     [SerializeField] private HintManager            _hintManager;
     [SerializeField] private VisualEffectsController _vfxController;
+    [SerializeField] private DailyChallenge          _dailyChallenge; // Батч 6: «Заказ дня» (опц.)
 
     [Header("Префабы гостей (stickman_1..9 из PrefsAll)")]
     [SerializeField] private GameObject[] _customerPrefabs;
@@ -61,9 +62,14 @@ public class DayController : MonoBehaviour
     private int  _coinsEarnedToday = 0;   // чистая прибыль за день (может быть < 0)
     private int  _currentDayNumber = 1;
     private bool _daySuccess       = false;
+    private float _specialDayMult  = 1f;  // Батч 6: ставка особого дня (×1.3 на днях 8/16/24/32/40)
+
+    /// <summary>Батч 6: «Особый гость» — каждый 8-й день (пик вовлечения).</summary>
+    public static bool IsSpecialDay(int day) => day > 0 && day % 8 == 0;
 
     public bool DaySuccess       => _daySuccess;
     public int  CoinsEarnedToday => _coinsEarnedToday;
+    public int  CurrentComboCount => _comboCount; // Батч 6: серия на конец дня (для «Сохранить комбо»)
 
     // ─── Главный метод ────────────────────────────────────────────────────────
 
@@ -73,11 +79,44 @@ public class DayController : MonoBehaviour
         _coinsEarnedToday = 0;
         _currentDayNumber = dayData.dayNumber;
         _daySuccess       = false;
-        _comboCount       = 0;                 // Батч 3: серия начинается заново каждый день
-        UiEffects.Instance?.ShowCombo(0);
+        // Батч 6: если игрок «сохранил комбо» за рекламу на прошлом экране результата —
+        // начинаем день уже с этой серией (и потребляем перенос). Иначе — с нуля.
+        _comboCount = GameManager.Instance != null ? GameManager.Instance.CarriedCombo : 0;
+        GameManager.Instance?.SetCarriedCombo(0);
+        UiEffects.Instance?.ShowCombo(_comboCount >= 2 ? _comboCount : 0);
+
+        // Батч 6: особый день (каждый 8-й) — выше ставка, у́же допуск, анонс.
+        bool special = IsSpecialDay(dayData.dayNumber);
+        _specialDayMult = special ? 1.3f : 1f;
+        _craftingSystem.SetExtraTolerance(special ? -0.02f : 0f);
 
         _dialogue?.ShowDayIntro(dayData.dayNumber);
         yield return new WaitForSeconds(2f);
+
+        if (special)
+        {
+            _dialogue?.ShowMessage(
+                Loc.T("★ Сегодня — Особый гость! Ставка выше, но заказ капризнее.",
+                      "★ A Special Guest today! Higher pay, but a pickier order."), 2.8f);
+            yield return new WaitForSeconds(1.5f);
+        }
+
+        // Батч 6: «Заказ дня» — квест на весь день, анонс игроку.
+        if (_dailyChallenge != null)
+        {
+            _dailyChallenge.BeginDay(dayData.dayNumber);
+            _dialogue?.ShowMessage(_dailyChallenge.Description, 2.5f);
+            yield return new WaitForSeconds(1f);
+
+            // Батч 6: при первом «Заказе дня» — пояснение механики.
+            if (GameManager.Instance != null && GameManager.Instance.MarkTipShown("tip_quest") && _dialogue != null)
+            {
+                _dialogue.ShowMessage(
+                    Loc.T("«Заказ дня» — квест на весь день. Он одинаков у всех игроков!",
+                          "The Daily Order is a full-day quest. It's the same for every player!"), 3f);
+                yield return new WaitForSeconds(2f);
+            }
+        }
 
         // Батч 2: продолжаем день с того гостя, на котором игрока прервали.
         int startIndex = GameManager.Instance != null ? GameManager.Instance.ResumeCustomerIndex : 0;
@@ -97,6 +136,19 @@ public class DayController : MonoBehaviour
         // День завершён — сбрасываем внутридневной индекс и убираем индикатор комбо.
         GameManager.Instance?.SetCustomerIndex(0);
         UiEffects.Instance?.ShowCombo(0);
+
+        // Батч 6: награда за выполненный «Заказ дня» (входит в дневную выручку).
+        int challengeBonus = _dailyChallenge != null ? _dailyChallenge.Claim() : 0;
+        if (challengeBonus > 0)
+        {
+            GameManager.Instance?.AddCoins(challengeBonus);
+            _coinsEarnedToday += challengeBonus;
+            UiEffects.Instance?.CoinBurst(challengeBonus);
+            AudioController.Instance?.PlayCoin();
+            _dialogue?.ShowMessage(
+                Loc.T($"Заказ дня выполнен! +{challengeBonus}", $"Daily order done! +{challengeBonus}"), 2.5f);
+            yield return new WaitForSeconds(1.5f);
+        }
 
         // Пункт 9: провала по «3 ошибкам» больше нет. День считается провальным
         // только если кофейня отработала в минус (экономика — см. _coinsEarnedToday).
@@ -153,9 +205,13 @@ public class DayController : MonoBehaviour
         _hintManager?.SetCurrentOrder(entry.order);
         _customerController.SetSatisfaction(stored);
 
-        // 5. Готовим напиток. Рекламная подсказка доступна после 2 провалов подряд (пункт 4.1)
-        _craftingSystem.SetAdHintAllowed(_consecutiveFails >= 2);
+        // 5. Готовим напиток. Батч 6: rewarded-подсказка «Уточнить заказ» доступна ВСЕГДА
+        //    (добровольная реклама → больше показов без фрустрации); после 2 провалов
+        //    подряд она лишь ПОДСВЕЧИВАЕТСЯ, привлекая внимание застрявшего игрока.
+        _craftingSystem.SetAdHintHighlight(_consecutiveFails >= 2);
         _craftingSystem.SetTargetOrder(entry.order);
+        // Батч 6: апселл «любимый топпинг» — просьба доступна при симпатии ≥60%.
+        _craftingSystem.SetFavorite(CharacterNames.FavoriteTopping(entry.characterType), stored >= 0.6f);
         _craftingSystem.Show();
         yield return new WaitUntil(() => _craftingSystem.IsOrderReady);
         _craftingSystem.Hide();
@@ -180,10 +236,17 @@ public class DayController : MonoBehaviour
         AudioController.Instance?.PlayServeDing();
         if (stars == 3) AudioController.Instance?.PlayPerfect();
         UiEffects.Instance?.Celebrate(stars);
+
+        // Батч 6: журнал гостей — фиксируем визит и лучшую оценку этого типа гостя.
+        GameManager.Instance?.RecordVisit(entry.characterType, stars);
+
         yield return new WaitForSeconds(0.5f);
 
         // 7. Обновляем ЗАПОМНЕННУЮ шкалу клиента (среднее старого и нового) (пункт 4.3)
         float newStored = Mathf.Clamp01(stored * 0.5f + result * 0.5f);
+        // Батч 6: положил любимый топпинг → гость теплеет; проигнорировал явную просьбу → чуть остывает.
+        if (_craftingSystem.FavoriteAdded)        newStored = Mathf.Clamp01(newStored + 0.03f);
+        else if (_craftingSystem.FavoriteIgnored) newStored = Mathf.Clamp01(newStored - 0.02f);
         GameManager.Instance?.SetClientSatisfaction(entry.characterType, newStored);
         _customerController.SetSatisfaction(newStored);
         yield return new WaitForSeconds(0.6f);
@@ -208,14 +271,22 @@ public class DayController : MonoBehaviour
         //    Дальше — по качеству напитка и отношениям с клиентом (пункт 4.3).
         //    Батч 3: апгрейд «зёрна» повышает оплату; «лояльность» добавляет чаевые
         //    (только к оплате, не к запомненной шкале); комбо множит за серию.
-        float dayBase = coinsPerOrder * _payScale;
+        float dayBase = coinsPerOrder * _payScale * _specialDayMult; // Батч 6: ×1.3 в особый день
         float early   = Difficulty.EarlyEase(_currentDayNumber);
         float upgMult = GameManager.Instance != null ? GameManager.Instance.PriceMultiplier : 1f;
-        float tipMood = Mathf.Clamp01(newStored + (GameManager.Instance != null ? GameManager.Instance.MoodBonus : 0f));
+        // Батч 6: «завсегдатай» (симпатия ≥90%) — пассивные +5% к настроению/чаевым.
+        float regularBonus = newStored >= 0.9f ? 0.05f : 0f;
+        float tipMood = Mathf.Clamp01(newStored + regularBonus + (GameManager.Instance != null ? GameManager.Instance.MoodBonus : 0f));
         float combo   = UpdateCombo(result);
-        int payment = Mathf.RoundToInt(dayBase * result * (0.5f + tipMood) * early * upgMult * combo);
+        float precision = _craftingSystem.PrecisionBonus; // Батч 6: ×1.1 за идеальное попадание в центр
+        float favoriteMult = _craftingSystem.FavoriteAdded ? 1.08f : 1f; // Батч 6: апселл любимого топпинга
+        int payment = Mathf.RoundToInt(dayBase * result * (0.5f + tipMood) * early * upgMult * combo * precision * favoriteMult);
         GameManager.Instance?.AddCoins(payment);
         _coinsEarnedToday += payment - _craftingSystem.CurrentDrinkCost;
+
+        // Батч 6: прогресс «Заказа дня» по этому напитку.
+        _dailyChallenge?.ReportDrink(payment, stars, _craftingSystem.ChosenToppingCount,
+                                     _craftingSystem.PrecisionBonus > 1f, result);
 
         // 9. Реакция гостя — реплика зависит от отношений (пункт 4.3)
         yield return StartCoroutine(GoToStageAndWait(_stageReaction));
@@ -237,9 +308,35 @@ public class DayController : MonoBehaviour
             yield return StartCoroutine(_dialogue.PlayDialogueLines(entry.wrongOrderLines));
         }
 
+        // Батч 6: одноразовые обучающие подсказки при первом срабатывании механик.
+        ShowFirstTimeTips(
+            didPerfect: _craftingSystem.PrecisionBonus > 1f,
+            favoriteEligible: stored >= 0.6f,
+            regularVisit: GameManager.Instance != null && GameManager.Instance.GetVisits(entry.characterType) >= 2);
+
         // 10. Гость уходит. ГГ остаётся видимым за стойкой (пункт 1).
         yield return new WaitForSeconds(0.4f);
         yield return StartCoroutine(LetCustomerLeave());
+    }
+
+    // ─── Батч 6: контекстные обучающие подсказки (по одной, при первом событии) ─
+    private void ShowFirstTimeTips(bool didPerfect, bool favoriteEligible, bool regularVisit)
+    {
+        var gm = GameManager.Instance;
+        if (gm == null || _dialogue == null) return;
+
+        string msg = null;
+        if (didPerfect && gm.MarkTipShown("tip_perfect"))
+            msg = Loc.T("Точно в центр — оплата ×1.1! Стремись к «✨ Идеально».",
+                        "Dead center — pay ×1.1! Aim for ✨ Perfect.");
+        else if (regularVisit && gm.MarkTipShown("tip_regular"))
+            msg = Loc.T("Это завсегдатай. Радуй его — растут симпатия и чаевые (журнал гостей).",
+                        "A regular. Please them — sympathy and tips grow (guest journal).");
+        else if (favoriteEligible && gm.MarkTipShown("tip_favorite"))
+            msg = Loc.T("Завсегдатай любит свой топпинг — добавь его для апселла ×1.08.",
+                        "Regulars love their topping — add it for a ×1.08 upsell.");
+
+        if (msg != null) _dialogue.ShowMessage(msg, 3.5f);
     }
 
     // ─── Вспомогательные ─────────────────────────────────────────────────────

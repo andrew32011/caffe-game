@@ -352,7 +352,7 @@ public class GameManager : MonoBehaviour
 
             if (_dayResultUI != null)
             {
-                _dayResultUI.Show(day, _dayController.CoinsEarnedToday, dayData.GetDayEndText());
+                _dayResultUI.Show(day, _dayController.CoinsEarnedToday, dayData.GetDayEndText(), _dayController.CurrentComboCount);
                 yield return new WaitUntil(() => !_dayResultUI.IsShowing);
             }
             else
@@ -375,6 +375,14 @@ public class GameManager : MonoBehaviour
             {
                 _currentPhase = GamePhase.StoryVignette;
                 yield return StartCoroutine(PlayDreamVignette(day));
+            }
+
+            // Батч 6: тизер «Особого гостя» накануне (пик вовлечения → мотив вернуться завтра).
+            if (day < 40 && DayController.IsSpecialDay(day + 1) && _dialogue != null)
+            {
+                _dialogue.ShowMessage(
+                    Loc.T("Завтра придёт кто-то особенный…", "Someone special is coming tomorrow…"), 2.5f);
+                yield return new WaitForSeconds(2f);
             }
 
             // Реклама теперь показывается на каждом переходе — внутри Transition() (пункт 4).
@@ -422,6 +430,16 @@ public class GameManager : MonoBehaviour
     {
         _saveData.totalCoins += amount;
     }
+
+    // ─── Батч 6: перенос комбо на следующий день (rewarded «Сохранить комбо») ──
+
+    private int _carriedCombo = 0; // серия, перенесённая с прошлого дня (runtime; сгорает при перезагрузке между днями)
+
+    /// <summary>Комбо, перенесённое с прошлого дня (0 — нет). Читается DayController в начале дня.</summary>
+    public int CarriedCombo => _carriedCombo;
+
+    /// <summary>Задать перенос комбо (rewarded на экране результата) или сбросить (0).</summary>
+    public void SetCarriedCombo(int c) => _carriedCombo = Mathf.Max(0, c);
 
     // ─── Батч 2: продолжение посреди дня ───────────────────────────────────────
 
@@ -542,6 +560,52 @@ public class GameManager : MonoBehaviour
         SaveGame();
     }
 
+    // ─── Батч 6: журнал гостей («Завсегдатаи») ────────────────────────────────
+
+    /// <summary>Записывает визит гостя и лучшую оценку (1..3⭐). Сохраняет.</summary>
+    public void RecordVisit(CharacterType type, int stars)
+    {
+        int key = (int)type;
+        int i = _saveData.journalKeys.IndexOf(key);
+        if (i < 0)
+        {
+            _saveData.journalKeys.Add(key);
+            _saveData.journalVisits.Add(1);
+            _saveData.journalBestStars.Add(Mathf.Clamp(stars, 1, 3));
+        }
+        else
+        {
+            _saveData.journalVisits[i]++;
+            if (stars > _saveData.journalBestStars[i])
+                _saveData.journalBestStars[i] = Mathf.Clamp(stars, 1, 3);
+        }
+        SaveGame();
+    }
+
+    /// <summary>Список встреченных типов гостей (ключи журнала).</summary>
+    public System.Collections.Generic.List<int> JournalKeys => _saveData.journalKeys;
+
+    public int GetVisits(CharacterType type)
+    {
+        int i = _saveData.journalKeys.IndexOf((int)type);
+        return i >= 0 ? _saveData.journalVisits[i] : 0;
+    }
+
+    public int GetBestStars(CharacterType type)
+    {
+        int i = _saveData.journalKeys.IndexOf((int)type);
+        return i >= 0 ? _saveData.journalBestStars[i] : 0;
+    }
+
+    /// <summary>Батч 6: помечает обучающую подсказку показанной. true — если показывается ВПЕРВЫЕ.</summary>
+    public bool MarkTipShown(string id)
+    {
+        if (_saveData.shownTips.Contains(id)) return false;
+        _saveData.shownTips.Add(id);
+        SaveGame();
+        return true;
+    }
+
     // ─── Сохранение / Загрузка ───────────────────────────────────────────────
 
     /// <summary>Сохраняет прогресс в облако/локально (Яндекс). Вызывается после действий
@@ -570,6 +634,16 @@ public class GameManager : MonoBehaviour
         YG2.SetDefaultSaves();
         if (YG2.isSDKEnabled) YG2.SaveProgress();
         Debug.Log("GameManager: прогресс сброшен.");
+    }
+
+    /// <summary>ВРЕМЕННО (для тестирования): сбрасывает прогресс и перезапускает игру
+    /// с первой сцены. Привязано к временной кнопке «Сброс» в билдере сцены.</summary>
+    public void ResetProgressAndRestart()
+    {
+        YG2.SetDefaultSaves();
+        if (YG2.isSDKEnabled) YG2.SaveProgress();
+        Time.timeScale = 1f;
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 
     // ─── YG2: видимость окна ─────────────────────────────────────────────────

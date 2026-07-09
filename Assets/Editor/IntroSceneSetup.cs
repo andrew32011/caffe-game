@@ -66,6 +66,12 @@ public static class IntroSceneSetup
         SetRef(so, "_continueLabel", label);
         so.ApplyModifiedPropertiesWithoutUndo();
 
+        // Все нарезанные (Sliced) спрайты канваса → pixelsPerUnitMultiplier = 4
+        // (одинаковая толщина рамок у кнопок и панелей интро).
+        foreach (var img in canvasGO.GetComponentsInChildren<Image>(true))
+            if (img != null && img.type == Image.Type.Sliced)
+                img.pixelsPerUnitMultiplier = 4f;
+
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         var cam = Object.FindObjectOfType<SmoothCameraWaypointController>();
         Debug.Log("IntroSceneSetup: вступление собрано в текущей сцене." +
