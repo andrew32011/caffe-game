@@ -29,41 +29,14 @@ public static class CoffeGameSceneSetup
     const string SystemsRootName = "--- GAME SYSTEMS ---";
     const string CanvasName       = "GameCanvas";
 
-    // Перевод статических подписей: ru → en. Фабрика Text() авто-вешает LocalizeYG,
-    // если исходный текст есть в этом словаре (кнопки тоже — их подпись идёт через Text()).
-    // Динамические тексты (счётчики, диалоги) сюда НЕ вносим — их переводит рантайм-код (Loc.T).
-    static readonly System.Collections.Generic.Dictionary<string, string> RuEn =
-        new System.Collections.Generic.Dictionary<string, string>
-    {
-        { "Подать ☕", "Serve ☕" },
-        { "Подтвердить ✓", "Confirm ✓" },
-        { "Смотреть рекламу (+60)", "Watch ad (+60)" },
-        { "Закрыть", "Close" },
-        { "Подсказка", "Hint" },
-        { "За монеты", "For coins" },
-        { "За рекламу", "For an ad" },
-        { "Продолжить", "Continue" },
-        { "Улучшить кофейню", "Upgrade café" },
-        { "Начать заново", "Start over" },
-        { "Купить монеты", "Buy coins" },
-        { "Меню", "Menu" },
-        { "Таблица лидеров", "Leaderboard" },
-        { "Журнал", "Journal" },
-        { "Сброс", "Reset" },
-        { "Не хватает монет на ингредиент!", "Not enough coins for the ingredient!" },
-        { "Нужна подсказка?", "Need a hint?" },
-        { "Кофейня · улучшения", "Café · upgrades" },
-        { "Настройки", "Settings" },
-        { "Музыка", "Music" },
-        { "Звуки", "Sound" },
-        { "Журнал гостей · Завсегдатаи", "Guest journal · Regulars" },
-    };
-
-    // Вешает LocalizeYG на надпись, если её исходный русский текст есть в словаре RuEn.
+    // Авто-локализация статических подписей: если русский текст есть в общей таблице
+    // UiTranslations (все языки), вешаем на надпись LocalizeYG. Кнопки покрыты тоже —
+    // их подпись создаётся через Text(). Динамические тексты (счётчики, диалоги) в таблицу
+    // не входят и переводятся рантайм-кодом (Loc.T).
     static void TryLocalize(GameObject go, string ru)
     {
-        if (go != null && ru != null && RuEn.TryGetValue(ru, out string en))
-            go.AddComponent<LocalizeYG>().Set(ru, en);
+        if (go != null && UiTranslations.Has(ru))
+            go.AddComponent<LocalizeYG>().Set(ru, UiTranslations.Get(ru, "en"));
     }
 
     [MenuItem("Tools/CoffeGame/Build Scene Systems + UI")]
@@ -439,8 +412,16 @@ public static class CoffeGameSceneSetup
         var fullscreenLabel = fullscreenBtn.GetComponentInChildren<TextMeshProUGUI>();
         var leaderboardBtn = Btn("BtnLeaderboard", settingsPanel.transform, "Таблица лидеров");
         SetRect(leaderboardBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.235f), new Vector2(0.9f, 0.33f));
+
+        // ── Выбор языка прямо в игре (клик циклирует по языкам) ─────────────
+        var langBtn = Btn("BtnLanguage", settingsPanel.transform, "Русский");
+        SetRect(langBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.165f), new Vector2(0.9f, 0.225f));
+        var langLabel = langBtn.GetComponentInChildren<TextMeshProUGUI>();
+        var langSelector = langBtn.gameObject.AddComponent<LanguageSelector>();
+        new W(langSelector).Ref("_button", langBtn).Ref("_label", langLabel).Apply();
+
         var settingsClose = Btn("BtnSettingsClose", settingsPanel.transform, "Закрыть");
-        SetRect(settingsClose.GetComponent<RectTransform>(), new Vector2(0.3f, 0.06f), new Vector2(0.7f, 0.16f));
+        SetRect(settingsClose.GetComponent<RectTransform>(), new Vector2(0.3f, 0.06f), new Vector2(0.7f, 0.155f));
         ApplyPanelSprite(settingsPanel);
         settingsPanel.SetActive(false);
 

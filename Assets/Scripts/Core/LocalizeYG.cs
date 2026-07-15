@@ -49,6 +49,14 @@ public class LocalizeYG : MonoBehaviour
         if (_text == null) _text = GetComponent<TextMeshProUGUI>();
         if (_text == null) return;
 
+        // 1) Централизованная таблица UI-переводов (все языки) по ключу = русский текст.
+        if (!string.IsNullOrEmpty(ru) && UiTranslations.TryGet(ru, lang, out string t))
+        {
+            _text.text = t;
+            return;
+        }
+
+        // 2) Иначе — встроенные ru/en/tr (для текста вне таблицы, напр. названия-бренда).
         switch (lang)
         {
             case "ru": case "be": case "kk": case "uk": case "uz":
