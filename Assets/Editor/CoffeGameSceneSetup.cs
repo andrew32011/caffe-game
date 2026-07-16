@@ -466,7 +466,9 @@ public static class CoffeGameSceneSetup
         ApplyPanelSprite(journalPanel);
         journalPanel.SetActive(false);
 
-        var guestJournal = journalPanel.AddComponent<GuestJournalUI>();
+        // GuestJournalUI вешаем на ВСЕГДА АКТИВНЫЙ Canvas (как SettingsUI), иначе его Awake
+        // не выполнится (панель выключена) и кнопка «Журнал» не подпишется.
+        var guestJournal = canvasGO.AddComponent<GuestJournalUI>();
         new W(guestJournal)
             .Ref("_panel", journalPanel)
             .Ref("_content", journalContent)
@@ -660,6 +662,7 @@ public static class CoffeGameSceneSetup
         new W(audio)
             .Ref("_musicSource", music)
             .Ref("_sfxSource", sfx)
+            .Ref("_speechMixer", speech) // для превью громкости SFX (бубнёж)
             .Apply();
 
         // ── ВРЕМЕННО: кнопка сброса прогресса (для тестирования) ─────────────

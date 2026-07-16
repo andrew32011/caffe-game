@@ -89,6 +89,7 @@ public class SettingsUI : MonoBehaviour
     {
         if (!_ready) return;
         AudioController.Instance?.SetSfxVolume(v);
+        AudioController.Instance?.PlaySfxPreview(); // дать услышать уровень звука сразу
     }
 
     // ─── Полный экран ─────────────────────────────────────────────────────────

@@ -17,6 +17,7 @@ public class AudioController : MonoBehaviour
     [Header("Источники звука")]
     [SerializeField] private AudioSource _musicSource;     // Фоновая музыка
     [SerializeField] private AudioSource _sfxSource;       // Эффекты
+    [SerializeField] private SpeechMixer _speechMixer;     // Бубнёж (реальный звук игры + превью громкости)
 
     [Header("Клипы")]
     [SerializeField] private AudioClip _mainTheme;         // Основная музыка кофейни
@@ -113,6 +114,16 @@ public class AudioController : MonoBehaviour
     {
         _sfxVolume = Mathf.Clamp01(v);
         GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume);
+    }
+
+    private float _lastPreviewTime;
+    /// <summary>Проигрывает короткий бубнёж на текущей громкости эффектов — чтобы игрок
+    /// СЛЫШАЛ уровень при перетаскивании ползунка (в меню на паузе иначе звука нет). С троттлингом.</summary>
+    public void PlaySfxPreview()
+    {
+        if (Time.unscaledTime - _lastPreviewTime < 0.12f) return;
+        _lastPreviewTime = Time.unscaledTime;
+        if (_speechMixer != null) _speechMixer.PlayRandomFragment();
     }
 
     /// <summary>Применяет сохранённую громкость без записи в сейв (вызывает GameManager после загрузки).</summary>
