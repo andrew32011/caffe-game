@@ -19,7 +19,10 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioSource _sfxSource;       // Эффекты
     [SerializeField] private SpeechMixer _speechMixer;     // Бубнёж (реальный звук игры + превью громкости)
 
-    [Header("Клипы")]
+    [Header("Банк звуков (пакет 50 клипов + музыка)")]
+    [SerializeField] private SoundBank _bank;
+
+    [Header("Клипы (запасные; приоритет — банк)")]
     [SerializeField] private AudioClip _mainTheme;         // Основная музыка кофейни
     [SerializeField] private AudioClip _dayClearSound;     // Конец дня (успех)
     [SerializeField] private AudioClip _dayFailSound;      // Рестарт дня
@@ -56,7 +59,7 @@ public class AudioController : MonoBehaviour
         // Обязательное требование YG2 — останавливаем звук при скрытии
         YG2.onFocusWindowGame += HandleWindowFocus;
 
-        PlayMusic(_mainTheme);
+        PlayMusic(_bank != null && _bank.music != null ? _bank.music : _mainTheme);
     }
 
     private void OnDestroy()
@@ -134,19 +137,31 @@ public class AudioController : MonoBehaviour
         if (_musicSource != null) _musicSource.volume = _musicVolume;
     }
 
-    // ─── Игровые события ─────────────────────────────────────────────────────
+    // ─── Музыка: пауза ночью / на видениях ────────────────────────────────────
 
-    public void PlayDayClear()      => PlaySFX(_dayClearSound);
-    public void PlayDayFail()       => PlaySFX(_dayFailSound);
-    public void PlayCoin()          => PlaySFX(_coinSound);
-    public void PlayWrongOrder()    => PlaySFX(_wrongOrderSound);
-    public void PlayCorrectOrder()  => PlaySFX(_correctOrderSound);
-    public void PlayCustomerIn()    => PlaySFX(_customerInSound);
+    public void PauseMusic()  { if (_musicSource != null && _musicSource.isPlaying) _musicSource.Pause(); }
+    public void ResumeMusic() { if (_musicSource != null && _musicSource.clip != null && !_isMuted) _musicSource.UnPause(); }
 
-    // Сочность (Батч 1)
-    public void PlayPour()          => PlaySFX(_pourSound);
-    public void PlayServeDing()     => PlaySFX(_serveDingSound);
-    public void PlayPerfect()       => PlaySFX(_perfectSound);
-    public void PlayStar()          => PlaySFX(_starSound);
-    public void PlayBonus()         => PlaySFX(_bonusSound);
+    // ─── Игровые события (приоритет — клип из банка, иначе запасной) ───────────
+
+    private AudioClip B(AudioClip bankClip, AudioClip fallback) => bankClip != null ? bankClip : fallback;
+
+    public void PlayDayClear()      => PlaySFX(B(_bank?.dayClear, _dayClearSound));
+    public void PlayDayFail()       => PlaySFX(B(_bank?.dayFail, _dayFailSound));
+    public void PlayCoin()          => PlaySFX(B(_bank?.coin, _coinSound));
+    public void PlayWrongOrder()    => PlaySFX(B(_bank?.wrong, _wrongOrderSound));
+    public void PlayCorrectOrder()  => PlaySFX(B(_bank?.correct, _correctOrderSound));
+    public void PlayCustomerIn()    => PlaySFX(B(_bank?.customerIn, _customerInSound));
+
+    public void PlayPour()          => PlaySFX(B(_bank?.pour, _pourSound));
+    public void PlayServeDing()     => PlaySFX(B(_bank?.ding, _serveDingSound));
+    public void PlayPerfect()       => PlaySFX(B(_bank?.perfect, _perfectSound));
+    public void PlayStar()          => PlaySFX(B(_bank?.star, _starSound));
+    public void PlayBonus()         => PlaySFX(B(_bank?.bonus, _bonusSound));
+
+    // Новые (только из банка)
+    public void PlayClick()         => PlaySFX(_bank?.click);
+    public void PlayUiOpen()        => PlaySFX(_bank?.uiOpen);
+    public void PlayUiClose()       => PlaySFX(_bank?.uiClose);
+    public void PlayCombo()         => PlaySFX(_bank?.combo);
 }

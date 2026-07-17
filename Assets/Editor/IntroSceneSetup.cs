@@ -110,7 +110,7 @@ public static class IntroSceneSetup
         if (img == null) return;
         if (_buttonSprite == null)
             _buttonSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
-                "Assets/Mini UI/Buttons/Dark Theme Border Buttons/192Px Round DarkBorder/Small Round Button DARK.png");
+                "Assets/Mini UI/Buttons/Dark Theme Border Buttons/256Px Rectangle DarkBorder/Dark Long Btn DARK.png");
         if (_buttonSprite != null)
         {
             img.sprite = _buttonSprite; img.type = Image.Type.Sliced; img.color = Color.white; img.pixelsPerUnitMultiplier = 8f;

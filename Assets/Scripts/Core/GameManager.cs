@@ -360,6 +360,9 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(3f);
             }
 
+            // Ночь: видения/эффекты — фоновая музыка замолкает (возобновится на новом дне).
+            _audioController?.PauseMusic();
+
             // ─── Вставная сцена (визуальный эффект) ─────────────────────────
             if (dayData.hasVignette && _vfxController != null)
             {
@@ -376,6 +379,9 @@ public class GameManager : MonoBehaviour
                 _currentPhase = GamePhase.StoryVignette;
                 yield return StartCoroutine(PlayDreamVignette(day));
             }
+
+            // Ночь закончилась — возвращаем фоновую музыку.
+            _audioController?.ResumeMusic();
 
             // Батч 6: тизер «Особого гостя» накануне (пик вовлечения → мотив вернуться завтра).
             if (day < 40 && DayController.IsSpecialDay(day + 1) && _dialogue != null)

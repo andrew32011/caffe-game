@@ -38,11 +38,16 @@
 - **DialogueManager** (164) + **DialogLine** (64, содержит *SO* `DialogueDatabase`) — СТАРАЯ система реплик по ID. ⚠️ **legacy**, сюжет идёт через StoryDatabase.
 
 ### UI (все — панели, оркестрируются билдером)
+- **ButtonJuice** (MonoBehaviour) — лёгкая анимация кнопки: дыхание масштаба/качание/блеск/подскок при клике (unscaled). Билдер вешает через хелпер `Juice(btn,pulse,shine,wobble)` на важные кнопки (Подать=pulse+shine, Подтвердить/Продолжить=pulse, HUD-иконки). НЕ вешать на кнопки со своим рантайм-пульсом (Double/SaveCombo/AdHint) — конфликт масштаба.
+- HUD-кнопки (Меню/Журнал/Подсказка) — теперь **иконка+мини-подпись** (хелпер `IconBtn`, иконки Gear/Notebook/Bulb из `Mini UI/UI Icons`), правый вертикальный док (x≈0.9, сверху вниз). Спрайт кнопок сменён на прямоугольный `Dark Long Btn DARK` (минимальное скругление).
 - **DayResultUI** (344) — экран итогов дня: rewarded «Удвоить»/«Сохранить комбо», трекер «Путь к 10000», предупреждение о стрике.
 - **TutorialController** (292) — обучение. **UiEffects** (263, *singleton*) — 2D эффекты (монеты/звёзды/комбо/баннеры). **HintManager** (166) — панель подсказок. **UpgradeShopUI** (121) — магазин апгрейдов. **SettingsUI** (128) — настройки+пауза (громкость/фуллскрин/лидерборд). **DailyBonusUI** (123) — бонус за вход. **JourneyGateUI** (102) — гейт цели. **GuestJournalUI** (73) + **JournalCard** (32) — журнал «Завсегдатаи». **AdForCoins** (44) — реклама за монеты. **CoinsUI** (30) — касса, `Update()`.
 
 ### Audio / SDK / CutScene / Effects / прочее
-- **AudioController** (152, *singleton*) — музыка/SFX/бубнёж (`_speechMixer`), громкости в сейв, пауза на рекламе/сворачивании. ⚠️ клипы музыки/SFX не назначены (реальный звук — только бубнёж).
+- **AudioController** (*singleton*) — музыка/SFX/бубнёж. Клипы берёт из **`SoundBank`** (`_bank`, приоритет) с фолбэком на старые поля. Методы `PlayCoin/Star/...`, `PlayClick/UiOpen/UiClose/Combo`, `PauseMusic/ResumeMusic` (музыка молчит ночью — вызывается из GameManager вокруг виньеток/сна).
+- **SoundBank** (*ScriptableObject*, `Assets/SoundBank.asset`) — именованные события→AudioClip + `music` + `all[]` (50 клипов пакета `Assets/Casual Game Sounds U6/DM-CGS-01..50`). Билдер (`BuildSoundBank`) наполняет: `all`=все клипы, `music`=`Assets/Audio/bg_music_celtic.mp3`, события — черновой best-guess по индексу (пустые слоты; ручные назначения сохраняются). Фон-музыка — кельтская.
+- **ButtonClickSound** (MonoBehaviour) — клик-звук на ВСЕ кнопки (в фабриках Btn/IconBtn), transform не трогает.
+- Камера: `Stages` поднимает камеру на этапе ожидания гостя (`guestWaitStageIndex`/`guestWaitCameraLift`, +Y на endPos).
 - **SpeechFragment/SpeechMixer** (131) — нарезка бубнежа `Пер3.ogg`, кэш клипов, громкость = `SfxVolume`. **SpeechPlayer** (39).
 - **SavesYG.Game** (56, *partial* `SavesYG`) — поля облачного сейва YG2. **YandexManager** (146, *singleton*) — инициализация YG2.
 - **Stages** (176) — машина этапов 0–7 (двигает камеру по `cameraTarget`), `JumpToStage`, `OnStageEntered`, `IsTransitioning`. `Update()` debug. + **StagesPointers/Stage0–7** — маркеры фаз (OnEnable-триггеры).

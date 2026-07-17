@@ -181,6 +181,7 @@ public static class CoffeGameSceneSetup
         // ── Кнопка «Подать» (низ по центру; пункт 10) ───────────────────────
         var serveBtn = Btn("BtnServe", ct, "Подать ☕");
         SetRect(serveBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.04f), new Vector2(0.6f, 0.12f));
+        Juice(serveBtn, pulse: true, shine: true); // главный CTA — пульс + блеск
         serveBtn.gameObject.SetActive(false);
 
         // ── Кнопка рекламной подсказки (после 2 провалов подряд, пункт 4.1) ──
@@ -243,6 +244,7 @@ public static class CoffeGameSceneSetup
         selectedText.gameObject.SetActive(false);
         var confirmBtn = Btn("BtnConfirm", ct, "Подтвердить ✓");
         SetRect(confirmBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.05f), new Vector2(0.6f, 0.13f));
+        Juice(confirmBtn, pulse: true);
         confirmBtn.gameObject.SetActive(false);
 
         // ── Экран «нет денег» с рекламой за монеты (пункт 5) ────────────────
@@ -271,8 +273,10 @@ public static class CoffeGameSceneSetup
             FindMarker("CofeBasis"),   FindMarker("PointCashier", "PointCashierForDialog"));
 
         // ── Кнопка «Подсказка» (левый нижний угол, видна всегда) ────────────
-        var btnHint = Btn("BtnHint", ct, "Подсказка");
-        SetRect(btnHint.GetComponent<RectTransform>(), new Vector2(0.02f, 0.02f), new Vector2(0.12f, 0.08f));
+        // HUD-иконка «Подсказка» (нижняя в правом доке). Пульс — приглашает при затыке.
+        var btnHint = IconBtn("BtnHint", ct, "Assets/Mini UI/UI Icons/Bulb.png", "Подсказка");
+        SetRect(btnHint.GetComponent<RectTransform>(), new Vector2(0.905f, 0.64f), new Vector2(0.99f, 0.74f));
+        Juice(btnHint, pulse: true);
 
         // ── Панель подсказок (центр, модальная) ─────────────────────────────
         var hintPanel = Panel("HintPanel", ct, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), new Color(0.05f, 0.08f, 0.05f, 0.92f));
@@ -307,6 +311,7 @@ public static class CoffeGameSceneSetup
 
         var btnContinue = Btn("BtnContinue", resultPanel.transform, "Продолжить");
         SetRect(btnContinue.GetComponent<RectTransform>(), new Vector2(0.06f, 0.29f), new Vector2(0.48f, 0.385f));
+        Juice(btnContinue, pulse: true);
         // Батч 2: «Удвоить заработок — реклама» (rewarded)
         var btnDouble = Btn("BtnDoubleEarnings", resultPanel.transform, "Удвоить — реклама");
         SetRect(btnDouble.GetComponent<RectTransform>(), new Vector2(0.52f, 0.29f), new Vector2(0.94f, 0.385f));
@@ -398,8 +403,10 @@ public static class CoffeGameSceneSetup
 
         // ── Меню/настройки + пауза (Батч 4) ─────────────────────────────────
         // Кнопка-«Меню» в правом верхнем углу (всегда видна). Открывает настройки и паузу.
-        var settingsBtn = Btn("BtnSettings", ct, "Меню");
-        SetRect(settingsBtn.GetComponent<RectTransform>(), new Vector2(0.915f, 0.9f), new Vector2(0.99f, 0.975f));
+        // HUD-иконка «Меню» (верхняя в правом доке).
+        var settingsBtn = IconBtn("BtnSettings", ct, "Assets/Mini UI/UI Icons/Gear.png", "Меню");
+        SetRect(settingsBtn.GetComponent<RectTransform>(), new Vector2(0.905f, 0.88f), new Vector2(0.99f, 0.98f));
+        Juice(settingsBtn, pulse: false);
 
         var settingsPanel = Panel("SettingsPanel", ct, new Vector2(0.3f, 0.22f), new Vector2(0.7f, 0.82f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
         Text("SettingsTitle", settingsPanel.transform, "Настройки", 34, TextAlignmentOptions.Top, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.99f));
@@ -453,8 +460,10 @@ public static class CoffeGameSceneSetup
             .Apply();
 
         // ── Журнал гостей «Завсегдатаи» (Батч 6) ────────────────────────────
-        var journalOpenBtn = Btn("BtnJournal", ct, "Журнал");
-        SetRect(journalOpenBtn.GetComponent<RectTransform>(), new Vector2(0.02f, 0.75f), new Vector2(0.12f, 0.81f));
+        // HUD-иконка «Журнал» (средняя в правом доке).
+        var journalOpenBtn = IconBtn("BtnJournal", ct, "Assets/Mini UI/UI Icons/Notebook.png", "Журнал");
+        SetRect(journalOpenBtn.GetComponent<RectTransform>(), new Vector2(0.905f, 0.76f), new Vector2(0.99f, 0.86f));
+        Juice(journalOpenBtn, pulse: false);
 
         var journalPanel = Panel("GuestJournalPanel", ct, new Vector2(0.2f, 0.12f), new Vector2(0.8f, 0.88f), new Color(0.05f, 0.06f, 0.12f, 0.98f));
         Text("GuestJournalTitle", journalPanel.transform, "Журнал гостей · Завсегдатаи", 32, TextAlignmentOptions.Top, new Vector2(0.05f, 0.9f), new Vector2(0.95f, 0.99f));
@@ -659,10 +668,14 @@ public static class CoffeGameSceneSetup
             .Apply();
 
         // AudioController
+        // Банк звуков: создаём/наполняем ассет из пакета 50 клипов + фон-музыки.
+        var soundBank = BuildSoundBank();
+
         new W(audio)
             .Ref("_musicSource", music)
             .Ref("_sfxSource", sfx)
             .Ref("_speechMixer", speech) // для превью громкости SFX (бубнёж)
+            .Ref("_bank", soundBank)     // банк звуков (50 клипов)
             .Apply();
 
         // ── ВРЕМЕННО: кнопка сброса прогресса (для тестирования) ─────────────
@@ -722,6 +735,53 @@ public static class CoffeGameSceneSetup
     {
         var go = GameObject.Find(name);
         if (go != null) Object.DestroyImmediate(go);
+    }
+
+    // Создаёт/наполняет ассет SoundBank: все клипы пакета + фон-музыка + черновое
+    // назначение событий по индексу. Пустые слоты заполняет, уже назначенные НЕ трогает.
+    static SoundBank BuildSoundBank()
+    {
+        const string path = "Assets/SoundBank.asset";
+        var bank = AssetDatabase.LoadAssetAtPath<SoundBank>(path);
+        if (bank == null)
+        {
+            bank = ScriptableObject.CreateInstance<SoundBank>();
+            AssetDatabase.CreateAsset(bank, path);
+        }
+
+        var clips = new List<AudioClip>();
+        foreach (var guid in AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets/Casual Game Sounds U6" }))
+        {
+            var c = AssetDatabase.LoadAssetAtPath<AudioClip>(AssetDatabase.GUIDToAssetPath(guid));
+            if (c != null) clips.Add(c);
+        }
+        clips.Sort((a, b) => string.CompareOrdinal(a.name, b.name)); // DM-CGS-01..50 по порядку
+        bank.all = clips.ToArray();
+
+        bank.music = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/bg_music_celtic.mp3");
+
+        AudioClip At(int i) => (bank.all != null && i < bank.all.Length) ? bank.all[i] : null;
+        if (bank.click == null)      bank.click      = At(0);
+        if (bank.uiOpen == null)     bank.uiOpen     = At(1);
+        if (bank.uiClose == null)    bank.uiClose    = At(2);
+        if (bank.pour == null)       bank.pour       = At(3);
+        if (bank.ding == null)       bank.ding       = At(4);
+        if (bank.perfect == null)    bank.perfect    = At(5);
+        if (bank.star == null)       bank.star       = At(6);
+        if (bank.customerIn == null) bank.customerIn = At(7);
+        if (bank.coin == null)       bank.coin       = At(8);
+        if (bank.combo == null)      bank.combo      = At(9);
+        if (bank.bonus == null)      bank.bonus      = At(10);
+        if (bank.correct == null)    bank.correct    = At(11);
+        if (bank.wrong == null)      bank.wrong      = At(12);
+        if (bank.dayClear == null)   bank.dayClear   = At(13);
+        if (bank.dayFail == null)    bank.dayFail    = At(14);
+
+        EditorUtility.SetDirty(bank);
+        AssetDatabase.SaveAssets();
+        Debug.Log($"CoffeGameSetup: SoundBank — клипов {clips.Count}, музыка {(bank.music != null ? "OK" : "НЕТ")}. " +
+                  "Переназначь события в Assets/SoundBank.asset при желании.");
+        return bank;
     }
 
     // ── 3D-предметы и станции ───────────────────────────────────────────────
@@ -1008,7 +1068,7 @@ public static class CoffeGameSceneSetup
         if (img == null) return;
         if (_buttonSprite == null)
             _buttonSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
-                "Assets/Mini UI/Buttons/Dark Theme Border Buttons/192Px Round DarkBorder/Small Round Button DARK.png");
+                "Assets/Mini UI/Buttons/Dark Theme Border Buttons/256Px Rectangle DarkBorder/Dark Long Btn DARK.png");
         if (_buttonSprite != null)
         {
             img.sprite = _buttonSprite;
@@ -1418,7 +1478,32 @@ public static class CoffeGameSceneSetup
         var txt = Text("Label", go.transform, label, 20, TextAlignmentOptions.Center);
         var btn = go.GetComponent<Button>();
         btn.targetGraphic = img;
+        go.AddComponent<ButtonClickSound>(); // клик-звук всем кнопкам
         return btn;
+    }
+
+    // Кнопка «иконка сверху + мини-подпись снизу» (для HUD). Подпись локализуется через Text().
+    static Button IconBtn(string name, Transform parent, string iconPath, string ru)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+        go.transform.SetParent(parent, false);
+        var img = go.GetComponent<Image>();
+        ApplyButtonSprite(img);
+        var btn = go.GetComponent<Button>();
+        btn.targetGraphic = img;
+
+        var icon = IconImage("Icon", go.transform, iconPath, new Vector2(0.28f, 0.36f), new Vector2(0.72f, 0.93f));
+        icon.color = new Color(0.95f, 0.95f, 1f); // светлый тон линейной иконки
+        Text("Caption", go.transform, ru, 15, TextAlignmentOptions.Center, new Vector2(0.02f, 0.04f), new Vector2(0.98f, 0.34f));
+        go.AddComponent<ButtonClickSound>(); // клик-звук
+        return btn;
+    }
+
+    // Навешивает лёгкую анимацию (сочность) на кнопку.
+    static void Juice(Button b, bool pulse = true, bool shine = false, bool wobble = false)
+    {
+        if (b == null) return;
+        b.gameObject.AddComponent<ButtonJuice>().Configure(pulse, shine, wobble);
     }
 
     static Image Overlay(string name, Transform parent, Color color)

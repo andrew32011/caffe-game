@@ -34,6 +34,12 @@ public class Stages : MonoBehaviour
     public Transform playerCharacter;
     public Camera mainCamera;
 
+    [Header("Подъём камеры на этапе ожидания гостя")]
+    [Tooltip("Индекс этапа, где мы смотрим на подходящего гостя (обычно 0).")]
+    public int guestWaitStageIndex = 0;
+    [Tooltip("На сколько поднять камеру (по Y) на этом этапе.")]
+    public float guestWaitCameraLift = 0.5f;
+
     [Header("Debug")]
     public bool manualControl = false; // ����� ��� ������� ������������ � ���������
     public int debugStageIndex = 0;
@@ -125,6 +131,8 @@ public class Stages : MonoBehaviour
         {
             Vector3 startPos = mainCamera.transform.position;
             Vector3 endPos = stage.cameraTarget.position;
+            // Подъём камеры на этапе ожидания гостя — смотрим на подходящего гостя чуть свысока.
+            if (currentStage == guestWaitStageIndex) endPos.y += guestWaitCameraLift;
             Quaternion startRot = mainCamera.transform.rotation;
             Quaternion endRot = stage.cameraTarget.rotation;
             float timer = 0f;
