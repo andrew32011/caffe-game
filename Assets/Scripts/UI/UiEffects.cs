@@ -259,5 +259,24 @@ public class UiEffects : MonoBehaviour
         t = 0f;
         while (t < 1f) { t += Time.deltaTime * 4f; rt.localScale = Vector3.one * (1.2f - 0.2f * t); yield return null; }
         rt.localScale = Vector3.one;
+
+        // Держим надпись пару секунд, затем плавно гасим и прячем — чтобы «Комбо xN»
+        // не висело постоянно после получения комбо. Таймер перезапускается на каждом
+        // новом комбо (StopCoroutine/StartCoroutine в ShowCombo), при сбросе серии
+        // ShowCombo(count<2) прячет надпись сразу.
+        yield return new WaitForSeconds(2f);
+        if (_comboLabel != null)
+        {
+            Color c0 = _comboLabel.color;
+            float f = 0f;
+            while (f < 1f)
+            {
+                f += Time.unscaledDeltaTime * 2f;
+                _comboLabel.color = new Color(c0.r, c0.g, c0.b, Mathf.Lerp(1f, 0f, f));
+                yield return null;
+            }
+            _comboLabel.gameObject.SetActive(false);
+            _comboLabel.color = new Color(c0.r, c0.g, c0.b, 1f); // вернуть непрозрачность на будущее
+        }
     }
 }

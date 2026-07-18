@@ -52,5 +52,14 @@ namespace YG
 
         // Одноразовые обучающие подсказки новых механик (id уже показанных).
         public List<string> shownTips = new List<string>();
+
+        // ─── Сцена сна: какой день только что завершён (для текста/эффекта сна). ──
+        public int sleepFromDay = 0;
+
+        // ─── Отключение рекламы за донат (YG2 Payments, навсегда). ───────────────
+        public bool adsDisabled = false;
+
+        // ─── Бейдж журнала: сколько записей игрок уже открывал (для «новых» гостей). ─
+        public int journalSeenCount = 0;
     }
 }

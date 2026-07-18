@@ -83,8 +83,7 @@ public class UpgradeShopUI : MonoBehaviour
             int cost  = gm.GetUpgradeCost(type);
 
             SetText(_titleTexts, i, UpgradeName(type));
-            SetText(_infoTexts, i, UpgradeDesc(type) + "\n" +
-                Loc.T($"Уровень {level}/{GameManager.UpgradeMaxLevel}", $"Level {level}/{GameManager.UpgradeMaxLevel}"));
+            SetText(_infoTexts, i, EffectLine(type, level));
 
             if (_buyButtons != null && i < _buyButtons.Length && _buyButtons[i] != null)
                 _buyButtons[i].interactable = cost >= 0 && gm.TotalCoins >= cost;
@@ -109,13 +108,42 @@ public class UpgradeShopUI : MonoBehaviour
         }
     }
 
-    private static string UpgradeDesc(UpgradeType t)
+    // ─── Показ выгоды в ПРОЦЕНТАХ (насколько лучше работает после улучшения) ──────
+    // Вместо «Уровень N/5» показываем понятный игроку эффект: текущий накопленный
+    // процент и — если не максимум — насколько станет лучше после покупки.
+
+    // Прирост эффекта за один уровень (в дружелюбных процентах для игрока).
+    private static int PercentPerLevel(UpgradeType t)
     {
         switch (t)
         {
-            case UpgradeType.Beans:   return Loc.T("+12% к оплате за каждый уровень", "+12% payment per level");
-            case UpgradeType.Machine: return Loc.T("Шире допуск на кофемашине", "Wider machine tolerance");
-            default:                  return Loc.T("Щедрее чаевые от гостей", "More generous tips");
+            case UpgradeType.Beans:   return 12; // ровно как в экономике (+12% к оплате/ур)
+            case UpgradeType.Machine: return 20; // «легче попасть» — шире зона на кофемашине
+            default:                  return 15; // щедрее чаевые от гостей
         }
+    }
+
+    private static string EffectWord(UpgradeType t)
+    {
+        switch (t)
+        {
+            case UpgradeType.Beans:   return Loc.T("Оплата за напиток", "Payment per drink");
+            case UpgradeType.Machine: return Loc.T("Точность на кофемашине", "Machine accuracy");
+            default:                  return Loc.T("Чаевые от гостей", "Guest tips");
+        }
+    }
+
+    private static string EffectLine(UpgradeType t, int level)
+    {
+        int per    = PercentPerLevel(t);
+        int curPct = level * per;
+        string word = EffectWord(t);
+
+        if (level >= GameManager.UpgradeMaxLevel)
+            return Loc.T($"{word}: +{curPct}% Улучшено полностью", $"{word}: +{curPct}% Fully upgraded");
+
+        int nextPct = (level + 1) * per;
+        return Loc.T($"{word}: +{curPct}% Станет +{nextPct}%",
+                     $"{word}: +{curPct}% Will be +{nextPct}%");
     }
 }

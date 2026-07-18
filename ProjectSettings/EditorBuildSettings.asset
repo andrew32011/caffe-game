@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainScene.unity
     guid: 7e0908356adf5044ba1b3f20f66bccc5
+  - enabled: 1
+    path: Assets/Scenes/Sleepy scene.unity
+    guid: 72490b55e3061534eb109b59a67a3bb7
   m_configObjects: {}

@@ -333,8 +333,8 @@ public class DayController : MonoBehaviour
             msg = Loc.T("Это завсегдатай. Радуй его — растут симпатия и чаевые (журнал гостей).",
                         "A regular. Please them — sympathy and tips grow (guest journal).");
         else if (favoriteEligible && gm.MarkTipShown("tip_favorite"))
-            msg = Loc.T("Завсегдатай любит свой топпинг — добавь его для апселла ×1.08.",
-                        "Regulars love their topping — add it for a ×1.08 upsell.");
+            msg = Loc.T("Завсегдатай любит свой топпинг — добавь его, и он заплатит щедрее.",
+                        "This regular loves their topping — add it and they'll pay more generously.");
 
         if (msg != null) _dialogue.ShowMessage(msg, 3.5f);
     }

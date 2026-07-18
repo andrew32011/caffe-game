@@ -158,15 +158,28 @@ public class DialogueDisplayer : MonoBehaviour
         if (playSpeech && speechMixer != null)
             speechMixer.PlayRandomFragment();
 
-        // Появление ПО СЛОВАМ за ~revealDuration секунд (не мгновенно, не посимвольно).
-        string[] words = string.IsNullOrEmpty(text) ? new string[0] : text.Split(' ');
-        float perWord = Mathf.Max(0.03f, revealDuration / Mathf.Max(1, words.Length));
+        // Появление ПОСИМВОЛЬНО («печатная машинка») за ~revealDuration секунд, вне
+        // зависимости от длины реплики. Кадрово накапливаем время и открываем ровно
+        // столько символов, сколько должно быть видно к этому моменту — так короткая и
+        // длинная реплики печатаются за одно и то же время и выглядят плавно.
+        int total = string.IsNullOrEmpty(text) ? 0 : text.Length;
+        float perChar = total > 0 ? revealDuration / total : 0f;
+        float acc = 0f;
+        int shown = 0;
 
-        for (int w = 1; w <= words.Length; w++)
+        while (shown < total)
         {
             if (_clickedToSkip) break;                 // первый клик — показать сразу всю реплику
-            SetDialogueText(string.Join(" ", words, 0, w));
-            yield return new WaitForSeconds(perWord);
+            acc += Time.deltaTime;
+            int target = perChar > 0f
+                ? Mathf.Clamp(Mathf.FloorToInt(acc / perChar), 0, total)
+                : total;
+            if (target != shown)
+            {
+                shown = target;
+                SetDialogueText(text.Substring(0, shown));
+            }
+            yield return null;
         }
         SetDialogueText(text);
         _isTyping = false;

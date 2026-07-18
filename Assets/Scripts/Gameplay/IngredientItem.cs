@@ -44,6 +44,16 @@ public class IngredientItem : MonoBehaviour
         _baseScale  = transform.localScale;
         _renderers  = GetComponentsInChildren<Renderer>();
         _mpb        = new MaterialPropertyBlock();
+
+        // Жёсткая привязка топпинга к КОНКРЕТНОЙ модели по её имени — в рантайме, не
+        // завися от того, что сохранил билдер. Гарантирует: кликнул «Салями» — получил
+        // именно Salami (а не рыбу и не случайный предмет).
+        if (kind == ItemKind.Topping)
+        {
+            var byName = ToppingUtil.FromObjectName(gameObject.name);
+            if (byName != Topping.None) topping = byName;
+            if (string.IsNullOrEmpty(displayName)) displayName = gameObject.name;
+        }
     }
 
     private void OnEnable()  => CoffeeCraftingSystem.Register(this);

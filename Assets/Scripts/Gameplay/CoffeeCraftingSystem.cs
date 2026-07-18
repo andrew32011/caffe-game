@@ -99,7 +99,8 @@ public class CoffeeCraftingSystem : MonoBehaviour
     private readonly List<Topping> _chosenToppings = new List<Topping>();
 
     private bool _ingredientDecided, _machineDecided, _toppingDecided;
-    private IngredientItem _pending;     // выбранный, но не подтверждённый сосуд
+    private IngredientItem _pending;         // выбранный, но не подтверждённый сосуд
+    private IngredientItem _pendingTopping;  // выбранный, но не подтверждённый топпинг (один слот)
     private int  _currentDrinkCost;      // себестоимость текущего напитка
 
     private bool _orderReady;
@@ -141,7 +142,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
     {
         Instance = this;
         if (_serveButton   != null) _serveButton.onClick.AddListener(OnServeClicked);
-        if (_confirmButton != null) _confirmButton.onClick.AddListener(OnConfirmIngredient);
+        if (_confirmButton != null) _confirmButton.onClick.AddListener(OnConfirmClicked);
         if (_adHintButton  != null) _adHintButton.onClick.AddListener(OnAdHintClicked);
     }
 
@@ -205,9 +206,21 @@ public class CoffeeCraftingSystem : MonoBehaviour
     {
         _target = order;
         _hintRevealed = false;
+        // Защита: если запрошенного топпинга нет на полке (нет такой модели) — не требуем
+        // его, иначе заказ невыполним. Гость просит только то, что реально есть.
+        if (_target != null && _target.topping != Topping.None && !ToppingOnShelf(_target.topping))
+            _target.topping = Topping.None;
         // Пункт 4.1/4.2: по умолчанию только расплывчатый намёк, не точный заказ
         if (_orderDisplayText != null)
             _orderDisplayText.text = order != null ? VagueHint() : "";
+    }
+
+    // Есть ли на полке модель, дающая этот топпинг (по зарегистрированным предметам).
+    private static bool ToppingOnShelf(Topping t)
+    {
+        foreach (var it in _items)
+            if (it != null && it.kind == IngredientItem.ItemKind.Topping && it.topping == t) return true;
+        return false;
     }
 
     private bool _hintRevealed;
@@ -232,8 +245,12 @@ public class CoffeeCraftingSystem : MonoBehaviour
         // Пункт 3: намёк опирается на РЕАЛЬНЫЙ сосуд-ингредиент в игре (его магическое
         // имя), чтобы заказ согласовывался с тем, по чему игрок кликает.
         string baseHint = IngredientName(TargetIngredientIndex());
+        // Топпинг НАЗЫВАЕМ явно (единственный источник — enum заказа): нельзя честно
+        // угадать конкретный топпинг по намёку, поэтому гость просит его прямо, и это
+        // ровно та модель, что лежит на полке.
         string top = _target.topping != Topping.None
-            ? Loc.T(", и чтоб с изюминкой", ", with a little something extra")
+            ? Loc.T($", и обязательно с топпингом «{ToppingName(_target.topping)}»",
+                    $", and definitely with the \"{ToppingName(_target.topping)}\" topping")
             : "";
         return Loc.T("«Хочется ", "\"I'd like ") + baseHint + ", " + temp + ", " + vol + top + "…»";
     }
@@ -406,6 +423,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _chosenTemp = _chosenVolume = 0f;
         _chosenToppings.Clear();
         _ingredientDecided = _machineDecided = _toppingDecided = false;
+        if (_pendingTopping != null) { _pendingTopping.SetPulsing(false); _pendingTopping = null; }
         _pending = null;
         _currentDrinkCost = 0;
         _orderReady = false;
@@ -443,18 +461,74 @@ public class CoffeeCraftingSystem : MonoBehaviour
         }
         else if (_stage == Stage.Toppings && item.kind == IngredientItem.ItemKind.Topping)
         {
-            if (!_chosenToppings.Contains(item.topping))
-            {
-                _chosenToppings.Add(item.topping);
-                Spend(_toppingCost);                 // пункт 5: списываем за топпинг
-            }
-            if (item.topping == _favoriteTopping) _favoriteAdded = true; // Батч 6: апселл
-            item.FlashSelected();
-            _cup?.DropTopping(item);
-            AudioController.Instance?.PlayStar();
-            StepFeedback(_target != null && item.topping == _target.topping, partial: true);
-            ShowButton(_serveButton);
+            SelectTopping(item);
         }
+    }
+
+    // ─── Топпинги: один слот, замена, подтверждение (списание только по кнопке) ──
+
+    private void SelectTopping(IngredientItem item)
+    {
+        // Повторный клик по уже выбранному — снять выбор (гость может остаться без топпинга).
+        if (_pendingTopping == item)
+        {
+            _pendingTopping.SetPulsing(false);
+            _pendingTopping = null;
+            if (_selectedText != null) _selectedText.gameObject.SetActive(false);
+            HideButton(_confirmButton);
+            AudioController.Instance?.PlayClick();
+            return;
+        }
+
+        // Один слот: снимаем прошлый выбор, подсвечиваем новый. Деньги НЕ списываем и в
+        // кружку НЕ кладём — только по кнопке «Подтвердить».
+        if (_pendingTopping != null) _pendingTopping.SetPulsing(false);
+        _pendingTopping = item;
+        item.SetPulsing(true);
+        if (_selectedText != null)
+        {
+            _selectedText.gameObject.SetActive(true);
+            _selectedText.text = Loc.T("Выбрано: ", "Selected: ") + ToppingName(item.topping);
+        }
+        ShowButton(_confirmButton);
+        AudioController.Instance?.PlayClick();
+    }
+
+    // Кнопка «Подтвердить» на текущем этапе (ингредиент или топпинг).
+    private void OnConfirmClicked()
+    {
+        if (_stage == Stage.Ingredients) OnConfirmIngredient();
+        else if (_stage == Stage.Toppings) OnConfirmTopping();
+    }
+
+    // Подтверждение выбранного топпинга: только ЗДЕСЬ списываем деньги и кладём в кружку.
+    private void OnConfirmTopping()
+    {
+        if (_stage != Stage.Toppings || _pendingTopping == null) return;
+
+        if (GameManager.Instance != null && GameManager.Instance.TotalCoins < _toppingCost)
+        {
+            if (_noMoneyPanel != null) _noMoneyPanel.SetActive(true);
+            return;
+        }
+
+        var item = _pendingTopping;
+        item.SetPulsing(false);
+        _pendingTopping = null;
+
+        _chosenToppings.Clear();                 // максимум ОДИН топпинг за напиток
+        _chosenToppings.Add(item.topping);
+        Spend(_toppingCost);                      // списываем ТОЛЬКО сейчас (пункт 5)
+        if (item.topping == _favoriteTopping) _favoriteAdded = true; // Батч 6: апселл
+
+        item.FlashSelected();
+        _cup?.DropTopping(item);
+        AudioController.Instance?.PlayStar();
+
+        if (_selectedText != null) _selectedText.gameObject.SetActive(false);
+        HideButton(_confirmButton);
+        StepFeedback(_target != null && item.topping == _target.topping, partial: true);
+        ShowButton(_serveButton);
     }
 
     // Подтверждение выбранного ингредиента (кнопка)

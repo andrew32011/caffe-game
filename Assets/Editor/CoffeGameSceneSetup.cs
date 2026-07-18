@@ -173,8 +173,10 @@ public static class CoffeGameSceneSetup
         var orderText = Text("OrderDisplayText", ct, "Заказ: ...", 30, TextAlignmentOptions.Center, new Vector2(0.28f, 0.865f), new Vector2(0.72f, 0.915f));
 
         // ── HUD «Заказ дня» (Батч 6, слева под кассой) ──────────────────────
-        var challengeHud = Text("DailyChallengeHud", ct, "", 20, TextAlignmentOptions.Left, new Vector2(0.02f, 0.83f), new Vector2(0.34f, 0.89f));
-        challengeHud.color = new Color(0.9f, 0.85f, 0.5f);
+        // Пункт 5: цель дня была слишком мелкой — крупнее и шире, чтобы читалась.
+        var challengeHud = Text("DailyChallengeHud", ct, "", 30, TextAlignmentOptions.Left, new Vector2(0.02f, 0.80f), new Vector2(0.40f, 0.89f));
+        challengeHud.color = new Color(0.95f, 0.88f, 0.5f);
+        challengeHud.enableWordWrapping = true;
 
         // ── Ачивка («Отлично!»/«В точку!») сверху ───────────────────────────
         var achievement = Text("AchievementText", ct, "В точку!", 48, TextAlignmentOptions.Center, new Vector2(0.25f, 0.72f), new Vector2(0.75f, 0.79f));
@@ -206,6 +208,11 @@ public static class CoffeGameSceneSetup
             .Ref("_heartSprite", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Mini UI/Icons/Heart.png"))
             .Ref("_font", UiFont())
             .Apply();
+
+        // ── Кнопка «Убрать рекламу» (пункт 5): постоянная покупка через YG2 Payments ─
+        // Компонент сам строит свою пульсирующую кнопку в углу; прячется, если куплено.
+        var adDisable = canvasGO.AddComponent<AdDisableButton>();
+        new W(adDisable).Ref("_font", UiFont()).Apply();
 
         // ── Панель машины: 2 вертикальных заполнения (температура, объём) ────
         var machinePanel = Panel("MachinePanel", ct, new Vector2(0.35f, 0.25f), new Vector2(0.65f, 0.75f), new Color(0.06f, 0.06f, 0.1f, 0.9f));
@@ -467,6 +474,9 @@ public static class CoffeGameSceneSetup
         var journalOpenBtn = IconBtn("BtnJournal", ct, "Assets/Mini UI/Icons/Book.png", "Журнал");
         SetRect(journalOpenBtn.GetComponent<RectTransform>(), new Vector2(0.905f, 0.76f), new Vector2(0.99f, 0.86f));
         Juice(journalOpenBtn, pulse: false);
+        // Пункт 5: бейдж «новые гости» с числом непросмотренных записей + пульсация.
+        var journalBadge = journalOpenBtn.gameObject.AddComponent<JournalBadge>();
+        new W(journalBadge).Ref("_font", UiFont()).Apply();
 
         var journalPanel = Panel("GuestJournalPanel", ct, new Vector2(0.2f, 0.12f), new Vector2(0.8f, 0.88f), new Color(0.05f, 0.06f, 0.12f, 0.98f));
         Text("GuestJournalTitle", journalPanel.transform, "Журнал гостей · Завсегдатаи", 32, TextAlignmentOptions.Top, new Vector2(0.05f, 0.9f), new Vector2(0.95f, 0.99f));
@@ -611,7 +621,9 @@ public static class CoffeGameSceneSetup
             .Ref("_commentText", commentText)
             .Ref("_noMoneyPanel", noMoneyPanel)
             .Ref("_heroObject", hero)
-            .Ref("_adHintButton", adHintBtn)
+            // Пункт 5: боковую верхне-правую кнопку-подсказку НЕ подключаем — она дублировала
+            // иконку подсказки в правом доке. Подсказки остаются в панели подсказок, а
+            // пульсирующая иконка «Подсказка» служит мягким призывом ими пользоваться.
             .Ref("_complimentButton", complimentBtn) // пункт 2: комплимент за монеты
             .Apply();
 
@@ -850,21 +862,9 @@ public static class CoffeGameSceneSetup
         Debug.Log($"CoffeGameSetup: топпингов (дети {parentName}): {i}");
     }
 
-    // Топпинг по имени модели-предмета на полке (Food Pack). Не распознан → None.
-    static Topping ToppingByName(string objName)
-    {
-        string n = objName.ToLower();
-        if (n.Contains("bell pepper") || n.Contains("pepper")) return Topping.BellPepper;
-        if (n.Contains("bundt") || n.Contains("cake"))         return Topping.BundtCake;
-        if (n.Contains("cookie"))                              return Topping.Cookies;
-        if (n.Contains("salami"))                              return Topping.Salami;
-        if (n.Contains("salmon"))                              return Topping.Salmon;
-        if (n.Contains("wasabi"))                              return Topping.Wasabi;
-        if (n.Contains("lollipop") || n.Contains("swirl"))     return Topping.Lollipop;
-        if (n.Contains("tomato"))                              return Topping.Tomato;
-        if (n.Contains("pretzel"))                             return Topping.Pretzel;
-        return Topping.None;
-    }
+    // Топпинг по имени модели-предмета на полке (Food Pack). Единый источник привязки —
+    // тот же ToppingUtil, что и рантайм IngredientItem (чтобы не расходились).
+    static Topping ToppingByName(string objName) => ToppingUtil.FromObjectName(objName);
 
     // Убирает парящую подпись над объектом, если осталась от прошлой версии (пункт 2)
     static void RemoveWorldLabel(GameObject go)
@@ -1597,6 +1597,77 @@ public static class CoffeGameSceneSetup
                      as UnityEngine.Events.UnityAction;
         if (action != null)
             UnityEditor.Events.UnityEventTools.AddPersistentListener(btn.onClick, action);
+    }
+
+    // ─── Сборка сцены сна (пункт 4) ──────────────────────────────────────────────
+    // Вешает SleepSceneController на сцену со спящим ГГ (эффекты/текст/UI контроллер
+    // строит сам в рантайме), назначает ночной звук и шрифт, добавляет обе сцены в
+    // Build Settings (нужно для перехода MainScene ↔ Sleepy scene по имени).
+    [MenuItem("Tools/CoffeGame/Build Sleep Scene")]
+    public static void BuildSleepScene()
+    {
+        const string scenePath = "Assets/Scenes/Sleepy scene.unity";
+        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) == null)
+        {
+            Debug.LogError($"CoffeGameSetup: не найдена сцена {scenePath}.");
+            return;
+        }
+
+        string prevPath = EditorSceneManager.GetActiveScene().path;
+        var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+
+        var go = GameObject.Find("SleepController");
+        if (go == null) go = new GameObject("SleepController");
+        var ctrl = go.GetComponent<SleepSceneController>();
+        if (ctrl == null) ctrl = go.AddComponent<SleepSceneController>();
+
+        var nightClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/night_ambience.mp3");
+        var font      = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/ofont.ru_Nunito SDF.asset");
+        if (nightClip == null) Debug.LogWarning("CoffeGameSetup: не найден Assets/Audio/night_ambience.mp3 — сон будет без звука.");
+        if (font == null)      Debug.LogWarning("CoffeGameSetup: не найден шрифт Nunito SDF — текст сна на стандартном шрифте.");
+
+        var so = new SerializedObject(ctrl);
+        if (nightClip != null) so.FindProperty("_nightClip").objectReferenceValue = nightClip;
+        if (font != null)      so.FindProperty("_font").objectReferenceValue      = font;
+        var mainProp = so.FindProperty("_mainSceneName");
+        if (mainProp != null) mainProp.stringValue = "MainScene";
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+
+        RegisterScenesInBuildSettings();
+
+        Debug.Log("CoffeGameSetup: сцена сна собрана (SleepController + ночной звук + шрифт), сцены добавлены в Build Settings.");
+
+        if (!string.IsNullOrEmpty(prevPath) && prevPath != scenePath)
+            EditorSceneManager.OpenScene(prevPath, OpenSceneMode.Single);
+    }
+
+    // Регистрирует MainScene и сцену сна в Build Settings (для LoadScene по имени).
+    static void RegisterScenesInBuildSettings()
+    {
+        string[] wanted =
+        {
+            "Assets/Scenes/MainScene.unity",
+            "Assets/Scenes/Sleepy scene.unity",
+        };
+        var list = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+        bool changed = false;
+        foreach (var path in wanted)
+        {
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(path) == null)
+            {
+                Debug.LogWarning($"CoffeGameSetup: сцена не найдена в Build Settings: {path}");
+                continue;
+            }
+            if (!list.Exists(s => s.path == path))
+            {
+                list.Add(new EditorBuildSettingsScene(path, true));
+                changed = true;
+            }
+        }
+        if (changed) EditorBuildSettings.scenes = list.ToArray();
     }
 }
 #endif

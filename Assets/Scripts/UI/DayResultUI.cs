@@ -118,8 +118,8 @@ public class DayResultUI : MonoBehaviour
             bool warn = streak >= 3;
             _streakWarningText.gameObject.SetActive(warn);
             if (warn)
-                _streakWarningText.text = Loc.T($"Стрик входа: {streak} дней Загляни завтра — иначе сгорит!",
-                                                $"Login streak: {streak} days Come back tomorrow or lose it!");
+                _streakWarningText.text = Loc.T($"Заходишь {streak} дней подряд Загляни завтра — иначе награда сгорит!",
+                                                $"You've visited {streak} days in a row Come back tomorrow or the reward is lost!");
         }
 
         // ×2 за рекламу: доступно только если за день заработано > 0 (Батч 2).
@@ -158,7 +158,114 @@ public class DayResultUI : MonoBehaviour
         }
 
         _resultPanel?.SetActive(true);
+        _shopAutoOpened = false; // пункт 5: заново акцентируем магазин на каждом экране итогов
+        EmphasizeShop();         // пульс + бейдж «сколько апгрейдов по карману» + автооткрытие
         StartCoroutine(FadeIn());
+    }
+
+    // ─── Пункт 5: акцент на улучшении кофейни ────────────────────────────────────
+    // Кнопка магазина пульсирует и показывает бейдж с числом доступных по деньгам
+    // апгрейдов; если что-то по карману — магазин сам открывается (не спрятан за кнопкой).
+
+    private bool _shopAutoOpened;
+    private Coroutine _shopPulseCo;
+    private TextMeshProUGUI _shopBadgeText;
+    private GameObject _shopBadge;
+
+    private int AffordableUpgrades()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null) return 0;
+        int n = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            int cost = gm.GetUpgradeCost((UpgradeType)i);
+            if (cost >= 0 && gm.TotalCoins >= cost) n++;
+        }
+        return n;
+    }
+
+    private void EmphasizeShop()
+    {
+        if (_btnShop == null) return;
+        int affordable = AffordableUpgrades();
+
+        EnsureShopBadge();
+        if (_shopBadge != null)
+        {
+            _shopBadge.SetActive(affordable > 0);
+            if (affordable > 0 && _shopBadgeText != null) _shopBadgeText.text = affordable.ToString();
+        }
+
+        if (affordable > 0) StartShopPulse();
+        else                StopShopPulse();
+
+        // Автооткрытие: если есть что купить — открываем магазин после появления экрана.
+        if (affordable > 0 && !_shopAutoOpened)
+        {
+            _shopAutoOpened = true;
+            StartCoroutine(AutoOpenShopSoon());
+        }
+    }
+
+    private IEnumerator AutoOpenShopSoon()
+    {
+        yield return new WaitForSecondsRealtime(0.6f);
+        if (IsShowing) _upgradeShop?.Open();
+    }
+
+    private void EnsureShopBadge()
+    {
+        if (_shopBadge != null || _btnShop == null) return;
+
+        _shopBadge = new GameObject("ShopBadge", typeof(RectTransform), typeof(Image));
+        _shopBadge.transform.SetParent(_btnShop.transform, false);
+        var rt = (RectTransform)_shopBadge.transform;
+        rt.anchorMin = rt.anchorMax = new Vector2(1f, 1f);
+        rt.sizeDelta = new Vector2(46, 46);
+        rt.anchoredPosition = new Vector2(6f, 6f);
+        var img = _shopBadge.GetComponent<Image>();
+        img.color = new Color(0.9f, 0.2f, 0.2f, 1f);
+        img.raycastTarget = false;
+
+        var txtGo = new GameObject("Count", typeof(RectTransform), typeof(TextMeshProUGUI));
+        txtGo.transform.SetParent(_shopBadge.transform, false);
+        var trt = (RectTransform)txtGo.transform;
+        trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+        trt.offsetMin = Vector2.zero; trt.offsetMax = Vector2.zero;
+        _shopBadgeText = txtGo.GetComponent<TextMeshProUGUI>();
+        if (_dayNumberText != null && _dayNumberText.font != null) _shopBadgeText.font = _dayNumberText.font;
+        _shopBadgeText.fontSize = 26;
+        _shopBadgeText.fontStyle = FontStyles.Bold;
+        _shopBadgeText.alignment = TextAlignmentOptions.Center;
+        _shopBadgeText.color = Color.white;
+        _shopBadgeText.raycastTarget = false;
+    }
+
+    private void StartShopPulse()
+    {
+        StopShopPulse();
+        if (_btnShop != null && _btnShop.gameObject.activeInHierarchy)
+            _shopPulseCo = StartCoroutine(ShopPulseRoutine());
+    }
+
+    private void StopShopPulse()
+    {
+        if (_shopPulseCo != null) { StopCoroutine(_shopPulseCo); _shopPulseCo = null; }
+        if (_btnShop != null) _btnShop.transform.localScale = Vector3.one;
+    }
+
+    private IEnumerator ShopPulseRoutine()
+    {
+        Transform tr = _btnShop.transform;
+        float t = 0f;
+        while (true)
+        {
+            t += Time.unscaledDeltaTime * 3f;
+            float s = 1f + 0.07f * Mathf.Sin(t);
+            tr.localScale = new Vector3(s, s, 1f);
+            yield return null;
+        }
     }
 
     private void OnSaveComboClicked()
@@ -326,6 +433,7 @@ public class DayResultUI : MonoBehaviour
     private IEnumerator FadeOutAndClose()
     {
         StopDoublePulse();
+        StopShopPulse();
 
         if (_canvasGroup != null)
         {

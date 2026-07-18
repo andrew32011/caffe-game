@@ -80,6 +80,39 @@ public enum Topping
     Pretzel      // Крендель          (Pretzel)
 }
 
+/// <summary>
+/// Единый источник привязки «модель на полке → топпинг». Используется И рантайм-компонентом
+/// IngredientItem, И билдером сцены — чтобы кликнутая модель ВСЕГДА соответствовала одному и
+/// тому же топпингу (иначе «салями» превращалась в рыбу и менялась случайно каждый раз).
+/// </summary>
+public static class ToppingUtil
+{
+    /// <summary>Топпинг по имени модели (Food Pack). Не распознан → None.</summary>
+    public static Topping FromObjectName(string objName)
+    {
+        if (string.IsNullOrEmpty(objName)) return Topping.None;
+        string n = objName.ToLowerInvariant();
+        if (n.Contains("bell pepper") || n.Contains("pepper")) return Topping.BellPepper;
+        if (n.Contains("bundt") || n.Contains("cake"))         return Topping.BundtCake;
+        if (n.Contains("cookie"))                              return Topping.Cookies;
+        if (n.Contains("salami"))                              return Topping.Salami;
+        if (n.Contains("salmon"))                              return Topping.Salmon;
+        if (n.Contains("wasabi"))                              return Topping.Wasabi;
+        if (n.Contains("lollipop") || n.Contains("swirl"))     return Topping.Lollipop;
+        if (n.Contains("tomato"))                              return Topping.Tomato;
+        if (n.Contains("pretzel"))                             return Topping.Pretzel;
+        return Topping.None;
+    }
+
+    /// <summary>Реальные топпинги на полке (без None) — из них берём случайные заказы,
+    /// чтобы гость никогда не просил то, чего на полке нет.</summary>
+    public static readonly Topping[] ShelfToppings =
+    {
+        Topping.BellPepper, Topping.BundtCake, Topping.Cookies, Topping.Salami,
+        Topping.Salmon, Topping.Wasabi, Topping.Lollipop, Topping.Tomato, Topping.Pretzel
+    };
+}
+
 // ─── Апгрейды кофейни (Батч 3) ─────────────────────────────────────────────────
 
 public enum UpgradeType

@@ -40,6 +40,13 @@ public class GuestJournalUI : MonoBehaviour
     {
         Rebuild();
         if (_panel != null) _panel.SetActive(true);
+
+        // Пункт 5: игрок увидел журнал — сбрасываем бейдж «новые гости».
+        if (GameManager.Instance != null && YG.YG2.saves != null)
+        {
+            YG.YG2.saves.journalSeenCount = GameManager.Instance.JournalKeys.Count;
+            GameManager.Instance.SaveGame();
+        }
     }
 
     public void Close()

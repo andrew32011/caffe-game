@@ -53,6 +53,17 @@ public class GameManager : MonoBehaviour
     // Прогресс хранится в облачном сейве Яндекс Игр (YG2.saves). Поля — в SavesYG.Game.cs.
     private SavesYG _saveData => YG2.saves;
 
+    // Разовые на СЕССИЮ. Статики переживают SceneManager.LoadScene (домен не перезагружается),
+    // а сцена сна перезагружает MainScene каждый день — поэтому обучение, ежедневный бонус и
+    // GameReadyAPI выполняем только на ПЕРВОМ входе в сессию, а не на каждом дне.
+    private static bool _sessionReadyCalled;
+    private static bool _sessionInitDone;
+
+    // Имя сцены сна (полная смена сцены между днями).
+    private const string SleepSceneName = "Sleepy scene";
+    private static bool SleepSceneAvailable()
+        => Application.CanStreamedLevelBeLoaded(SleepSceneName);
+
     // ─── Публичные свойства ───────────────────────────────────────────────────
 
     public GamePhase    CurrentPhase  => _currentPhase;
@@ -121,20 +132,31 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => YG2.isSDKEnabled);
         LoadGame();
         _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume); // Батч 4
-        YG2.GameReadyAPI();                  // 1.19.2: игрок может начинать
+        if (!_sessionReadyCalled)            // 1.19.2: игрок может начинать (один раз за сессию)
+        {
+            YG2.GameReadyAPI();
+            _sessionReadyCalled = true;
+        }
         yield return new WaitForSeconds(0.2f); // Ждём инициализации всех систем
 
-        if (_forceTutorial || !_saveData.tutorialDone)
+        // Обучение и ежедневный бонус — только на ПЕРВОМ входе в сессию. При возврате из
+        // сцены сна MainScene перезагружается, но повторять их не нужно — сразу к дню.
+        if (!_sessionInitDone)
         {
-            yield return StartCoroutine(RunTutorial());
+            if (_forceTutorial || !_saveData.tutorialDone)
+            {
+                yield return StartCoroutine(RunTutorial());
 
-            // Затемнение между обучением и первым днём (пункт 5)
-            yield return StartCoroutine(Transition());
+                // Затемнение между обучением и первым днём (пункт 5)
+                yield return StartCoroutine(Transition());
+            }
+
+            // Батч 2: ежедневный бонус за вход (если сегодня ещё не получали).
+            if (_dailyBonus != null)
+                yield return StartCoroutine(_dailyBonus.RunIfDue());
+
+            _sessionInitDone = true;
         }
-
-        // Батч 2: ежедневный бонус за вход (если сегодня ещё не получали).
-        if (_dailyBonus != null)
-            yield return StartCoroutine(_dailyBonus.RunIfDue());
 
         yield return StartCoroutine(RunGameDays());
     }
@@ -282,6 +304,8 @@ public class GameManager : MonoBehaviour
     /// <summary>Показ межстраничной рекламы и ожидание её закрытия (если модуль установлен).</summary>
     private IEnumerator ShowInterstitial()
     {
+        // Куплено отключение рекламы (YG2 Payments, навсегда) — не показываем.
+        if (_saveData != null && _saveData.adsDisabled) yield break;
 #if InterstitialAdv_yg
         YG2.InterstitialAdvShow();
         yield return new WaitUntil(() => !YG2.nowInterAdv);
@@ -380,25 +404,13 @@ public class GameManager : MonoBehaviour
                     _dialogue));
             }
 
-            // ─── «Сон» в конце каждого дня (пункт 8): тусклый свет + эффекты + текст ─
-            if (day < 40 && _vfxController != null)
-            {
-                _currentPhase = GamePhase.StoryVignette;
-                yield return StartCoroutine(PlayDreamVignette(day));
-            }
-
-            // Музыку НЕ возвращаем здесь: сначала реклама на переходе (ниже), и лишь
-            // после неё — фоновая музыка нового дня (порядок: сон → реклама → музыка).
-
-            // Батч 6: тизер «Особого гостя» накануне (пик вовлечения → мотив вернуться завтра).
+            // Батч 6: тизер «Особого гостя» накануне (перед сном, ещё в MainScene).
             if (day < 40 && DayController.IsSpecialDay(day + 1) && _dialogue != null)
             {
                 _dialogue.ShowMessage(
                     Loc.T("Завтра придёт кто-то особенный…", "Someone special is coming tomorrow…"), 2.5f);
                 yield return new WaitForSeconds(2f);
             }
-
-            // Реклама теперь показывается на каждом переходе — внутри Transition() (пункт 4).
 
             // ─── Переход к следующему дню ────────────────────────────────────
             _saveData.currentDay++;
@@ -408,10 +420,28 @@ public class GameManager : MonoBehaviour
             if (_saveData.currentDay > 40)
                 break;
 
-            // Затемнение между днями (пункт 5). Реклама показывается ВНУТРИ Transition.
-            yield return StartCoroutine(Transition());
+            // ─── «Сон» между днями теперь в ОТДЕЛЬНОЙ сцене (Sleepy scene) ───
+            // Порядок (пункт 4): итоги+магазин здесь → сцена сна (эффекты+текст+ночной
+            // звук) → реклама (в сцене сна) → возврат в MainScene на новый день.
+            // MainScene перезагрузится и продолжит игру с сохранённого currentDay.
+            if (day < 40 && SleepSceneAvailable())
+            {
+                _saveData.sleepFromDay = day;   // для текста/эффекта сна
+                SaveGame();
+                if (_vfxController != null)
+                    yield return StartCoroutine(_vfxController.FadeScreen(true, 0.6f));
+                UnityEngine.SceneManagement.SceneManager.LoadScene(SleepSceneName);
+                yield break; // управление уходит в сцену сна
+            }
 
-            // Реклама после сна уже прошла — теперь возвращаем фоновую музыку нового дня.
+            // Запасной путь, если сцена сна не добавлена в Build Settings: старый оверлей
+            // сна прямо в MainScene + реклама на переходе (порядок: сон → реклама → музыка).
+            if (day < 40 && _vfxController != null)
+            {
+                _currentPhase = GamePhase.StoryVignette;
+                yield return StartCoroutine(PlayDreamVignette(day));
+            }
+            yield return StartCoroutine(Transition());
             _audioController?.ResumeMusic();
         }
 

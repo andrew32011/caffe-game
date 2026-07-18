@@ -1598,7 +1598,8 @@ public class StoryDatabase : ScriptableObject
         CoffeeType[] types     = (CoffeeType[])System.Enum.GetValues(typeof(CoffeeType));
         Volume[]     volumes   = (Volume[])System.Enum.GetValues(typeof(Volume));
         SweetnessLevel[] sweets= (SweetnessLevel[])System.Enum.GetValues(typeof(SweetnessLevel));
-        Topping[]    toppings  = (Topping[])System.Enum.GetValues(typeof(Topping));
+        // Только реальные топпинги полки (без None) — гость не попросит того, чего нет.
+        Topping[]    toppings  = ToppingUtil.ShelfToppings;
 
         // Пул шуток-мемов про кофейни (пункт 6): тасуем и выдаём без повторов,
         // часть гостей оставляем без шуток. Шутки — только завсегдатаям, чтобы не
