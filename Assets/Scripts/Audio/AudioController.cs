@@ -31,6 +31,10 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioClip _correctOrderSound; // Правильный заказ
     [SerializeField] private AudioClip _customerInSound;   // Гость входит
 
+    [Header("Ночная атмосфера (сон между днями, пункт 7)")]
+    [SerializeField] private AudioClip _nightAmbience;     // «Шёпот призраков» на стадии сна
+    private AudioSource _nightSource;                      // отдельный зацикленный источник
+
     [Header("Клипы — сочность (Батч 1; можно оставить пустыми — игра не упадёт)")]
     [SerializeField] private AudioClip _pourSound;         // Налив ингредиента
     [SerializeField] private AudioClip _serveDingSound;    // Подача напитка (динь)
@@ -52,6 +56,12 @@ public class AudioController : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(this); return; }
         Instance = this;
+
+        // Отдельный зацикленный источник для ночной атмосферы (создаём в коде,
+        // чтобы не требовать ручной привязки в билдере).
+        _nightSource = gameObject.AddComponent<AudioSource>();
+        _nightSource.loop        = true;
+        _nightSource.playOnAwake = false;
     }
 
     private void Start()
@@ -141,6 +151,23 @@ public class AudioController : MonoBehaviour
 
     public void PauseMusic()  { if (_musicSource != null && _musicSource.isPlaying) _musicSource.Pause(); }
     public void ResumeMusic() { if (_musicSource != null && _musicSource.clip != null && !_isMuted) _musicSource.UnPause(); }
+
+    // ─── Ночная атмосфера (пункт 7): звучит на «сне», глохнет до рекламы ───────
+
+    /// <summary>Включает зацикленный ночной эмбиент (если клип задан). Громкость — по SFX.</summary>
+    public void PlayNight()
+    {
+        if (_nightSource == null || _nightAmbience == null) return;
+        _nightSource.clip   = _nightAmbience;
+        _nightSource.volume = Mathf.Clamp01(_sfxVolume * 0.9f);
+        _nightSource.Play();
+    }
+
+    /// <summary>Останавливает ночной эмбиент (на пробуждении, перед показом рекламы).</summary>
+    public void StopNight()
+    {
+        if (_nightSource != null && _nightSource.isPlaying) _nightSource.Stop();
+    }
 
     // ─── Игровые события (приоритет — клип из банка, иначе запасной) ───────────
 

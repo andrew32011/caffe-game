@@ -49,11 +49,34 @@ public class TutorialController : MonoBehaviour
 
     private List<GameObject> _activeHighlights = new List<GameObject>();
 
+    // Пункт 6: на обучении прячем все кнопки HUD, КРОМЕ настроек (журнал, подсказка).
+    // Ищем по именам из билдера; на пробуждении/финале возвращаем.
+    private static readonly string[] HideButtonNames = { "BtnJournal", "BtnHint" };
+    private readonly List<GameObject> _hiddenButtons = new List<GameObject>();
+
+    private void HideHudButtons()
+    {
+        foreach (var n in HideButtonNames)
+        {
+            var go = GameObject.Find(n);
+            if (go != null && go.activeSelf) { go.SetActive(false); _hiddenButtons.Add(go); }
+        }
+    }
+
+    private void RestoreHudButtons()
+    {
+        foreach (var go in _hiddenButtons) if (go != null) go.SetActive(true);
+        _hiddenButtons.Clear();
+    }
+
     // ─── Публичное API ───────────────────────────────────────────────────────
 
     /// <summary>Запускает полный туториал. Awaitable.</summary>
     public IEnumerator RunTutorial()
     {
+        // Пункт 6: прячем кнопки HUD (кроме настроек) на всё время обучения.
+        HideHudButtons();
+
         // Если шаги не настроены в инспекторе — используем дефолтные
         if (_steps.Count == 0)
             BuildDefaultSteps();
@@ -112,6 +135,9 @@ public class TutorialController : MonoBehaviour
             }
         };
         yield return StartCoroutine(_dialogue.PlayDialogueLines(finalLines));
+
+        // Обучение завершено — возвращаем кнопки HUD (журнал, подсказка).
+        RestoreHudButtons();
     }
 
     // ─── Практика: ведём игрока, подсвечивая нужный предмет ───────────────────
@@ -245,8 +271,8 @@ public class TutorialController : MonoBehaviour
             new TutorialStep
             {
                 speakerName    = master,
-                text           = Loc.T("И последнее — топпинги! Можно добавить сливки, корицу или карамель. Если гость не просил — выбери «Без топпинга».",
-                                       "And finally — toppings! You can add cream, cinnamon or caramel. If the guest didn't ask — pick \"No topping\"."),
+                text           = Loc.T("И последнее — топпинги на полке! Можно добавить, например, печенье, кекс или леденец. Название топпинга гость назовёт сам. Если не просил — можно обойтись без топпинга.",
+                                       "And finally — the toppings on the shelf! You can add, say, cookies, a bundt cake or a lollipop. The guest will name the topping themselves. If they didn't ask — you can skip it."),
                 highlightObject= _toppingsZoneObject,
                 stageIndex = 4
             },
@@ -261,8 +287,8 @@ public class TutorialController : MonoBehaviour
             new TutorialStep
             {
                 speakerName = master,
-                text        = Loc.T("Три ошибки за день — и день придётся начать заново. Будь внимательна! И помни: если совсем не понятно — можно взять подсказку (кнопка снизу).",
-                                    "Three mistakes in a day — and the day starts over. Stay sharp! And remember: if you're lost, you can take a hint (button at the bottom)."),
+                text        = Loc.T("Три ошибки за день — и день придётся начать заново. Будь внимательна! А со следующего дня, если что-то непонятно, тебе поможет кнопка подсказки.",
+                                    "Three mistakes in a day — and the day starts over. Stay sharp! And from the next day on, if something's unclear, the hint button will help you."),
                 stageIndex = 1
             }
         };

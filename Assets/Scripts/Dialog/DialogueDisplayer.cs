@@ -35,9 +35,10 @@ public class DialogueDisplayer : MonoBehaviour
     public TextMeshProUGUI messageText;
     public CanvasGroup messageGroup;
 
-    [Header("Печать текста")]
-    public float typewriterSpeed = 35f;   // Символов в секунду
+    [Header("Показ текста")]
+    public float revealDuration = 3f;     // За сколько секунд появляется вся реплика (по словам)
     public float autoAdvanceDelay = 0f;   // 0 = ждём клик
+    public float advanceGuard = 0.35f;    // Пауза перед приёмом клика «дальше» (защита от быстрого скипа)
 
     [Header("References")]
     public DialogueManager manager;       // База реплик по ID (старая система)
@@ -157,28 +158,24 @@ public class DialogueDisplayer : MonoBehaviour
         if (playSpeech && speechMixer != null)
             speechMixer.PlayRandomFragment();
 
-        // Печатная машинка
-        int charIndex = 0;
-        float interval = 1f / Mathf.Max(1f, typewriterSpeed);
+        // Появление ПО СЛОВАМ за ~revealDuration секунд (не мгновенно, не посимвольно).
+        string[] words = string.IsNullOrEmpty(text) ? new string[0] : text.Split(' ');
+        float perWord = Mathf.Max(0.03f, revealDuration / Mathf.Max(1, words.Length));
 
-        while (charIndex < text.Length)
+        for (int w = 1; w <= words.Length; w++)
         {
-            if (_clickedToSkip)
-            {
-                SetDialogueText(text);
-                break;
-            }
-
-            charIndex++;
-            SetDialogueText(text.Substring(0, charIndex));
-            yield return new WaitForSeconds(interval);
+            if (_clickedToSkip) break;                 // первый клик — показать сразу всю реплику
+            SetDialogueText(string.Join(" ", words, 0, w));
+            yield return new WaitForSeconds(perWord);
         }
-
+        SetDialogueText(text);
         _isTyping = false;
 
-        // Ждём клика (или авто-переход)
+        // Защита от «быстрого проскока»: короткая пауза, пока клик «дальше» не принимается.
         if (continueHint != null) continueHint.SetActive(true);
+        if (advanceGuard > 0f) yield return new WaitForSeconds(advanceGuard);
 
+        // Ждём клика (или авто-переход)
         if (autoAdvanceDelay > 0f)
         {
             yield return new WaitForSeconds(autoAdvanceDelay);

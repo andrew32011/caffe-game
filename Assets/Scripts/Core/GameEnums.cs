@@ -64,14 +64,20 @@ public enum SweetnessLevel
     High    // Очень сладкий
 }
 
+// Топпинги = реальные модели-предметы на полке ShelfItems (Food Pack), самоопознаваемы по виду.
+// Порядок/имена соответствуют объектам сцены; привязка в билдере — по имени модели.
 public enum Topping
 {
-    None,       // Без топпинга
-    Cream,      // Сливки
-    Cinnamon,   // Корица
-    Caramel,    // Карамель
-    Chocolate,  // Шоколад
-    Mint        // Мята
+    None,        // Без топпинга
+    BellPepper,  // Болгарский перец  (Bell pepper green)
+    BundtCake,   // Кекс              (Bundt Cake cut)
+    Cookies,     // Печенье           (Cookies)
+    Salami,      // Салями            (Salami cut A)
+    Salmon,      // Лосось            (Salmon)
+    Wasabi,      // Васаби            (Wasabi)
+    Lollipop,    // Леденец           (Swirl lollipop C)
+    Tomato,      // Помидор           (Tomato)
+    Pretzel      // Крендель          (Pretzel)
 }
 
 // ─── Апгрейды кофейни (Батч 3) ─────────────────────────────────────────────────
@@ -184,12 +190,16 @@ public class CoffeeOrder
 
     public string GetToppingName() => topping switch
     {
-        Topping.Cream     => Loc.T("Сливки", "Cream"),
-        Topping.Cinnamon  => Loc.T("Корица", "Cinnamon"),
-        Topping.Caramel   => Loc.T("Карамель", "Caramel"),
-        Topping.Chocolate => Loc.T("Шоколад", "Chocolate"),
-        Topping.Mint      => Loc.T("Мята", "Mint"),
-        _                 => ""
+        Topping.BellPepper => Loc.T("Болгарский перец", "Bell pepper"),
+        Topping.BundtCake  => Loc.T("Кекс", "Bundt cake"),
+        Topping.Cookies    => Loc.T("Печенье", "Cookies"),
+        Topping.Salami     => Loc.T("Салями", "Salami"),
+        Topping.Salmon     => Loc.T("Лосось", "Salmon"),
+        Topping.Wasabi     => Loc.T("Васаби", "Wasabi"),
+        Topping.Lollipop   => Loc.T("Леденец", "Lollipop"),
+        Topping.Tomato     => Loc.T("Помидор", "Tomato"),
+        Topping.Pretzel    => Loc.T("Крендель", "Pretzel"),
+        _                  => ""
     };
 }
 

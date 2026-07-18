@@ -96,8 +96,8 @@ public class DayController : MonoBehaviour
         if (special)
         {
             _dialogue?.ShowMessage(
-                Loc.T("★ Сегодня — Особый гость! Ставка выше, но заказ капризнее.",
-                      "★ A Special Guest today! Higher pay, but a pickier order."), 2.8f);
+                Loc.T("Сегодня — Особый гость! Ставка выше, но заказ капризнее.",
+                      "A Special Guest today! Higher pay, but a pickier order."), 2.8f);
             yield return new WaitForSeconds(1.5f);
         }
 
@@ -231,7 +231,7 @@ public class DayController : MonoBehaviour
         yield return StartCoroutine(
             _craftingSystem.HandCupToCustomer(_customerController.CurrentCustomer));
 
-        // Батч 1 (сочность): оценка напитка 1–3⭐ + празднование + динь/идеально.
+        // Батч 1 (сочность): оценка напитка 1–3+ празднование + динь/идеально.
         int stars = result >= 0.8f ? 3 : result >= 0.5f ? 2 : 1;
         AudioController.Instance?.PlayServeDing();
         if (stars == 3) AudioController.Instance?.PlayPerfect();
@@ -327,8 +327,8 @@ public class DayController : MonoBehaviour
 
         string msg = null;
         if (didPerfect && gm.MarkTipShown("tip_perfect"))
-            msg = Loc.T("Точно в центр — оплата ×1.1! Стремись к «✨ Идеально».",
-                        "Dead center — pay ×1.1! Aim for ✨ Perfect.");
+            msg = Loc.T("Точно в центр — оплата ×1.1! Стремись к «Идеально».",
+                        "Dead center — pay ×1.1! Aim for Perfect.");
         else if (regularVisit && gm.MarkTipShown("tip_regular"))
             msg = Loc.T("Это завсегдатай. Радуй его — растут симпатия и чаевые (журнал гостей).",
                         "A regular. Please them — sympathy and tips grow (guest journal).");

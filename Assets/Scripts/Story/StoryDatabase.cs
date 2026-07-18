@@ -690,7 +690,7 @@ public class StoryDatabase : ScriptableObject
                 new DayCustomerEntry
                 {
                     characterType = CharacterType.CrystalSinger, stickmanIndex = 6,
-                    order = Order(CoffeeType.Latte, Volume.Medium, SweetnessLevel.Medium, Topping.Cinnamon),
+                    order = Order(CoffeeType.Latte, Volume.Medium, SweetnessLevel.Medium, Topping.BundtCake),
                     greetingLines = L(
                         ("Мира",                    "(К Кристаллической певице.) Вы чувствуете вибрации миров. Где находится «место трёх теней»?",
                                                     "(To the Crystal Singer.) You feel the vibrations of the worlds. Where is the 'place of three shadows'?"),
@@ -698,8 +698,8 @@ public class StoryDatabase : ScriptableObject
                                                     "I have heard the stones sing of it. It is the old observatory on the Border Cliff. But its door opens only to the sound of a forgotten melody. One passed down within a family.")
                     ),
                     wrongOrderLines = L(
-                        ("Кристаллическая певица",   "Латте с корицей. Камни любят тепло и пряности.",
-                                                    "A latte with cinnamon. Stones love warmth and spice.")
+                        ("Кристаллическая певица",   "Латте с кексом. Камни любят тепло и что-то сытное.",
+                                                    "A latte with a bundt cake. Stones love warmth and something hearty.")
                     ),
                     storyRevealLines = L(
                         ("Мира",                    "(Вспоминает колыбельную, которую пел отец. Напевает её.)",
@@ -932,16 +932,16 @@ public class StoryDatabase : ScriptableObject
                 new DayCustomerEntry
                 {
                     characterType = CharacterType.Beekeeper, stickmanIndex = 5,
-                    order = Order(CoffeeType.GreenTea, Volume.Medium, SweetnessLevel.High, Topping.Caramel),
+                    order = Order(CoffeeType.GreenTea, Volume.Medium, SweetnessLevel.High, Topping.Lollipop),
                     greetingLines = L(
-                        ("Пасечник",   "Зелёный, послаще, и с карамелью. Сладкое к сладкому.",
-                                       "Green tea, sweeter, with caramel. Sweet to sweet."),
+                        ("Пасечник",   "Зелёный, послаще, и с леденцом. Сладкое к сладкому.",
+                                       "Green tea, sweeter, with a lollipop. Sweet to sweet."),
                         ("Мира",       "У вас руки пахнут воском.",
                                        "Your hands smell of beeswax.")
                     ),
                     wrongOrderLines = L(
-                        ("Пасечник",   "Зелёный чай, очень сладкий, с карамелью.",
-                                       "Green tea, very sweet, with caramel.")
+                        ("Пасечник",   "Зелёный чай, очень сладкий, с леденцом.",
+                                       "Green tea, very sweet, with a lollipop.")
                     ),
                     storyRevealLines = L(
                         ("Пасечник",   "(Ставит баночку мёда.) Капни в чай тому, кому не веришь. Солжёт — мёд загустеет до камня. Тише лунного серебра, а правды в нём не меньше.",
@@ -1236,16 +1236,16 @@ public class StoryDatabase : ScriptableObject
                 new DayCustomerEntry
                 {
                     characterType = CharacterType.Grandmother, stickmanIndex = 5,
-                    order = Order(CoffeeType.HerbalTea, Volume.Small, SweetnessLevel.Low, Topping.Cinnamon),
+                    order = Order(CoffeeType.HerbalTea, Volume.Small, SweetnessLevel.Low, Topping.Cookies),
                     greetingLines = L(
-                        ("Бабушка", "Маленький травяной, чуть сладкий, с корицей. Как варила твоя мать. Я узнала бы этот запах где угодно.",
-                                    "A small herbal, a touch sweet, with cinnamon. The way your mother made it. I'd know that scent anywhere."),
+                        ("Бабушка", "Маленький травяной, чуть сладкий, с печеньем. Как варила твоя мать. Я узнала бы этот запах где угодно.",
+                                    "A small herbal, a touch sweet, with cookies. The way your mother made it. I'd know that scent anywhere."),
                         ("Мира",    "Вы… знали мою мать?",
                                     "You… knew my mother?")
                     ),
                     wrongOrderLines = L(
-                        ("Бабушка", "Маленький травяной, слегка сладкий, с корицей. Дитя, ты должна это помнить.",
-                                    "A small herbal, lightly sweet, with cinnamon. Child, you ought to remember this.")
+                        ("Бабушка", "Маленький травяной, слегка сладкий, с печеньем. Дитя, ты должна это помнить.",
+                                    "A small herbal, lightly sweet, with cookies. Child, you ought to remember this.")
                     ),
                     storyRevealLines = L(
                         ("Бабушка", "Твой род — Хранители Границ. Песня — ваша кровь, не выученное ремесло. Орден забрал Кая, чтобы выманить тебя: ты сильнее, чем думаешь. Пой смело.",
@@ -1438,16 +1438,16 @@ public class StoryDatabase : ScriptableObject
                 new DayCustomerEntry
                 {
                     characterType = CharacterType.CrystalSinger, stickmanIndex = 2,
-                    order = Order(CoffeeType.Latte, Volume.Medium, SweetnessLevel.Medium, Topping.Cinnamon),
+                    order = Order(CoffeeType.Latte, Volume.Medium, SweetnessLevel.Medium, Topping.BundtCake),
                     greetingLines = L(
-                        ("Мира",                    "(Расставляет поющие сосуды.) Латте с корицей — тебе, чтобы голос звенел чисто. Сегодня ты ведёшь хор.",
-                                                    "(Sets out the singing vessels.) A latte with cinnamon — for you, so your voice rings clear. Tonight you lead the choir."),
+                        ("Мира",                    "(Расставляет поющие сосуды.) Латте с кексом — тебе, чтобы голос звенел чисто. Сегодня ты ведёшь хор.",
+                                                    "(Sets out the singing vessels.) A latte with a bundt cake — for you, so your voice rings clear. Tonight you lead the choir."),
                         ("Кристаллическая певица",   "Стекло уже дрожит в ожидании. Затмение на пороге. Я слышу, как сходятся три тени.",
                                                     "The glass is already trembling in anticipation. The eclipse is at the threshold. I hear the three shadows gathering.")
                     ),
                     wrongOrderLines = L(
-                        ("Кристаллическая певица",   "Латте, средне сладкий, с корицей. Для голоса.",
-                                                    "A latte, medium sweet, with cinnamon. For the voice.")
+                        ("Кристаллическая певица",   "Латте, средне сладкий, с кексом. Для голоса.",
+                                                    "A latte, medium sweet, with a bundt cake. For the voice.")
                     ),
                     storyRevealLines = L(
                         ("Мира",                    "(Разносит кофе союзникам.) Зеркала завешены, стекло поёт, Фонарь зажжён. Сегодня в полночь они придут. Мы готовы.",
@@ -1716,12 +1716,12 @@ public class StoryDatabase : ScriptableObject
 
             // 5. Экстрасенсы и детективы
             L(
-                ("Гость", "Девушка, я же просил без корицы!",
-                          "Miss, I asked for no cinnamon!"),
+                ("Гость", "Девушка, я же просил без васаби!",
+                          "Miss, I asked for no wasabi!"),
                 ("Мира",  "Вы ещё ничего не заказали.",
                           "You haven't ordered anything yet."),
-                ("Гость", "А… ну тогда сейчас закажу. Без корицы.",
-                          "Ah… then let me order now. No cinnamon.")),
+                ("Гость", "А… ну тогда сейчас закажу. Без васаби.",
+                          "Ah… then let me order now. No wasabi.")),
 
             // 6. «Света нет»
             L(

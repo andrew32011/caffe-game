@@ -185,6 +185,10 @@ public class GameManager : MonoBehaviour
         //    аналогично «ДЕНЬ N» в начале дня (пункт 1). Сначала титр, потом эффект.
         //    (Титр НЕ под чёрным оверлеем — иначе его не было бы видно; затемнение
         //    дальше сделает сам PlayVignette.)
+        // Пункт 7: ночная атмосфера («шёпот призраков») — включается вместе с началом
+        // диалога сна и выключается на пробуждении, ДО показа рекламы на переходе.
+        _audioController?.PlayNight();
+
         if (_dialogue != null)
             yield return StartCoroutine(_dialogue.ShowTitleCardRoutine(Loc.T("СОН", "DREAM"), true, 2.2f));
 
@@ -202,6 +206,9 @@ public class GameManager : MonoBehaviour
             yield return StartCoroutine(FadeLight(_sceneLight, _sceneLight.intensity, origIntensity, 0.6f));
 
         CoffeeCraftingSystem.Instance?.SetHeroVisible(false);
+
+        // Проснулись — ночной звук выключаем (до рекламы на переходе).
+        _audioController?.StopNight();
     }
 
     // Пул эффектов сна (без красного) + «мешок» для выдачи без повторов подряд.
@@ -380,8 +387,8 @@ public class GameManager : MonoBehaviour
                 yield return StartCoroutine(PlayDreamVignette(day));
             }
 
-            // Ночь закончилась — возвращаем фоновую музыку.
-            _audioController?.ResumeMusic();
+            // Музыку НЕ возвращаем здесь: сначала реклама на переходе (ниже), и лишь
+            // после неё — фоновая музыка нового дня (порядок: сон → реклама → музыка).
 
             // Батч 6: тизер «Особого гостя» накануне (пик вовлечения → мотив вернуться завтра).
             if (day < 40 && DayController.IsSpecialDay(day + 1) && _dialogue != null)
@@ -401,8 +408,11 @@ public class GameManager : MonoBehaviour
             if (_saveData.currentDay > 40)
                 break;
 
-            // Затемнение между днями (пункт 5)
+            // Затемнение между днями (пункт 5). Реклама показывается ВНУТРИ Transition.
             yield return StartCoroutine(Transition());
+
+            // Реклама после сна уже прошла — теперь возвращаем фоновую музыку нового дня.
+            _audioController?.ResumeMusic();
         }
 
         yield return StartCoroutine(ShowGameComplete());
@@ -568,7 +578,7 @@ public class GameManager : MonoBehaviour
 
     // ─── Батч 6: журнал гостей («Завсегдатаи») ────────────────────────────────
 
-    /// <summary>Записывает визит гостя и лучшую оценку (1..3⭐). Сохраняет.</summary>
+    /// <summary>Записывает визит гостя и лучшую оценку (1..3). Сохраняет.</summary>
     public void RecordVisit(CharacterType type, int stars)
     {
         int key = (int)type;

@@ -118,8 +118,8 @@ public class DayResultUI : MonoBehaviour
             bool warn = streak >= 3;
             _streakWarningText.gameObject.SetActive(warn);
             if (warn)
-                _streakWarningText.text = Loc.T($"Стрик входа: {streak} дней 🔥 Загляни завтра — иначе сгорит!",
-                                                $"Login streak: {streak} days 🔥 Come back tomorrow or lose it!");
+                _streakWarningText.text = Loc.T($"Стрик входа: {streak} дней Загляни завтра — иначе сгорит!",
+                                                $"Login streak: {streak} days Come back tomorrow or lose it!");
         }
 
         // ×2 за рекламу: доступно только если за день заработано > 0 (Батч 2).
@@ -151,7 +151,7 @@ public class DayResultUI : MonoBehaviour
             _btnSaveCombo.gameObject.SetActive(eligible);
             _btnSaveCombo.interactable = eligible;
             if (eligible && _saveComboLabel != null)
-                _saveComboLabel.text = Loc.T($"Сохранить серию ×{comboCount} 📺", $"Keep streak ×{comboCount} 📺");
+                _saveComboLabel.text = Loc.T($"Сохранить серию ×{comboCount}", $"Keep streak ×{comboCount}");
 #else
             _btnSaveCombo.gameObject.SetActive(false);
 #endif
@@ -188,7 +188,7 @@ public class DayResultUI : MonoBehaviour
         if (total >= goal)
         {
             _journeyForecastText.color = new Color(0.35f, 0.85f, 0.40f);
-            _journeyForecastText.text  = Loc.T("Цель достигнута! ⭐", "Goal reached! ⭐");
+            _journeyForecastText.text  = Loc.T("Цель достигнута!", "Goal reached!");
             return;
         }
 
@@ -207,7 +207,7 @@ public class DayResultUI : MonoBehaviour
         if (actualPerDay >= needPerDay * 1.05f)
         {
             _journeyForecastText.color = new Color(0.35f, 0.85f, 0.40f);
-            _journeyForecastText.text  = Loc.T("Опережаешь график ⭐", "Ahead of schedule ⭐");
+            _journeyForecastText.text  = Loc.T("Опережаешь график", "Ahead of schedule");
         }
         else if (actualPerDay >= needPerDay * 0.90f)
         {
@@ -218,8 +218,8 @@ public class DayResultUI : MonoBehaviour
         {
             int gap = Mathf.CeilToInt(needPerDay - actualPerDay);
             _journeyForecastText.color = new Color(0.90f, 0.40f, 0.40f);
-            _journeyForecastText.text  = Loc.T($"Отставание ~{gap}/день — удвой выручку 📺",
-                                               $"Behind ~{gap}/day — double your earnings 📺");
+            _journeyForecastText.text  = Loc.T($"Отставание ~{gap}/день — удвой выручку",
+                                               $"Behind ~{gap}/day — double your earnings");
         }
     }
 

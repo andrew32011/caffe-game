@@ -168,7 +168,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
         _adHintButton.gameObject.SetActive(true);           // доступна всегда
         var label = _adHintButton.GetComponentInChildren<TextMeshProUGUI>();
         if (label != null)
-            label.text = Loc.T("Уточнить заказ 📺", "Reveal order 📺");
+            label.text = Loc.T("Уточнить заказ", "Reveal order");
         StartAdHintPulse(_adHintHighlight);
     }
 
@@ -268,12 +268,16 @@ public class CoffeeCraftingSystem : MonoBehaviour
     {
         switch (t)
         {
-            case Topping.Cream:     return Loc.T("Сливки", "Cream");
-            case Topping.Cinnamon:  return Loc.T("Корица", "Cinnamon");
-            case Topping.Caramel:   return Loc.T("Карамель", "Caramel");
-            case Topping.Chocolate: return Loc.T("Шоколад", "Chocolate");
-            case Topping.Mint:      return Loc.T("Мята", "Mint");
-            default:                return Loc.T("без топпинга", "no topping");
+            case Topping.BellPepper: return Loc.T("Болгарский перец", "Bell pepper");
+            case Topping.BundtCake:  return Loc.T("Кекс", "Bundt cake");
+            case Topping.Cookies:    return Loc.T("Печенье", "Cookies");
+            case Topping.Salami:     return Loc.T("Салями", "Salami");
+            case Topping.Salmon:     return Loc.T("Лосось", "Salmon");
+            case Topping.Wasabi:     return Loc.T("Васаби", "Wasabi");
+            case Topping.Lollipop:   return Loc.T("Леденец", "Lollipop");
+            case Topping.Tomato:     return Loc.T("Помидор", "Tomato");
+            case Topping.Pretzel:    return Loc.T("Крендель", "Pretzel");
+            default:                 return Loc.T("без топпинга", "no topping");
         }
     }
 
@@ -378,7 +382,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
                 newMood = Mathf.Clamp01(mood + _complimentBoost);
                 if (_commentText != null)
                 {
-                    _commentText.text = Loc.T("Комплимент от души ☕", "A heartfelt compliment ☕");
+                    _commentText.text = Loc.T("Комплимент от души", "A heartfelt compliment");
                     if (_commentCo != null) StopCoroutine(_commentCo);
                     _commentCo = StartCoroutine(CommentRoutine());
                 }
@@ -510,12 +514,12 @@ public class CoffeeCraftingSystem : MonoBehaviour
         bool tempOk = Mathf.Abs(temp   - TempTarget())   <= EffectiveTolerance;
         bool volOk  = Mathf.Abs(volume - VolumeTarget()) <= EffectiveTolerance;
 
-        // Батч 6: попадание точно в центр обеих осей → «✨ Идеально» + ×1.1 к оплате (скилл-градиент).
+        // Батч 6: попадание точно в центр обеих осей → «Идеально» + ×1.1 к оплате (скилл-градиент).
         bool tempPerfect = Mathf.Abs(temp   - TempTarget())   <= PerfectTol;
         bool volPerfect  = Mathf.Abs(volume - VolumeTarget()) <= PerfectTol;
         _precisionBonus  = (tempPerfect && volPerfect) ? 1.1f : 1f;
 
-        if (tempPerfect && volPerfect) ShowAchievement(Loc.T("✨ Идеально!", "✨ Perfect!"));
+        if (tempPerfect && volPerfect) ShowAchievement(Loc.T("Идеально!", "Perfect!"));
         else if (tempOk && volOk)      ShowAchievement(Loc.T("В точку!", "Spot on!"));
 
         // Пункт 5: удовлетворённость зависит ОТ КАЖДОЙ фичи отдельно — и температуры,
@@ -548,8 +552,8 @@ public class CoffeeCraftingSystem : MonoBehaviour
         // Батч 6: завсегдатай (симпатия ≥ порога) просит любимый топпинг — апселл.
         if (_favoriteEligible && _favoriteTopping != Topping.None && !TutorialMode && _commentText != null)
         {
-            _commentText.text = Loc.T($"Гость любит: {ToppingName(_favoriteTopping)} ☕",
-                                      $"Guest loves: {ToppingName(_favoriteTopping)} ☕");
+            _commentText.text = Loc.T($"Гость любит: {ToppingName(_favoriteTopping)}",
+                                      $"Guest loves: {ToppingName(_favoriteTopping)}");
             if (_commentCo != null) StopCoroutine(_commentCo);
             _commentCo = StartCoroutine(CommentRoutine());
         }

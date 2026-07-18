@@ -58,7 +58,7 @@ public static class CharacterNames
     /// <summary>Статус отношений по симпатии 0..1 (для журнала).</summary>
     public static string Status(float sympathy)
     {
-        if (sympathy >= 0.9f) return Loc.T("Завсегдатай ⭐", "Regular ⭐");
+        if (sympathy >= 0.9f) return Loc.T("Завсегдатай", "Regular");
         if (sympathy >= 0.7f) return Loc.T("Друг кофейни", "Café friend");
         if (sympathy >= 0.5f) return Loc.T("Знакомый", "Acquaintance");
         if (sympathy >= 0.3f) return Loc.T("Прохладно", "Cool");

@@ -25,7 +25,7 @@ public class JournalCard : MonoBehaviour
         if (_nameText    != null) _nameText.text    = CharacterNames.Get(type);
         if (_statusText  != null) _statusText.text  = CharacterNames.Status(sympathy);
         if (_visitsText  != null) _visitsText.text  = Loc.T("Визитов: ", "Visits: ") + visits;
-        if (_starsText   != null) _starsText.text   = new string('★', s) + new string('☆', 3 - s);
+        if (_starsText   != null) _starsText.text   = s + " / 3";
         if (_sympathyFill != null) _sympathyFill.fillAmount = Mathf.Clamp01(sympathy);
         if (_sympathyText != null) _sympathyText.text = Mathf.RoundToInt(sympathy * 100f) + "%";
     }

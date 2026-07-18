@@ -22,13 +22,13 @@ public static class UiTranslations
     static readonly Dictionary<string, Dictionary<string,string>> Table =
         new Dictionary<string, Dictionary<string,string>>
     {
-        { "Подать ☕", M("Serve ☕","Подати ☕","Падаць ☕","Ұсыну ☕","Servis et ☕","Ver ☕","Servieren ☕","Servir ☕",
-            "Servir ☕","Servir ☕","Servi ☕","Servește ☕","Sajikan ☕","Serveeri ☕","Pasniegt ☕","Patiekti ☕",
-            "Берүү ☕","Додан ☕","Hödürle ☕","Bering ☕") },
+        { "Подать", M("Serve","Подати","Падаць","Ұсыну","Servis et","Ver","Servieren","Servir",
+            "Servir","Servir","Servi","Servește","Sajikan","Serveeri","Pasniegt","Patiekti",
+            "Берүү","Додан","Hödürle","Bering") },
 
-        { "Подтвердить ✓", M("Confirm ✓","Підтвердити ✓","Пацвердзіць ✓","Растау ✓","Onayla ✓","Təsdiqlə ✓","Bestätigen ✓","Confirmer ✓",
-            "Confirmar ✓","Confirmar ✓","Conferma ✓","Confirmă ✓","Konfirmasi ✓","Kinnita ✓","Apstiprināt ✓","Patvirtinti ✓",
-            "Ырастоо ✓","Тасдиқ ✓","Tassykla ✓","Tasdiqlash ✓") },
+        { "Подтвердить", M("Confirm","Підтвердити","Пацвердзіць","Растау","Onayla","Təsdiqlə","Bestätigen","Confirmer",
+            "Confirmar","Confirmar","Conferma","Confirmă","Konfirmasi","Kinnita","Apstiprināt","Patvirtinti",
+            "Ырастоо","Тасдиқ","Tassykla","Tasdiqlash") },
 
         { "Смотреть рекламу (+60)", M("Watch ad (+60)","Дивитися рекламу (+60)","Глядзець рэкламу (+60)","Жарнама көру (+60)","Reklam izle (+60)","Reklama bax (+60)","Werbung ansehen (+60)","Voir la pub (+60)",
             "Ver anuncio (+60)","Ver anúncio (+60)","Guarda l'annuncio (+60)","Vezi reclama (+60)","Tonton iklan (+60)","Vaata reklaami (+60)","Skatīties reklāmu (+60)","Žiūrėti reklamą (+60)",

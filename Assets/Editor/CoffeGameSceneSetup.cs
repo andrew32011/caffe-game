@@ -147,7 +147,10 @@ public static class CoffeGameSceneSetup
         var speakerName   = Text("SpeakerName", dialoguePanel.transform, "Имя", 30, TextAlignmentOptions.TopLeft, new Vector2(0.02f, 0.7f), new Vector2(0.6f, 0.98f));
         var dialogueText  = Text("DialogueText", dialoguePanel.transform, "Текст реплики...", 28, TextAlignmentOptions.TopLeft, new Vector2(0.02f, 0.08f), new Vector2(0.98f, 0.68f));
         dialogueText.enableAutoSizing = false; // печатная машинка: фикс. размер, без «прыжков»
-        var continueHint  = Text("ContinueHint", dialoguePanel.transform, "▼ далее", 22, TextAlignmentOptions.BottomRight, new Vector2(0.6f, 0.0f), new Vector2(0.98f, 0.18f)).gameObject;
+        var continueHintTmp = Text("ContinueHint", dialoguePanel.transform, "нажмите для продолжения", 20, TextAlignmentOptions.BottomRight, new Vector2(0.45f, 0.0f), new Vector2(0.98f, 0.18f));
+        continueHintTmp.gameObject.AddComponent<BlinkText>();                       // мигание
+        continueHintTmp.gameObject.AddComponent<LocalizeYG>().Set("нажмите для продолжения", "click to continue");
+        var continueHint = continueHintTmp.gameObject;
 
         // ── Заставка дня (центр) ────────────────────────────────────────────
         var dayIntroPanel = Panel("DayIntroPanel", ct, new Vector2(0.3f, 0.4f), new Vector2(0.7f, 0.6f), new Color(0f, 0f, 0f, 0.8f));
@@ -179,7 +182,7 @@ public static class CoffeGameSceneSetup
         achievement.gameObject.SetActive(false);
 
         // ── Кнопка «Подать» (низ по центру; пункт 10) ───────────────────────
-        var serveBtn = Btn("BtnServe", ct, "Подать ☕");
+        var serveBtn = Btn("BtnServe", ct, "Подать");
         SetRect(serveBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.04f), new Vector2(0.6f, 0.12f));
         Juice(serveBtn, pulse: true, shine: true); // главный CTA — пульс + блеск
         serveBtn.gameObject.SetActive(false);
@@ -242,7 +245,7 @@ public static class CoffeGameSceneSetup
         // ── Выбор ингредиента + кнопка «Подтвердить» (пункт 2) ──────────────
         var selectedText = Text("SelectedText", ct, "Выбрано: …", 28, TextAlignmentOptions.Center, new Vector2(0.3f, 0.18f), new Vector2(0.7f, 0.24f));
         selectedText.gameObject.SetActive(false);
-        var confirmBtn = Btn("BtnConfirm", ct, "Подтвердить ✓");
+        var confirmBtn = Btn("BtnConfirm", ct, "Подтвердить");
         SetRect(confirmBtn.GetComponent<RectTransform>(), new Vector2(0.4f, 0.05f), new Vector2(0.6f, 0.13f));
         Juice(confirmBtn, pulse: true);
         confirmBtn.gameObject.SetActive(false);
@@ -274,7 +277,7 @@ public static class CoffeGameSceneSetup
 
         // ── Кнопка «Подсказка» (левый нижний угол, видна всегда) ────────────
         // HUD-иконка «Подсказка» (нижняя в правом доке). Пульс — приглашает при затыке.
-        var btnHint = IconBtn("BtnHint", ct, "Assets/Mini UI/UI Icons/Bulb.png", "Подсказка");
+        var btnHint = IconBtn("BtnHint", ct, "Assets/Mini UI/Icons/Blue Energy.png", "Подсказка");
         SetRect(btnHint.GetComponent<RectTransform>(), new Vector2(0.905f, 0.64f), new Vector2(0.99f, 0.74f));
         Juice(btnHint, pulse: true);
 
@@ -404,7 +407,7 @@ public static class CoffeGameSceneSetup
         // ── Меню/настройки + пауза (Батч 4) ─────────────────────────────────
         // Кнопка-«Меню» в правом верхнем углу (всегда видна). Открывает настройки и паузу.
         // HUD-иконка «Меню» (верхняя в правом доке).
-        var settingsBtn = IconBtn("BtnSettings", ct, "Assets/Mini UI/UI Icons/Gear.png", "Меню");
+        var settingsBtn = IconBtn("BtnSettings", ct, "Assets/Mini UI/Icons/Settings.png", "Меню");
         SetRect(settingsBtn.GetComponent<RectTransform>(), new Vector2(0.905f, 0.88f), new Vector2(0.99f, 0.98f));
         Juice(settingsBtn, pulse: false);
 
@@ -461,7 +464,7 @@ public static class CoffeGameSceneSetup
 
         // ── Журнал гостей «Завсегдатаи» (Батч 6) ────────────────────────────
         // HUD-иконка «Журнал» (средняя в правом доке).
-        var journalOpenBtn = IconBtn("BtnJournal", ct, "Assets/Mini UI/UI Icons/Notebook.png", "Журнал");
+        var journalOpenBtn = IconBtn("BtnJournal", ct, "Assets/Mini UI/Icons/Book.png", "Журнал");
         SetRect(journalOpenBtn.GetComponent<RectTransform>(), new Vector2(0.905f, 0.76f), new Vector2(0.99f, 0.86f));
         Juice(journalOpenBtn, pulse: false);
 
@@ -671,11 +674,13 @@ public static class CoffeGameSceneSetup
         // Банк звуков: создаём/наполняем ассет из пакета 50 клипов + фон-музыки.
         var soundBank = BuildSoundBank();
 
+        var nightClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/night_ambience.mp3");
         new W(audio)
             .Ref("_musicSource", music)
             .Ref("_sfxSource", sfx)
             .Ref("_speechMixer", speech) // для превью громкости SFX (бубнёж)
             .Ref("_bank", soundBank)     // банк звуков (50 клипов)
+            .Ref("_nightAmbience", nightClip) // ночная атмосфера сна (пункт 7)
             .Apply();
 
         // ── ВРЕМЕННО: кнопка сброса прогресса (для тестирования) ─────────────
@@ -826,7 +831,6 @@ public static class CoffeGameSceneSetup
         var parent = GameObject.Find(parentName);
         if (parent == null) { Debug.LogWarning($"CoffeGameSetup: не найден {parentName} (топпинги)."); return; }
 
-        var tops = (Topping[])System.Enum.GetValues(typeof(Topping));
         int i = 0;
         foreach (Transform child in parent.transform)
         {
@@ -834,13 +838,32 @@ public static class CoffeGameSceneSetup
             var it = child.GetComponent<IngredientItem>();
             if (it == null) it = child.gameObject.AddComponent<IngredientItem>();
             it.kind = IngredientItem.ItemKind.Topping;
-            // Пропускаем Topping.None (0) — реальным предметам даём Cream, Cinnamon, ...
-            it.topping = tops[Mathf.Min(i + 1, tops.Length - 1)];
-            it.displayName = child.name;   // имя из объекта (пункт 1)
+            // Привязка enum к предмету ПО ИМЕНИ МОДЕЛИ (а не по порядку) — гость просит
+            // конкретную еду, и она совпадает с конкретной моделью на полке.
+            it.topping = ToppingByName(child.name);
+            it.displayName = child.name;
             RemoveWorldLabel(child.gameObject);
+            if (it.topping == Topping.None)
+                Debug.LogWarning($"CoffeGameSetup: топпинг '{child.name}' не распознан — не будет кликабельным как топпинг.");
             i++;
         }
         Debug.Log($"CoffeGameSetup: топпингов (дети {parentName}): {i}");
+    }
+
+    // Топпинг по имени модели-предмета на полке (Food Pack). Не распознан → None.
+    static Topping ToppingByName(string objName)
+    {
+        string n = objName.ToLower();
+        if (n.Contains("bell pepper") || n.Contains("pepper")) return Topping.BellPepper;
+        if (n.Contains("bundt") || n.Contains("cake"))         return Topping.BundtCake;
+        if (n.Contains("cookie"))                              return Topping.Cookies;
+        if (n.Contains("salami"))                              return Topping.Salami;
+        if (n.Contains("salmon"))                              return Topping.Salmon;
+        if (n.Contains("wasabi"))                              return Topping.Wasabi;
+        if (n.Contains("lollipop") || n.Contains("swirl"))     return Topping.Lollipop;
+        if (n.Contains("tomato"))                              return Topping.Tomato;
+        if (n.Contains("pretzel"))                             return Topping.Pretzel;
+        return Topping.None;
     }
 
     // Убирает парящую подпись над объектом, если осталась от прошлой версии (пункт 2)
@@ -1304,7 +1327,7 @@ public static class CoffeGameSceneSetup
         var symFill    = HorizontalFill("SympathyFill", card.transform, new Vector2(0.03f, 0.30f), new Vector2(0.80f, 0.50f), new Color(0.3f, 0.85f, 0.4f));
         var symText    = Text("SympathyPct", card.transform, "50%", 18, TextAlignmentOptions.Right,     new Vector2(0.81f, 0.28f), new Vector2(0.97f, 0.52f));
         var visitsText = Text("Visits", card.transform, "Визитов: 0", 16, TextAlignmentOptions.BottomLeft, new Vector2(0.03f, 0.02f), new Vector2(0.55f, 0.28f));
-        var starsText  = Text("Stars",  card.transform, "☆☆☆", 20, TextAlignmentOptions.BottomRight,   new Vector2(0.55f, 0.02f), new Vector2(0.97f, 0.28f));
+        var starsText  = Text("Stars",  card.transform, "", 20, TextAlignmentOptions.BottomRight,   new Vector2(0.55f, 0.02f), new Vector2(0.97f, 0.28f));
         starsText.color = new Color(1f, 0.85f, 0.3f);
 
         var jc = card.AddComponent<JournalCard>();
@@ -1492,8 +1515,8 @@ public static class CoffeGameSceneSetup
         var btn = go.GetComponent<Button>();
         btn.targetGraphic = img;
 
-        var icon = IconImage("Icon", go.transform, iconPath, new Vector2(0.28f, 0.36f), new Vector2(0.72f, 0.93f));
-        icon.color = new Color(0.95f, 0.95f, 1f); // светлый тон линейной иконки
+        var icon = IconImage("Icon", go.transform, iconPath, new Vector2(0.24f, 0.34f), new Vector2(0.76f, 0.95f));
+        icon.color = Color.white; // цветные иконки — без тонировки
         Text("Caption", go.transform, ru, 15, TextAlignmentOptions.Center, new Vector2(0.02f, 0.04f), new Vector2(0.98f, 0.34f));
         go.AddComponent<ButtonClickSound>(); // клик-звук
         return btn;

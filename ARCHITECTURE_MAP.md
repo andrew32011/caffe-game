@@ -13,7 +13,7 @@
 ### Core
 - **GameManager** (656, *singleton*) — оркестратор: цикл 40 дней, фазы (`GamePhase`), сейв через `YG2.saves`, апгрейды, лидерборд, реклама (interstitial/transition), «Сон», финал. Держит ссылки на все системы. Публичн.: `AddCoins`, `CurrentDay`, `TotalCoins`, `Get/SetClientSatisfaction`, `RecordVisit/GetVisits/GetBestStars`, `CarriedCombo`, `MarkTipShown`, `PriceMultiplier/ToleranceBonus/MoodBonus`, `ResetProgressAndRestart`. ⚠️ god-class.
 - **DayController** (378) — один рабочий день: спавн гостя → этапы Stages → диалог → готовка → оценка → оплата (формула) → реакция → уход. Хуки: `RunDay`, `CurrentComboCount`, `IsSpecialDay`. Экономика оплаты тут.
-- **GameEnums** (220) — enum'ы (`GamePhase/DayPhase/CoffeeType/Volume/SweetnessLevel/Topping/UpgradeType/CharacterType`) + `[Serializable]` `CoffeeOrder`, `CustomerData`, `GameSaveData`.
+- **GameEnums** (220) — enum'ы (`GamePhase/DayPhase/CoffeeType/Volume/SweetnessLevel/Topping/UpgradeType/CharacterType`) + `[Serializable]` `CoffeeOrder`, `CustomerData`, `GameSaveData`. ⚠️ `Topping` = предметы полки `ShelfItems` (BellPepper/BundtCake/Cookies/Salami/Salmon/Wasabi/Lollipop/Tomato/Pretzel); билдер сопоставляет по **имени** дочернего объекта (`ToppingByName`), не по индексу.
 - **Difficulty** (35, *static*) — кривые `Tolerance(day)`, `EarlyEase(day)`, `FinalDay=40`.
 - **Loc** (51, *static*) — язык из **`YG2.envir.language`** (EnvirData), фолбэк `YG2.lang`→"ru". `T(ru,en)`, `IsRu`, `Lang`. См. §5.
 - **UiTranslations** (130, *static*) — таблица переводов статических подписей на 20 языков (ключ = рус. текст).
@@ -29,22 +29,23 @@
 - **CustomerController** (352) — модель гостя: спавн/удаление, эмоции, маршрут через `ProcessVisitor`, `SatisfactionBar`. Содержит *static* реестр.
 - **IngredientItem** (98) — кликабельный 3D-предмет (основа/топпинг), `displayName/displayNameEn`. `OnMouseDown`→крафтинг. `Update()` пульс.
 - **SatisfactionBar** (120) — префаб-полоса над гостем. `Update()` следит за камерой.
-- **DailyChallenge** (86) — «Заказ дня»: детерминир. квест (seed=день), `BeginDay/ReportDrink/Claim`.
+- **DailyChallenge** — «Заказ дня»: детерминир. квест (seed=день), **10 типов** (`Kind`: EarnCoins/PerfectHits/ThreeStars/SellToppings/GoodDrinks/ServeDrinks/StarCollector/HighSatisfaction/TwoStarsPlus/BigEarnings), `BeginDay/ReportDrink/Claim`.
 - **HeroIdle** (50) — процедурный idle ГГ (запасной). `Update()`.
 
 ### Story / Dialog
 - **StoryDatabase** (1745, *ScriptableObject*) — контент 40 дней: `DayData/DayCustomerEntry/DialogueLine` (ru+en), пул шуток. `GetDay(n)`. Ассет `Assets/StoryDatabase.asset`. ⚠️ огромный, но это данные.
-- **DialogueDisplayer** (276) — печ.машинка, имя, клик, заставки, `PlayDialogueLines`, `ShowMessage`, бубнёж через `SpeechMixer`. ⚠️ 14 public-полей (UI-ссылки).
+- **DialogueDisplayer** — показ реплики **по словам за ~3с** (`revealDuration`; 1-й клик=вся реплика, 2-й=дальше, `advanceGuard` от быстрого проскока), имя, заставки, `PlayDialogueLines`, `ShowMessage`, бубнёж через `SpeechMixer`. `continueHint` — мигающий (`BlinkText`) «нажмите для продолжения». ⚠️ 14 public-полей (UI-ссылки).
+- **BlinkText** (*MonoBehaviour*, UI) — пульс альфы графики (для хинта продолжения); билдер вешает на `ContinueHint`.
 - **DialogueManager** (164) + **DialogLine** (64, содержит *SO* `DialogueDatabase`) — СТАРАЯ система реплик по ID. ⚠️ **legacy**, сюжет идёт через StoryDatabase.
 
 ### UI (все — панели, оркестрируются билдером)
 - **ButtonJuice** (MonoBehaviour) — лёгкая анимация кнопки: дыхание масштаба/качание/блеск/подскок при клике (unscaled). Билдер вешает через хелпер `Juice(btn,pulse,shine,wobble)` на важные кнопки (Подать=pulse+shine, Подтвердить/Продолжить=pulse, HUD-иконки). НЕ вешать на кнопки со своим рантайм-пульсом (Double/SaveCombo/AdHint) — конфликт масштаба.
-- HUD-кнопки (Меню/Журнал/Подсказка) — теперь **иконка+мини-подпись** (хелпер `IconBtn`, иконки Gear/Notebook/Bulb из `Mini UI/UI Icons`), правый вертикальный док (x≈0.9, сверху вниз). Спрайт кнопок сменён на прямоугольный `Dark Long Btn DARK` (минимальное скругление).
+- HUD-кнопки (Меню/Журнал/Подсказка) — **иконка+мини-подпись** (хелпер `IconBtn`), **цветные иконки** Settings/Book/Blue Energy из `Mini UI/Icons` (не тонируются, `Color.white`), правый вертикальный док (x≈0.9, сверху вниз). Спрайт кнопок — прямоугольный `Dark Long Btn DARK` (минимальное скругление). На обучении (день 1) `TutorialController` прячет `BtnJournal`/`BtnHint`, оставляя только настройки.
 - **DayResultUI** (344) — экран итогов дня: rewarded «Удвоить»/«Сохранить комбо», трекер «Путь к 10000», предупреждение о стрике.
 - **TutorialController** (292) — обучение. **UiEffects** (263, *singleton*) — 2D эффекты (монеты/звёзды/комбо/баннеры). **HintManager** (166) — панель подсказок. **UpgradeShopUI** (121) — магазин апгрейдов. **SettingsUI** (128) — настройки+пауза (громкость/фуллскрин/лидерборд). **DailyBonusUI** (123) — бонус за вход. **JourneyGateUI** (102) — гейт цели. **GuestJournalUI** (73) + **JournalCard** (32) — журнал «Завсегдатаи». **AdForCoins** (44) — реклама за монеты. **CoinsUI** (30) — касса, `Update()`.
 
 ### Audio / SDK / CutScene / Effects / прочее
-- **AudioController** (*singleton*) — музыка/SFX/бубнёж. Клипы берёт из **`SoundBank`** (`_bank`, приоритет) с фолбэком на старые поля. Методы `PlayCoin/Star/...`, `PlayClick/UiOpen/UiClose/Combo`, `PauseMusic/ResumeMusic` (музыка молчит ночью — вызывается из GameManager вокруг виньеток/сна).
+- **AudioController** (*singleton*) — музыка/SFX/бубнёж. Клипы берёт из **`SoundBank`** (`_bank`, приоритет) с фолбэком на старые поля. Методы `PlayCoin/Star/...`, `PlayClick/UiOpen/UiClose/Combo`, `PauseMusic/ResumeMusic` (музыка молчит ночью), **`PlayNight/StopNight`** — ночной эмбиент `_nightAmbience` (`Assets/Audio/night_ambience.mp3`, отдельный зацикленный `_nightSource`; вкл. во «Сне», выкл. до рекламы). ⚠️ Порядок между днями: сон → StopNight → реклама (`Transition`) → ResumeMusic.
 - **SoundBank** (*ScriptableObject*, `Assets/SoundBank.asset`) — именованные события→AudioClip + `music` + `all[]` (50 клипов пакета `Assets/Casual Game Sounds U6/DM-CGS-01..50`). Билдер (`BuildSoundBank`) наполняет: `all`=все клипы, `music`=`Assets/Audio/bg_music_celtic.mp3`, события — черновой best-guess по индексу (пустые слоты; ручные назначения сохраняются). Фон-музыка — кельтская.
 - **ButtonClickSound** (MonoBehaviour) — клик-звук на ВСЕ кнопки (в фабриках Btn/IconBtn), transform не трогает.
 - Камера: `Stages` поднимает камеру на этапе ожидания гостя (`guestWaitStageIndex`/`guestWaitCameraLift`, +Y на endPos).
@@ -101,7 +102,7 @@ SampleScene: CameraWaypoint → IntroStoryUI(история, 1-й вход) ─�
 MainScene: YandexManager→SDK ▶ GameManager.StartGameFlow
   → Tutorial → цикл дней: DayController.RunDay
       Stages(0 приход →1 диалог →2/3/4 готовка[CoffeeCraftingSystem+Cup+Machine] →5 подача →6 реакция →7 уход)
-      → оплата(GameManager.AddCoins) → DayResultUI → «Сон»(VFX) → Transition(interstitial) → след. день
+      → оплата(GameManager.AddCoins) → DayResultUI → PauseMusic → «Сон»(VFX+ночной эмбиент) → StopNight → Transition(interstitial) → ResumeMusic → след. день
   → день 40: JourneyGate(10000) → финал
 UI-слой (Canvas, всегда активен): Settings/Journal/Hint/Shop/DailyBonus/Coins/UiEffects
 ```

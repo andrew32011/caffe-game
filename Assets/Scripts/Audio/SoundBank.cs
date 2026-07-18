@@ -20,7 +20,7 @@ public class SoundBank : ScriptableObject
     [Header("Готовка / гость")]
     public AudioClip pour;      // налив ингредиента
     public AudioClip ding;      // подача напитка
-    public AudioClip perfect;   // «Идеально» / 3⭐
+    public AudioClip perfect;   // «Идеально» / 3
     public AudioClip star;      // звезда / топпинг
     public AudioClip customerIn;// приход гостя
 
