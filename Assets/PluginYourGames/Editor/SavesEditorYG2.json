@@ -7,7 +7,7 @@
         false,
         false
     ],
-    "idSave": 425,
+    "idSave": 427,
     "totalCoins": 429,
     "currentDay": 2,
     "tutorialDone": true,
@@ -33,5 +33,8 @@
     "journalBestStars": [],
     "shownTips": [
         "tip_quest"
-    ]
+    ],
+    "sleepFromDay": 0,
+    "adsDisabled": true,
+    "journalSeenCount": 0
 }
