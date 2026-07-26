@@ -5915,6 +5915,7 @@ MonoBehaviour:
   _bonusSound: {fileID: 0}
   _musicVolume: 0.4
   _sfxVolume: 0.8
+  _voiceVolume: 0.8
 --- !u!1 &1669384524
 GameObject:
   m_ObjectHideFlags: 0

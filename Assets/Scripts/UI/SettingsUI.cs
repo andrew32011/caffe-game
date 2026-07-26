@@ -22,6 +22,7 @@ public class SettingsUI : MonoBehaviour
     [Header("Громкость")]
     [SerializeField] private Slider _musicSlider;
     [SerializeField] private Slider _sfxSlider;
+    [SerializeField] private Slider _voiceSlider; // «Голоса» — бубнёж героев, отдельно от эффектов
 
     [Header("Полный экран")]
     [SerializeField] private Button _fullscreenButton;
@@ -45,6 +46,7 @@ public class SettingsUI : MonoBehaviour
 
         if (_musicSlider != null) _musicSlider.onValueChanged.AddListener(OnMusicChanged);
         if (_sfxSlider   != null) _sfxSlider.onValueChanged.AddListener(OnSfxChanged);
+        if (_voiceSlider != null) _voiceSlider.onValueChanged.AddListener(OnVoiceChanged);
 
         if (_panel != null) _panel.SetActive(false);
         if (_leaderboardPanel != null) _leaderboardPanel.SetActive(false);
@@ -59,6 +61,7 @@ public class SettingsUI : MonoBehaviour
         {
             if (_musicSlider != null) _musicSlider.value = audio.MusicVolume;
             if (_sfxSlider   != null) _sfxSlider.value   = audio.SfxVolume;
+            if (_voiceSlider != null) _voiceSlider.value = audio.VoiceVolume;
         }
         _ready = true;
 
@@ -90,6 +93,13 @@ public class SettingsUI : MonoBehaviour
         if (!_ready) return;
         AudioController.Instance?.SetSfxVolume(v);
         AudioController.Instance?.PlaySfxPreview(); // дать услышать уровень звука сразу
+    }
+
+    private void OnVoiceChanged(float v)
+    {
+        if (!_ready) return;
+        AudioController.Instance?.SetVoiceVolume(v);
+        AudioController.Instance?.PlayVoicePreview(); // услышать уровень «бубнёжа» сразу
     }
 
     // ─── Полный экран ─────────────────────────────────────────────────────────

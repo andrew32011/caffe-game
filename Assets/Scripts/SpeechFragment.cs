@@ -119,10 +119,10 @@ public class SpeechMixer : MonoBehaviour
             _clipCache[fragment] = fragmentClip;
         }
 
-        // Громкость бубнежа подчиняется ползунку «Звуки» (AudioController.SfxVolume),
-        // т.к. это фактически единственный слышимый SFX в игре.
+        // Громкость бубнежа подчиняется ОТДЕЛЬНОМУ ползунку «Голоса»
+        // (AudioController.VoiceVolume), независимому от общих звуков-эффектов.
         audioSource.volume = AudioController.Instance != null
-            ? Mathf.Clamp01(AudioController.Instance.SfxVolume) : 1f;
+            ? Mathf.Clamp01(AudioController.Instance.VoiceVolume) : 1f;
 
         // Воспроизведение
         audioSource.Stop();

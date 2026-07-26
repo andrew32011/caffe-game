@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour
         // только потом читаем прогресс. Обновление страницы не теряет данные.
         yield return new WaitUntil(() => YG2.isSDKEnabled);
         LoadGame();
-        _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume); // Батч 4
+        _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume, _saveData.voiceVolume); // Батч 4 + голоса
         if (!_sessionReadyCalled)            // 1.19.2: игрок может начинать (один раз за сессию)
         {
             YG2.GameReadyAPI();
@@ -451,7 +451,128 @@ public class GameManager : MonoBehaviour
             _audioController?.ResumeMusic();
         }
 
-        yield return StartCoroutine(ShowGameComplete());
+        // ─── Сюжет пройден ──────────────────────────────────────────────────────
+        // При первом завершении показываем финал и включаем Бесконечный режим.
+        // При возврате (перезагрузка / сцена сна) endlessMode уже true — сразу к игре.
+        if (!_saveData.endlessMode)
+        {
+            yield return StartCoroutine(ShowGameComplete()); // финал (ждёт клик игрока)
+
+            _saveData.endlessMode = true;
+            _saveData.endlessDay  = 1;
+            SaveGame();
+
+            if (_dialogue != null)
+            {
+                _dialogue.ShowMessage(
+                    Loc.T("Кофейня «Междумирье» остаётся открытой. Дальше — Бесконечный режим: держись как можно дольше и ставь рекорды!",
+                          "The Inbetween stays open. From here on it's Endless mode — last as long as you can and set records!"),
+                    0f); // ждёт клик
+                yield return new WaitForSeconds(1f); // дать сообщению появиться
+                yield return StartCoroutine(WaitForClick());
+                yield return new WaitForSeconds(0.8f); // дать сообщению угаснуть
+            }
+        }
+
+        yield return StartCoroutine(RunEndlessDays());
+    }
+
+    // ─── Бесконечный режим (после дня 40) ──────────────────────────────────────
+
+    /// <summary>Цикл бесконечных дней: процедурные гости, максимальная сложность,
+    /// рекорд по «самому дальнему дню». Переиспользует поток DayController и переходы.</summary>
+    private IEnumerator RunEndlessDays()
+    {
+        while (true)
+        {
+            int eDay = _saveData.endlessDay;
+            if (eDay < 1) { eDay = 1; _saveData.endlessDay = 1; }
+
+            // После рекламы предыдущего перехода — ненавязчивое «убрать рекламу».
+            if (eDay > 1 && !_saveData.adsDisabled)
+                AdRemovalPrompt.Instance?.ShowAfterAd();
+
+            DayData dayData = EndlessMode.BuildDay(eDay);
+
+            _currentPhase = GamePhase.Day;
+            YG2.GameplayStart();
+
+            bool dayCompleted = false;
+            while (!dayCompleted)
+            {
+                GameInput.Locked = false;
+                yield return StartCoroutine(_dayController.RunDay(dayData));
+                GameInput.Locked = true;
+                dayCompleted = _dayController.DaySuccess;
+
+                if (!dayCompleted)
+                {
+                    AudioController.Instance?.PlayDayFail();
+                    _dialogue.ShowMessage(
+                        Loc.T("День не засчитан. Начинаем заново...",
+                              "The day doesn't count. Starting over..."), 2f);
+                    yield return new WaitForSeconds(2.5f);
+                }
+            }
+
+            YG2.GameplayStop();
+
+            // Рекорд бесконечного режима (самый дальний достигнутый день).
+            if (eDay > _saveData.endlessBestDay) _saveData.endlessBestDay = eDay;
+
+            // ─── Экран результатов (деньги уже начислены в процессе дня) ─────────
+            _currentPhase = GamePhase.DayResult;
+            AudioController.Instance?.PlayDayClear();
+            UiEffects.Instance?.DayEndBanner(
+                Loc.T($"Бесконечный день {eDay}", $"Endless day {eDay}"));
+
+            if (_dayResultUI != null)
+            {
+                _dayResultUI.Show(EndlessMode.DisplayDayNumber(eDay), _dayController.CoinsEarnedToday,
+                                  Loc.T("Ещё один день в «Междумирье». Кофейня не спит.",
+                                        "Another day at the Inbetween. The café never sleeps."),
+                                  _dayController.CurrentComboCount);
+                yield return new WaitUntil(() => !_dayResultUI.IsShowing);
+            }
+            else
+            {
+                yield return new WaitForSeconds(3f);
+            }
+
+            _audioController?.PauseMusic();
+
+            // Следующий бесконечный день.
+            _saveData.endlessDay = eDay + 1;
+            SaveGame();
+            SubmitLeaderboard();          // монеты-лидерборд (растёт с игрой)
+            SubmitEndlessLeaderboard();   // рекорд бесконечных дней
+
+            // Переход к следующему дню: сцена сна (если в Build Settings) ИЛИ реклама-затемнение.
+            if (SleepSceneAvailable())
+            {
+                _saveData.sleepFromDay = EndlessMode.DisplayDayNumber(eDay); // для текста/эффекта сна
+                SaveGame();
+                if (_vfxController != null)
+                    yield return StartCoroutine(_vfxController.FadeScreen(true, 0.6f));
+                UnityEngine.SceneManagement.SceneManager.LoadScene(SleepSceneName);
+                yield break; // управление уходит в сцену сна, после неё MainScene продолжит endless
+            }
+
+            yield return StartCoroutine(Transition());
+            _audioController?.ResumeMusic();
+        }
+    }
+
+    /// <summary>Ждёт клика/тапа игрока (для подтверждения экранных сообщений).</summary>
+    private IEnumerator WaitForClick()
+    {
+        bool clicked = false;
+        while (!clicked)
+        {
+            if (Input.GetMouseButtonDown(0)) clicked = true;
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) clicked = true;
+            yield return null;
+        }
     }
 
     // ─── Финал игры ───────────────────────────────────────────────────────────
@@ -473,7 +594,11 @@ public class GameManager : MonoBehaviour
             );
         }
 
-        yield return null;
+        // Ждём, пока игрок подтвердит финал кликом (иначе анонс Бесконечного режима
+        // проскочил бы поверх концовки).
+        yield return new WaitForSeconds(1f); // дать финалу появиться
+        yield return StartCoroutine(WaitForClick());
+        yield return new WaitForSeconds(0.8f); // дать финальному тексту угаснуть
     }
 
     // ─── Монеты ───────────────────────────────────────────────────────────────
@@ -571,12 +696,14 @@ public class GameManager : MonoBehaviour
 
     public float SavedMusicVolume => _saveData.musicVolume;
     public float SavedSfxVolume   => _saveData.sfxVolume;
+    public float SavedVoiceVolume => _saveData.voiceVolume;
 
     /// <summary>Записывает громкость в сейв и сохраняет (вызывает AudioController при изменении).</summary>
-    public void SetVolumes(float music, float sfx)
+    public void SetVolumes(float music, float sfx, float voice)
     {
         _saveData.musicVolume = Mathf.Clamp01(music);
         _saveData.sfxVolume   = Mathf.Clamp01(sfx);
+        _saveData.voiceVolume = Mathf.Clamp01(voice);
         SaveGame();
     }
 
@@ -585,6 +712,10 @@ public class GameManager : MonoBehaviour
     /// <summary>Техническое имя таблицы лидеров в консоли Яндекс Игр (счёт = всего монет).</summary>
     public const string LeaderboardName = "coins";
 
+    /// <summary>Таблица лидеров Бесконечного режима (счёт = самый дальний достигнутый день).
+    /// Создать одноимённую таблицу в консоли Яндекс Игр (иначе отправка молча игнорируется).</summary>
+    public const string EndlessLeaderboardName = "endless";
+
     /// <summary>Отправляет текущий баланс монет в таблицу лидеров (если модуль установлен).</summary>
     public void SubmitLeaderboard()
     {
@@ -592,6 +723,20 @@ public class GameManager : MonoBehaviour
         if (YG2.isSDKEnabled) YG2.SetLeaderboard(LeaderboardName, _saveData.totalCoins);
 #endif
     }
+
+    /// <summary>Отправляет рекорд Бесконечного режима (самый дальний день) в лидерборд.</summary>
+    public void SubmitEndlessLeaderboard()
+    {
+#if Leaderboards_yg
+        if (YG2.isSDKEnabled && _saveData.endlessBestDay > 0)
+            YG2.SetLeaderboard(EndlessLeaderboardName, _saveData.endlessBestDay);
+#endif
+    }
+
+    // ─── Бесконечный режим: доступ к состоянию (для UI/лидерборда) ──────────────
+    public bool EndlessActive  => _saveData.endlessMode;
+    public int  EndlessDay     => _saveData.endlessDay;
+    public int  EndlessBestDay => _saveData.endlessBestDay;
 
     // ─── Память удовлетворённости по клиентам (пункт 4.3) ────────────────────
 

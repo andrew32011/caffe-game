@@ -114,6 +114,10 @@ public static class UiTranslations
             "Sonidos","Sons","Suoni","Sunete","Suara","Helid","Skaņas","Garsai",
             "Үндөр","Садоҳо","Sesler","Tovushlar") },
 
+        { "Голоса", M("Voices","Голоси","Галасы","Дауыстар","Sesler","Səslər","Stimmen","Voix",
+            "Voces","Vozes","Voci","Voci","Suara","Hääled","Balsis","Balsai",
+            "Үндөр","Овозҳо","Sesler","Ovozlar") },
+
         { "Журнал гостей · Завсегдатаи", M("Guest journal · Regulars","Журнал гостей · Завсідники","Журнал гасцей · Заўсёднікі","Қонақтар журналы · Тұрақтылар","Konuk günlüğü · Müdavimler","Qonaq jurnalı · Daimi müştərilər","Gästejournal · Stammgäste","Journal des clients · Habitués",
             "Diario de clientes · Habituales","Diário de clientes · Frequentadores","Diario ospiti · Clienti abituali","Jurnalul oaspeților · Clienți fideli","Jurnal tamu · Pelanggan tetap","Külaliste päevik · Püsikliendid","Viesu žurnāls · Pastāvīgie klienti","Svečių žurnalas · Nuolatiniai klientai",
             "Меймандар журналы · Туруктуу кардарлар","Журнали меҳмонон · Мизоҷони доимӣ","Myhman žurnaly · Hemişelik müşderiler","Mehmonlar jurnali · Doimiy mijozlar") },

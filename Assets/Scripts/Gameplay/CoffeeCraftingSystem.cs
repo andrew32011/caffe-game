@@ -475,7 +475,10 @@ public class CoffeeCraftingSystem : MonoBehaviour
             _pendingTopping.SetPulsing(false);
             _pendingTopping = null;
             if (_selectedText != null) _selectedText.gameObject.SetActive(false);
+            // Только одна кнопка за раз: убираем «Подтвердить», возвращаем «Подать»
+            // (топпинги по желанию — без выбора можно сразу подать).
             HideButton(_confirmButton);
+            ShowButton(_serveButton);
             AudioController.Instance?.PlayClick();
             return;
         }
@@ -490,6 +493,9 @@ public class CoffeeCraftingSystem : MonoBehaviour
             _selectedText.gameObject.SetActive(true);
             _selectedText.text = Loc.T("Выбрано: ", "Selected: ") + ToppingName(item.topping);
         }
+        // Пока топпинг выбран, показываем ТОЛЬКО «Подтвердить» (без «Подать»),
+        // чтобы на экране не висели две кнопки сразу.
+        HideButton(_serveButton);
         ShowButton(_confirmButton);
         AudioController.Instance?.PlayClick();
     }

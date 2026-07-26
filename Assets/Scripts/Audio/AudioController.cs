@@ -45,6 +45,7 @@ public class AudioController : MonoBehaviour
     [Header("Настройки")]
     [Range(0f, 1f)] [SerializeField] private float _musicVolume = 0.4f;
     [Range(0f, 1f)] [SerializeField] private float _sfxVolume   = 0.8f;
+    [Range(0f, 1f)] [SerializeField] private float _voiceVolume = 0.8f; // «бубнёж» героев — отдельно от эффектов
 
     // ─── Состояние ───────────────────────────────────────────────────────────
 
@@ -113,37 +114,58 @@ public class AudioController : MonoBehaviour
 
     public float MusicVolume => _musicVolume;
     public float SfxVolume   => _sfxVolume;
+    public float VoiceVolume => _voiceVolume; // громкость бубнёжа героев (читает SpeechMixer)
 
     /// <summary>Меняет громкость музыки вживую и сохраняет (через GameManager → облако).</summary>
     public void SetMusicVolume(float v)
     {
         _musicVolume = Mathf.Clamp01(v);
         if (_musicSource != null) _musicSource.volume = _musicVolume;
-        GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume);
+        GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume, _voiceVolume);
     }
 
     /// <summary>Меняет громкость эффектов (применится к следующим звукам) и сохраняет.</summary>
     public void SetSfxVolume(float v)
     {
         _sfxVolume = Mathf.Clamp01(v);
-        GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume);
+        GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume, _voiceVolume);
+    }
+
+    /// <summary>Меняет громкость «бубнёжа» героев (отдельный канал) и сохраняет.</summary>
+    public void SetVoiceVolume(float v)
+    {
+        _voiceVolume = Mathf.Clamp01(v);
+        GameManager.Instance?.SetVolumes(_musicVolume, _sfxVolume, _voiceVolume);
     }
 
     private float _lastPreviewTime;
-    /// <summary>Проигрывает короткий бубнёж на текущей громкости эффектов — чтобы игрок
-    /// СЛЫШАЛ уровень при перетаскивании ползунка (в меню на паузе иначе звука нет). С троттлингом.</summary>
+    /// <summary>Проигрывает короткий звук-эффект на текущей громкости эффектов — чтобы игрок
+    /// СЛЫШАЛ уровень при перетаскивании ползунка «Звуки» (в меню на паузе иначе звука нет).</summary>
     public void PlaySfxPreview()
     {
         if (Time.unscaledTime - _lastPreviewTime < 0.12f) return;
         _lastPreviewTime = Time.unscaledTime;
+        // Проигрываем реальный SFX (клик из банка, с запасным «динь»), НЕ бубнёж —
+        // у голосов теперь свой ползунок и своё превью (PlayVoicePreview).
+        PlaySFX(B(_bank?.click, _serveDingSound));
+    }
+
+    private float _lastVoicePreviewTime;
+    /// <summary>Проигрывает короткий бубнёж на текущей громкости голосов — превью для
+    /// ползунка «Голоса» (SpeechMixer сам читает VoiceVolume). С троттлингом.</summary>
+    public void PlayVoicePreview()
+    {
+        if (Time.unscaledTime - _lastVoicePreviewTime < 0.12f) return;
+        _lastVoicePreviewTime = Time.unscaledTime;
         if (_speechMixer != null) _speechMixer.PlayRandomFragment();
     }
 
     /// <summary>Применяет сохранённую громкость без записи в сейв (вызывает GameManager после загрузки).</summary>
-    public void ApplySavedVolumes(float music, float sfx)
+    public void ApplySavedVolumes(float music, float sfx, float voice)
     {
         _musicVolume = Mathf.Clamp01(music);
         _sfxVolume   = Mathf.Clamp01(sfx);
+        _voiceVolume = Mathf.Clamp01(voice);
         if (_musicSource != null) _musicSource.volume = _musicVolume;
     }
 

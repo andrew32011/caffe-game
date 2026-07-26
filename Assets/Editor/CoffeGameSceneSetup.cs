@@ -421,15 +421,18 @@ public static class CoffeGameSceneSetup
 
         var settingsPanel = Panel("SettingsPanel", ct, new Vector2(0.3f, 0.22f), new Vector2(0.7f, 0.82f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
         Text("SettingsTitle", settingsPanel.transform, "Настройки", 34, TextAlignmentOptions.Top, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.99f));
-        Text("MusicLabel", settingsPanel.transform, "Музыка", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.75f), new Vector2(0.5f, 0.83f));
-        var musicSlider = MakeSlider("MusicSlider", settingsPanel.transform, new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.74f), 0.4f);
-        Text("SfxLabel", settingsPanel.transform, "Звуки", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.57f), new Vector2(0.5f, 0.65f));
-        var sfxSlider = MakeSlider("SfxSlider", settingsPanel.transform, new Vector2(0.08f, 0.48f), new Vector2(0.92f, 0.56f), 0.8f);
+        Text("MusicLabel", settingsPanel.transform, "Музыка", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.80f), new Vector2(0.5f, 0.87f));
+        var musicSlider = MakeSlider("MusicSlider", settingsPanel.transform, new Vector2(0.08f, 0.73f), new Vector2(0.92f, 0.79f), 0.4f);
+        Text("SfxLabel", settingsPanel.transform, "Звуки", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.655f), new Vector2(0.5f, 0.725f));
+        var sfxSlider = MakeSlider("SfxSlider", settingsPanel.transform, new Vector2(0.08f, 0.585f), new Vector2(0.92f, 0.645f), 0.8f);
+        // Отдельный ползунок «Голоса» — громкость бубнёжа героев, независимо от эффектов.
+        Text("VoiceLabel", settingsPanel.transform, "Голоса", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.51f), new Vector2(0.5f, 0.58f));
+        var voiceSlider = MakeSlider("VoiceSlider", settingsPanel.transform, new Vector2(0.08f, 0.44f), new Vector2(0.92f, 0.50f), 0.8f);
         var fullscreenBtn = Btn("BtnFullscreen", settingsPanel.transform, "Полный экран: выкл");
-        SetRect(fullscreenBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.355f), new Vector2(0.9f, 0.45f));
+        SetRect(fullscreenBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.335f), new Vector2(0.9f, 0.41f));
         var fullscreenLabel = fullscreenBtn.GetComponentInChildren<TextMeshProUGUI>();
         var leaderboardBtn = Btn("BtnLeaderboard", settingsPanel.transform, "Таблица лидеров");
-        SetRect(leaderboardBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.235f), new Vector2(0.9f, 0.33f));
+        SetRect(leaderboardBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.225f), new Vector2(0.9f, 0.30f));
         var settingsClose = Btn("BtnSettingsClose", settingsPanel.transform, "Закрыть");
         SetRect(settingsClose.GetComponent<RectTransform>(), new Vector2(0.3f, 0.06f), new Vector2(0.7f, 0.16f));
         ApplyPanelSprite(settingsPanel);
@@ -463,6 +466,7 @@ public static class CoffeGameSceneSetup
             .Ref("_closeButton", settingsClose)
             .Ref("_musicSlider", musicSlider)
             .Ref("_sfxSlider", sfxSlider)
+            .Ref("_voiceSlider", voiceSlider)
             .Ref("_fullscreenButton", fullscreenBtn)
             .Ref("_fullscreenLabel", fullscreenLabel)
             .Ref("_leaderboardButton", leaderboardBtn)
