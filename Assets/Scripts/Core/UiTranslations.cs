@@ -62,6 +62,14 @@ public static class UiTranslations
             "Empezar de nuevo","Recomeçar","Ricomincia","Începe din nou","Mulai lagi","Alusta uuesti","Sākt no jauna","Pradėti iš naujo",
             "Кайра баштоо","Аз нав оғоз","Täzeden başla","Qaytadan boshlash") },
 
+        { "Убрать рекламу", M("Remove ads","Прибрати рекламу","Прыбраць рэкламу","Жарнаманы өшіру","Reklamları kaldır","Reklamları sil","Werbung entfernen","Supprimer les pubs",
+            "Quitar anuncios","Remover anúncios","Rimuovi annunci","Elimină reclamele","Hapus iklan","Eemalda reklaamid","Noņemt reklāmas","Pašalinti reklamas",
+            "Жарнаманы өчүрүү","Рекламаро нест кардан","Mahabaty aýyr","Reklamani olib tashlash") },
+
+        { "Отключить рекламу и поддержать автора?", M("Disable ads and support the author?","Вимкнути рекламу та підтримати автора?","Адключыць рэкламу і падтрымаць аўтара?","Жарнаманы өшіріп, авторды қолдайсыз ба?","Reklamları kapatıp yazarı destekle?","Reklamları söndürüb müəllifi dəstəklə?","Werbung deaktivieren und den Autor unterstützen?","Désactiver les pubs et soutenir l'auteur ?",
+            "¿Desactivar anuncios y apoyar al autor?","Desativar anúncios e apoiar o autor?","Disattivare gli annunci e sostenere l'autore?","Dezactivezi reclamele și susții autorul?","Nonaktifkan iklan dan dukung penulis?","Keela reklaamid ja toeta autorit?","Atspējot reklāmas un atbalstīt autoru?","Išjungti reklamas ir paremti autorių?",
+            "Жарнаманы өчүрүп, авторду колдойсузбу?","Рекламаро хомӯш карда, муаллифро дастгирӣ кунед?","Mahabaty öçürip, awtory goldaň?","Reklamani o'chirib, muallifni qo'llab-quvvatlaysizmi?") },
+
         { "Купить монеты", M("Buy coins","Купити монети","Купіць манеты","Монета сатып алу","Para satın al","Sikkə al","Münzen kaufen","Acheter des pièces",
             "Comprar monedas","Comprar moedas","Compra monete","Cumpără monede","Beli koin","Osta münte","Pirkt monētas","Pirkti monetas",
             "Тыйын сатып алуу","Танга харидан","Teňňe satyn al","Tanga sotib olish") },

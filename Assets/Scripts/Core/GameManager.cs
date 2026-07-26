@@ -322,6 +322,12 @@ public class GameManager : MonoBehaviour
         {
             int day = _saveData.currentDay;
 
+            // После всплывающей рекламы на переходе к дню (в т.ч. из сцены сна) — короткое
+            // ненавязчивое напоминание, что рекламу можно убрать за донат и поддержать
+            // автора. Не показываем на самом первом дне и если реклама уже отключена.
+            if (day > 1 && !_saveData.adsDisabled)
+                AdRemovalPrompt.Instance?.ShowAfterAd();
+
             // Пункт 1: перед финальным днём проверяем «цель путешествия» (10000 монет).
             // Не хватило — даём выбор: начать заново с 1-го дня (копить) или купить монеты.
             if (day >= 40 && _journeyGate != null && _saveData.totalCoins < CoinsUI.JourneyGoal)

@@ -209,10 +209,11 @@ public static class CoffeGameSceneSetup
             .Ref("_font", UiFont())
             .Apply();
 
-        // ── Кнопка «Убрать рекламу» (пункт 5): постоянная покупка через YG2 Payments ─
-        // Компонент сам строит свою пульсирующую кнопку в углу; прячется, если куплено.
-        var adDisable = canvasGO.AddComponent<AdDisableButton>();
-        new W(adDisable).Ref("_font", UiFont()).Apply();
+        // ── Напоминание «Убрать рекламу» (органично, после рекламы) ─────────────────
+        // Вместо постоянной кнопки-«бельма» — всплывашка ПОСЛЕ рекламы с покупкой отключения
+        // (YG2 Payments) и поддержкой автора. Подписи — из UiTranslations (все языки).
+        var adPrompt = canvasGO.AddComponent<AdRemovalPrompt>();
+        new W(adPrompt).Ref("_font", UiFont()).Apply();
 
         // ── Панель машины: 2 вертикальных заполнения (температура, объём) ────
         var machinePanel = Panel("MachinePanel", ct, new Vector2(0.35f, 0.25f), new Vector2(0.65f, 0.75f), new Color(0.06f, 0.06f, 0.1f, 0.9f));
@@ -766,38 +767,52 @@ public static class CoffeGameSceneSetup
             AssetDatabase.CreateAsset(bank, path);
         }
 
-        var clips = new List<AudioClip>();
-        foreach (var guid in AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets/Casual Game Sounds U6" }))
+        // Новый набор звуковых эффектов (средневеково-фэнтезийный) ПОЛНОСТЬЮ заменяет
+        // прежний — старый пакет «Casual Game Sounds U6» больше не используется, ни один
+        // старый звук в банке не остаётся. Новых клипов меньше, чем событий, поэтому
+        // переиспользуем их по смыслу.
+        AudioClip L(string file)
         {
-            var c = AssetDatabase.LoadAssetAtPath<AudioClip>(AssetDatabase.GUIDToAssetPath(guid));
-            if (c != null) clips.Add(c);
+            var c = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/sfx/" + file);
+            if (c == null) Debug.LogWarning($"CoffeGameSetup: не найден звук Assets/Audio/sfx/{file}");
+            return c;
         }
-        clips.Sort((a, b) => string.CompareOrdinal(a.name, b.name)); // DM-CGS-01..50 по порядку
-        bank.all = clips.ToArray();
+        var runeSeal = L("rune_seal.mp3");  // святая печать/руна — магия
+        var crossbow = L("crossbow.mp3");   // натяжение тетивы
+        var axe      = L("axe_slash.mp3");  // резкий удар
+        var sword    = L("sword_draw.mp3"); // металлический выхват
+        var horn     = L("horn.mp3");       // рог герольда
+        var bell     = L("bell.mp3");       // колокол
+        var fanfare  = L("fanfare.mp3");    // фанфары
+        var sting    = L("sting.mp3");      // зловещий стинг
 
-        bank.music = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/bg_music_celtic.mp3");
+        bank.all = new[] { runeSeal, crossbow, axe, sword, horn, bell, fanfare, sting };
 
-        AudioClip At(int i) => (bank.all != null && i < bank.all.Length) ? bank.all[i] : null;
-        if (bank.click == null)      bank.click      = At(0);
-        if (bank.uiOpen == null)     bank.uiOpen     = At(1);
-        if (bank.uiClose == null)    bank.uiClose    = At(2);
-        if (bank.pour == null)       bank.pour       = At(3);
-        if (bank.ding == null)       bank.ding       = At(4);
-        if (bank.perfect == null)    bank.perfect    = At(5);
-        if (bank.star == null)       bank.star       = At(6);
-        if (bank.customerIn == null) bank.customerIn = At(7);
-        if (bank.coin == null)       bank.coin       = At(8);
-        if (bank.combo == null)      bank.combo      = At(9);
-        if (bank.bonus == null)      bank.bonus      = At(10);
-        if (bank.correct == null)    bank.correct    = At(11);
-        if (bank.wrong == null)      bank.wrong      = At(12);
-        if (bank.dayClear == null)   bank.dayClear   = At(13);
-        if (bank.dayFail == null)    bank.dayFail    = At(14);
+        // Перезаписываем ВСЕ события (без проверки на null) — старых звуков не остаётся.
+        bank.click      = axe;       // клик — короткий резкий
+        bank.uiOpen     = sword;     // открытие панели — выхват меча
+        bank.uiClose    = crossbow;  // закрытие — натяжение
+        bank.pour       = crossbow;  // налив ингредиента — натяжение
+        bank.ding       = bell;      // подача напитка — колокол
+        bank.perfect    = runeSeal;  // «Идеально» — магическая печать
+        bank.star       = runeSeal;  // звезда/топпинг — магия
+        bank.customerIn = horn;      // приход гостя — рог герольда
+        bank.coin       = bell;      // монета — звон
+        bank.combo      = fanfare;   // комбо — фанфары
+        bank.bonus      = fanfare;   // бонус/награда — фанфары
+        bank.correct    = runeSeal;  // верный заказ — магия
+        bank.wrong      = axe;       // неверный заказ — резкий удар
+        bank.dayClear   = fanfare;   // день завершён — фанфары
+        bank.dayFail    = sting;     // рестарт дня — зловещий стинг
+
+        // Фон-музыка не относится к звуковым эффектам — оставляем существующую.
+        if (bank.music == null)
+            bank.music = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/bg_music_celtic.mp3");
 
         EditorUtility.SetDirty(bank);
         AssetDatabase.SaveAssets();
-        Debug.Log($"CoffeGameSetup: SoundBank — клипов {clips.Count}, музыка {(bank.music != null ? "OK" : "НЕТ")}. " +
-                  "Переназначь события в Assets/SoundBank.asset при желании.");
+        Debug.Log("CoffeGameSetup: SoundBank пересобран на новые средневековые звуки (8 клипов). " +
+                  "Старые звуковые эффекты из банка полностью удалены.");
         return bank;
     }
 
