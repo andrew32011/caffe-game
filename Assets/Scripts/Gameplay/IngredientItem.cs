@@ -65,26 +65,41 @@ public class IngredientItem : MonoBehaviour
         CoffeeCraftingSystem.Instance?.OnItemClicked(this);
     }
 
-    private void Update()
-    {
-        if (_pulsing)
-        {
-            float p = 1f + pulseAmplitude * Mathf.Sin(Time.time * pulseSpeed);
-            transform.localScale = _baseScale * p;
-        }
-    }
+    // Перф: пульс масштаба крутится корутиной ТОЛЬКО пока предмет подсвечен. Иначе
+    // каждый из ~15 предметов на столе гонял бы пустой Update каждый кадр.
+    private Coroutine _pulseCo;
+    private Coroutine _flashCo;
 
     public void SetPulsing(bool on)
     {
         _pulsing = on;
-        if (!on) transform.localScale = _baseScale;
         SetEmission(on ? PulseColor : Color.black);
+        if (on)
+        {
+            if (_pulseCo == null) _pulseCo = StartCoroutine(PulseRoutine());
+        }
+        else
+        {
+            if (_pulseCo != null) { StopCoroutine(_pulseCo); _pulseCo = null; }
+            transform.localScale = _baseScale;
+        }
+    }
+
+    private IEnumerator PulseRoutine()
+    {
+        while (_pulsing)
+        {
+            float p = 1f + pulseAmplitude * Mathf.Sin(Time.time * pulseSpeed);
+            transform.localScale = _baseScale * p;
+            yield return null;
+        }
+        transform.localScale = _baseScale;
     }
 
     public void FlashSelected()
     {
-        StopAllCoroutines();
-        StartCoroutine(FlashRoutine());
+        if (_flashCo != null) StopCoroutine(_flashCo);
+        _flashCo = StartCoroutine(FlashRoutine());
     }
 
     private IEnumerator FlashRoutine()

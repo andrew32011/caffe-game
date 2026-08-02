@@ -61,10 +61,12 @@ public class Stages : MonoBehaviour
             StartCoroutine(GoToStage(0));
     }
 
+#if UNITY_EDITOR
+    // Только редакторский дебаг: ручное переключение стадий из инспектора.
+    // Весь метод скрыт под UNITY_EDITOR — в билде Update не существует, значит
+    // Unity не вызывает его каждый кадр (убираем пустой per-frame вызов).
     void Update()
     {
-        // ������ ������������ �������� ������ � ���������
-#if UNITY_EDITOR
         if (manualControl && !isTransitioning && stages.Count > 0)
         {
             if (debugStageIndex != currentStage)
@@ -73,8 +75,8 @@ public class Stages : MonoBehaviour
                 StartCoroutine(GoToStage(debugStageIndex));
             }
         }
-#endif
     }
+#endif
 
     // ����� �� �������� �������: ������ ��������
     public void CompleteStage()

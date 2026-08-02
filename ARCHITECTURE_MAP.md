@@ -84,7 +84,7 @@ CustomerController ─▶ ProcessVisitor, SatisfactionBar
 
 ## 4. Анти-паттерны / тех-долг (флаги)
 - **`FindObjectOfType`/`GameObject.Find`**: `GameManager`(свет), `Stage0`/`Stage7`(ProcessVisitor). Мелочь; лучше ссылки.
-- **`Update()`-полинг (11 файлов)**: часть оправдана (MachineMinigame, CameraWaypoint, ProcessVisitor), часть можно на события (`CoinsUI`, `SatisfactionBar`, `DialogueDisplayer` ввод).
+- **`Update()`-полинг**: частично разгружен (Батч 9-perf). `Stages.Update` — теперь целиком под `#if UNITY_EDITOR` (в билде метода нет). `IngredientItem` — пульс переведён на корутину (десяток предметов больше не гоняет пустой Update; работает только подсвеченный). `JournalBadge.Update` — троттлинг ~2×/сек. Осталось оправданным: MachineMinigame (только при активном минигейме), CameraWaypoint/ProcessVisitor/CustomerController (движение), SatisfactionBar (billboard, живёт только при госте), DialogueDisplayer (ввод), ButtonJuice (juice HUD-кнопок — при желании можно ужать `_shine`, т.к. смена color/кадр дёргает canvas rebuild). `CoinsUI` — Update есть, но с guard'ом (пишет только при смене баланса) → фактически бесплатен.
 - **Legacy-код**: `DialogueManager` + `DialogueDatabase`(в DialogLine.cs) — не используются сюжетом, кандидаты на удаление.
 - **public-поля вместо `[SerializeField] private`**: `DialogueDisplayer`(14), `CameraWaypointController`(17), `Stages`(16) — ослабляют инкапсуляцию.
 - **Битая кодировка комментариев** (mojibake) в `CameraWaypointController`, местами в `Stages`/`DialogLine` (старые файлы, cp1251).

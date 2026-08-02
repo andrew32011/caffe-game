@@ -35,8 +35,16 @@ public class JournalBadge : MonoBehaviour
         _shown = -1;
     }
 
+    private float _checkTimer;
+
     private void Update()
     {
+        // Перф: число новых гостей меняется редко (после обслуживания или открытия
+        // журнала), поэтому проверяем ~2 раза в секунду, а не каждый кадр.
+        _checkTimer -= Time.unscaledDeltaTime;
+        if (_checkTimer > 0f) return;
+        _checkTimer = 0.5f;
+
         int n = NewCount();
         if (n != _shown) Refresh(n);
     }
