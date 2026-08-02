@@ -422,12 +422,12 @@ public static class CoffeGameSceneSetup
         var settingsPanel = Panel("SettingsPanel", ct, new Vector2(0.3f, 0.22f), new Vector2(0.7f, 0.82f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
         Text("SettingsTitle", settingsPanel.transform, "Настройки", 34, TextAlignmentOptions.Top, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.99f));
         Text("MusicLabel", settingsPanel.transform, "Музыка", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.80f), new Vector2(0.5f, 0.87f));
-        var musicSlider = MakeSlider("MusicSlider", settingsPanel.transform, new Vector2(0.08f, 0.73f), new Vector2(0.92f, 0.79f), 0.4f);
+        var musicSlider = MakeSlider("MusicSlider", settingsPanel.transform, new Vector2(0.08f, 0.73f), new Vector2(0.92f, 0.79f), 0.5f);
         Text("SfxLabel", settingsPanel.transform, "Звуки", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.655f), new Vector2(0.5f, 0.725f));
         var sfxSlider = MakeSlider("SfxSlider", settingsPanel.transform, new Vector2(0.08f, 0.585f), new Vector2(0.92f, 0.645f), 0.8f);
         // Отдельный ползунок «Голоса» — громкость бубнёжа героев, независимо от эффектов.
         Text("VoiceLabel", settingsPanel.transform, "Голоса", 24, TextAlignmentOptions.Left, new Vector2(0.08f, 0.51f), new Vector2(0.5f, 0.58f));
-        var voiceSlider = MakeSlider("VoiceSlider", settingsPanel.transform, new Vector2(0.08f, 0.44f), new Vector2(0.92f, 0.50f), 0.8f);
+        var voiceSlider = MakeSlider("VoiceSlider", settingsPanel.transform, new Vector2(0.08f, 0.44f), new Vector2(0.92f, 0.50f), 0.9f);
         var fullscreenBtn = Btn("BtnFullscreen", settingsPanel.transform, "Полный экран: выкл");
         SetRect(fullscreenBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.335f), new Vector2(0.9f, 0.41f));
         var fullscreenLabel = fullscreenBtn.GetComponentInChildren<TextMeshProUGUI>();

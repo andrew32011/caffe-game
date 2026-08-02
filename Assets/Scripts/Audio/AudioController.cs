@@ -43,9 +43,15 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioClip _bonusSound;        // Ежедневный бонус / награда
 
     [Header("Настройки")]
-    [Range(0f, 1f)] [SerializeField] private float _musicVolume = 0.4f;
+    [Range(0f, 1f)] [SerializeField] private float _musicVolume = 0.5f;
     [Range(0f, 1f)] [SerializeField] private float _sfxVolume   = 0.8f;
-    [Range(0f, 1f)] [SerializeField] private float _voiceVolume = 0.8f; // «бубнёж» героев — отдельно от эффектов
+    [Range(0f, 1f)] [SerializeField] private float _voiceVolume = 0.9f; // «бубнёж» героев — отдельно от эффектов
+
+    // Звуковые эффекты по задумке заметно ТИШЕ музыки и голосов: даже при ползунке на
+    // максимуме их фактическая громкость = _sfxVolume × SfxGain. Так «динь/монеты/клики»
+    // остаются фоном, а не забивают музыку и речь. Ползунок «Звуки» по-прежнему регулирует
+    // их в этом приглушённом диапазоне.
+    private const float SfxGain = 0.35f;
 
     // ─── Состояние ───────────────────────────────────────────────────────────
 
@@ -107,7 +113,8 @@ public class AudioController : MonoBehaviour
     public void PlaySFX(AudioClip clip)
     {
         if (_sfxSource == null || clip == null) return;
-        _sfxSource.PlayOneShot(clip, _sfxVolume);
+        // SfxGain приглушает эффекты относительно музыки/голосов (см. поле выше).
+        _sfxSource.PlayOneShot(clip, _sfxVolume * SfxGain);
     }
 
     // ─── Батч 4: настройки громкости ─────────────────────────────────────────
