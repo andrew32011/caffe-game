@@ -153,6 +153,7 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
     private void OnAdHintClicked()
     {
+        Analytics.Rewarded("hint"); // метрика: игрок попросил точный заказ (сигнал «застрял» → риск оттока)
 #if RewardedAdv_yg
         YG.YG2.RewardedAdvShow("hint");
         // награду ловим в HintManager/здесь? упрощённо — открываем сразу после показа

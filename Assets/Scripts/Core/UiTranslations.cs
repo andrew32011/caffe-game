@@ -118,6 +118,33 @@ public static class UiTranslations
             "Voces","Vozes","Voci","Voci","Suara","Hääled","Balsis","Balsai",
             "Үндөр","Овозҳо","Sesler","Ovozlar") },
 
+        // ─── Промпты вовлечения (оценка игры / ярлык на рабочий стол) ───────────
+        { "Нравится игра? Оцени её — это очень поможет!", M(
+            "Enjoying the game? Rate it — it really helps!","Подобається гра? Оціни її — це дуже допоможе!","Падабаецца гульня? Ацані яе — гэта вельмі дапаможа!","Ойын ұнады ма? Бағалаңыз — бұл көп көмектеседі!","Oyunu beğendin mi? Puan ver — çok yardımcı olur!","Oyun xoşuna gəldi? Qiymətləndir — çox kömək edər!","Gefällt dir das Spiel? Bewerte es — das hilft sehr!","Le jeu te plaît ? Note-le — ça aide beaucoup !",
+            "¿Te gusta el juego? Puntúalo, ¡ayuda mucho!","Gostando do jogo? Avalie — ajuda muito!","Ti piace il gioco? Valutalo — aiuta molto!","Îți place jocul? Evaluează-l — ajută mult!","Suka gamenya? Beri nilai — sangat membantu!","Kas mäng meeldib? Hinda seda — see aitab palju!","Patīk spēle? Novērtē to — tas ļoti palīdz!","Patinka žaidimas? Įvertink — tai labai padeda!",
+            "Оюн жактыбы? Баалап кой — бул абдан жардам берет!","Бозӣ маъқул шуд? Онро баҳо диҳед — ин хеле кӯмак мекунад!","Oýun haladyňmy? Baha ber — bu köp kömek eder!","O'yin yoqdimi? Baholang — bu juda yordam beradi!") },
+
+        { "Оценить", M("Rate","Оцінити","Ацаніць","Бағалау","Puan ver","Qiymətləndir","Bewerten","Noter",
+            "Puntuar","Avaliar","Valuta","Evaluează","Beri nilai","Hinda","Novērtēt","Įvertinti",
+            "Баалоо","Баҳо додан","Baha ber","Baholash") },
+
+        { "Позже", M("Later","Пізніше","Пазней","Кейінірек","Sonra","Sonra","Später","Plus tard",
+            "Más tarde","Mais tarde","Più tardi","Mai târziu","Nanti","Hiljem","Vēlāk","Vėliau",
+            "Кийин","Баъдтар","Soňra","Keyinroq") },
+
+        { "Добавить игру на рабочий стол, чтобы вернуться?", M(
+            "Add the game to your home screen to come back?","Додати гру на робочий стіл, щоб повернутися?","Дадаць гульню на працоўны стол, каб вярнуцца?","Оралу үшін ойынды жұмыс үстеліне қосасыз ба?","Geri dönmek için oyunu ana ekrana ekle?","Qayıtmaq üçün oyunu ana ekrana əlavə et?","Das Spiel zum Startbildschirm hinzufügen, um zurückzukehren?","Ajouter le jeu à l'écran d'accueil pour revenir ?",
+            "¿Añadir el juego a la pantalla de inicio para volver?","Adicionar o jogo à tela inicial para voltar?","Aggiungere il gioco alla schermata home per tornare?","Adaugi jocul pe ecranul principal ca să revii?","Tambahkan game ke layar utama agar bisa kembali?","Kas lisada mäng avakuvale, et tagasi tulla?","Pievienot spēli sākuma ekrānam, lai atgrieztos?","Pridėti žaidimą į pradžios ekraną, kad grįžtum?",
+            "Кайра кирүү үчүн оюнду башкы экранга кошосузбу?","Барои баргаштан бозиро ба экрани асосӣ илова кунед?","Yzyna dolanmak üçin oýny baş ekrana goş?","Qaytish uchun o'yinni bosh ekranga qo'shasizmi?") },
+
+        { "Добавить", M("Add","Додати","Дадаць","Қосу","Ekle","Əlavə et","Hinzufügen","Ajouter",
+            "Añadir","Adicionar","Aggiungi","Adaugă","Tambah","Lisa","Pievienot","Pridėti",
+            "Кошуу","Илова","Goş","Qo'shish") },
+
+        { "Не сейчас", M("Not now","Не зараз","Не зараз","Қазір емес","Şimdi değil","İndi yox","Nicht jetzt","Pas maintenant",
+            "Ahora no","Agora não","Non ora","Nu acum","Nanti saja","Mitte praegu","Ne tagad","Ne dabar",
+            "Азыр эмес","Ҳозир не","Häzir däl","Hozir emas") },
+
         { "Журнал гостей · Завсегдатаи", M("Guest journal · Regulars","Журнал гостей · Завсідники","Журнал гасцей · Заўсёднікі","Қонақтар журналы · Тұрақтылар","Konuk günlüğü · Müdavimler","Qonaq jurnalı · Daimi müştərilər","Gästejournal · Stammgäste","Journal des clients · Habitués",
             "Diario de clientes · Habituales","Diário de clientes · Frequentadores","Diario ospiti · Clienti abituali","Jurnalul oaspeților · Clienți fideli","Jurnal tamu · Pelanggan tetap","Külaliste päevik · Püsikliendid","Viesu žurnāls · Pastāvīgie klienti","Svečių žurnalas · Nuolatiniai klientai",
             "Меймандар журналы · Туруктуу кардарлар","Журнали меҳмонон · Мизоҷони доимӣ","Myhman žurnaly · Hemişelik müşderiler","Mehmonlar jurnali · Doimiy mijozlar") },

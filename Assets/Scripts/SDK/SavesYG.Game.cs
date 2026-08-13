@@ -67,5 +67,9 @@ namespace YG
         public bool endlessMode    = false; // включён ли бесконечный режим (после финала)
         public int  endlessDay     = 0;     // текущий день бесконечного режима (1, 2, 3…)
         public int  endlessBestDay = 0;     // рекорд: самый дальний достигнутый бесконечный день
+
+        // ─── Промпты вовлечения (показываем один раз) ───────────────────────────
+        public bool shortcutAsked = false; // предложили добавить ярлык на рабочий стол (после дня 1)
+        public bool reviewAsked   = false; // предложили оценить игру (после дня 3)
     }
 }

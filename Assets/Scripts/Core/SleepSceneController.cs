@@ -198,6 +198,7 @@ public class SleepSceneController : MonoBehaviour
     {
         if (YG2.saves != null && YG2.saves.adsDisabled) yield break;
 #if InterstitialAdv_yg
+        Analytics.Send(Analytics.AdInterstitial); // метрика: показ межстраничной в сцене сна
         YG2.InterstitialAdvShow();
         yield return new WaitUntil(() => !YG2.nowInterAdv);
 #else

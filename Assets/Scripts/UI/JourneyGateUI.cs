@@ -84,6 +84,7 @@ public class JourneyGateUI : MonoBehaviour
     {
         if (id == _coinProductId)
         {
+            Analytics.Bought(_coinProductId); // метрика: покупка пакета монет
             GameManager.Instance?.AddCoins(_coinAmountPerPurchase);
             GameManager.Instance?.SaveGame();          // сохраняем покупку сразу (требование 1.13.3)
             YG2.ConsumePurchaseByID(_coinProductId);   // консумируем товар (требование 1.13.1) — иначе нельзя купить повторно

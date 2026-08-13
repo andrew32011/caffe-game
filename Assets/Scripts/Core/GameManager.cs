@@ -143,6 +143,8 @@ public class GameManager : MonoBehaviour
         // сцены сна MainScene перезагружается, но повторять их не нужно — сразу к дню.
         if (!_sessionInitDone)
         {
+            Analytics.Send(Analytics.SessionStart); // метрика: старт игровой сессии
+
             if (_forceTutorial || !_saveData.tutorialDone)
             {
                 yield return StartCoroutine(RunTutorial());
@@ -166,6 +168,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator RunTutorial()
     {
         _currentPhase = GamePhase.Tutorial;
+        Analytics.Send(Analytics.TutorialStart); // метрика: начало обучения (ранний отток)
 
         if (_tutorialController != null)
         {
@@ -174,6 +177,7 @@ public class GameManager : MonoBehaviour
         }
 
         GameInput.Locked = true; // после обучения управление выключаем (пункт 5)
+        Analytics.Send(Analytics.TutorialDone); // метрика: обучение пройдено
         _saveData.tutorialDone = true;
         _saveData.currentDay   = 1;
         SaveGame();
@@ -307,6 +311,7 @@ public class GameManager : MonoBehaviour
         // Куплено отключение рекламы (YG2 Payments, навсегда) — не показываем.
         if (_saveData != null && _saveData.adsDisabled) yield break;
 #if InterstitialAdv_yg
+        Analytics.Send(Analytics.AdInterstitial); // метрика: показ межстраничной (отток после рекламы)
         YG2.InterstitialAdvShow();
         yield return new WaitUntil(() => !YG2.nowInterAdv);
 #else
@@ -333,6 +338,7 @@ public class GameManager : MonoBehaviour
             if (day >= 40 && _journeyGate != null && _saveData.totalCoins < CoinsUI.JourneyGoal)
             {
                 GameInput.Locked = true;
+                Analytics.Send(Analytics.JourneyGate); // метрика: дошёл до гейта цели, но не накопил
                 yield return StartCoroutine(_journeyGate.Run(CoinsUI.JourneyGoal));
                 if (_journeyGate.RestartChosen)
                 {
@@ -356,6 +362,7 @@ public class GameManager : MonoBehaviour
             // ─── Запускаем день ─────────────────────────────────────────────
             _currentPhase = GamePhase.Day;
             YG2.GameplayStart();
+            Analytics.DayStarted(day, endless: false); // метрика: разбивка оттока по дню сюжета
 
             bool dayCompleted = false;
             while (!dayCompleted)
@@ -368,6 +375,7 @@ public class GameManager : MonoBehaviour
                 if (!dayCompleted)
                 {
                     // Рестарт дня — пауза, потом снова
+                    Analytics.DayFail(day); // метрика: провал дня (частая причина фрустрации/оттока)
                     AudioController.Instance?.PlayDayFail();
                     _dialogue.ShowMessage(
                         Loc.T("День не засчитан. Начинаем заново...",
@@ -377,6 +385,7 @@ public class GameManager : MonoBehaviour
             }
 
             YG2.GameplayStop();
+            Analytics.DayCompleted(day, _dayController.CoinsEarnedToday); // метрика: день пройден
 
             // ─── Экран результатов дня ──────────────────────────────────────
             // Деньги меняются живьём в процессе дня (списание себестоимости +
@@ -396,6 +405,9 @@ public class GameManager : MonoBehaviour
             {
                 yield return new WaitForSeconds(3f);
             }
+
+            // Промпты вовлечения: после дня 1 — ярлык на рабочий стол, после дня 3 — оценка игры.
+            yield return StartCoroutine(MaybeShowEngagementPrompt(day));
 
             // Ночь: видения/эффекты — фоновая музыка замолкает (возобновится на новом дне).
             _audioController?.PauseMusic();
@@ -461,6 +473,7 @@ public class GameManager : MonoBehaviour
             _saveData.endlessMode = true;
             _saveData.endlessDay  = 1;
             SaveGame();
+            Analytics.Send(Analytics.EndlessStart); // метрика: игрок дошёл до финала и включил endless
 
             if (_dialogue != null)
             {
@@ -496,6 +509,7 @@ public class GameManager : MonoBehaviour
 
             _currentPhase = GamePhase.Day;
             YG2.GameplayStart();
+            Analytics.DayStarted(eDay, endless: true); // метрика: как далеко заходят в endless
 
             bool dayCompleted = false;
             while (!dayCompleted)
@@ -573,6 +587,49 @@ public class GameManager : MonoBehaviour
             if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) clicked = true;
             yield return null;
         }
+    }
+
+    /// <summary>Промпты вовлечения после дня (каждый — один раз, локализация «плашками»):
+    /// день 1 → ярлык на рабочий стол; день 3 → оценка игры. Промпт строится в рантайме
+    /// (EngagementPrompt), сборка сцены билдером не нужна.</summary>
+    private IEnumerator MaybeShowEngagementPrompt(int day)
+    {
+        // День 1 — предложить добавить ярлык (только если платформа реально умеет ярлык).
+        if (day == 1 && !_saveData.shortcutAsked)
+        {
+            _saveData.shortcutAsked = true;
+            SaveGame();
+            if (YaShortcut.Available())
+            {
+                var p = EngagementPrompt.Ensure();
+                Analytics.Prompt("shortcut", accepted: false);
+                p.Show("Добавить игру на рабочий стол, чтобы вернуться?", "Добавить", "Не сейчас", () =>
+                {
+                    Analytics.Prompt("shortcut", accepted: true);
+                    YaShortcut.Prompt();
+                });
+                yield return new WaitUntil(() => !p.IsShowing);
+            }
+        }
+
+#if Review_yg
+        // День 3 — предложить оценить игру (только с установленным модулем Review,
+        // иначе кнопка «Оценить» была бы мёртвой — так её просто нет).
+        if (day == 3 && !_saveData.reviewAsked)
+        {
+            _saveData.reviewAsked = true;
+            SaveGame();
+            var p = EngagementPrompt.Ensure();
+            Analytics.Prompt("review", accepted: false);
+            p.Show("Нравится игра? Оцени её — это очень поможет!", "Оценить", "Позже", () =>
+            {
+                Analytics.Prompt("review", accepted: true);
+                YG2.ReviewShow();
+            });
+            yield return new WaitUntil(() => !p.IsShowing);
+        }
+#endif
+        yield break;
     }
 
     // ─── Финал игры ───────────────────────────────────────────────────────────

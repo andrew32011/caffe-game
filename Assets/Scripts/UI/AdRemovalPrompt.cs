@@ -160,6 +160,7 @@ public class AdRemovalPrompt : MonoBehaviour
     private void OnPurchase(string id)
     {
         if (id != ProductId) return;
+        Analytics.Bought(ProductId); // метрика: покупка «Убрать рекламу»
         if (YG2.saves != null)
         {
             YG2.saves.adsDisabled = true;
