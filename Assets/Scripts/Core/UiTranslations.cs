@@ -86,6 +86,11 @@ public static class UiTranslations
             "Diario","Diário","Diario","Jurnal","Jurnal","Päevik","Žurnāls","Žurnalas",
             "Журнал","Журнал","Žurnal","Jurnal") },
 
+        // Батч 11: рекорды бесконечного режима.
+        { "Рекорды: бесконечный режим", M("Records: Endless mode","Рекорди: нескінченний режим","Рэкорды: бясконцы рэжым","Рекордтар: шексіз режим","Rekorlar: Sonsuz mod","Rekordlar: Sonsuz rejim","Rekorde: Endlos-Modus","Records : mode Infini",
+            "Récords: modo Infinito","Recordes: modo Infinito","Record: modalità Infinita","Recorduri: mod Infinit","Rekor: mode Tanpa Batas","Rekordid: lõpmatu režiim","Rekordi: bezgalīgais režīms","Rekordai: begalinis režimas",
+            "Рекорддор: чексиз режим","Рекордҳо: реҷаи беохир","Rekordlar: Tükeniksiz režim","Rekordlar: Cheksiz rejim") },
+
         { "Сброс", M("Reset","Скидання","Скід","Ысыру","Sıfırla","Sıfırla","Zurücksetzen","Réinitialiser",
             "Reiniciar","Redefinir","Reimposta","Resetare","Reset","Lähtesta","Atiestatīt","Atstatyti",
             "Кайра коюу","Бознишонӣ","Täzeden düz","Qayta o'rnatish") },

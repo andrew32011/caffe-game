@@ -545,7 +545,9 @@ public class GameManager : MonoBehaviour
                 _dayResultUI.Show(EndlessMode.DisplayDayNumber(eDay), _dayController.CoinsEarnedToday,
                                   Loc.T("Ещё один день в «Междумирье». Кофейня не спит.",
                                         "Another day at the Inbetween. The café never sleeps."),
-                                  _dayController.CurrentComboCount);
+                                  _dayController.CurrentComboCount,
+                                  Loc.T($"БЕСКОНЕЧНЫЙ ДЕНЬ {eDay}", $"ENDLESS DAY {eDay}"), // Батч 11: плашка вместо «День 41…»
+                                  _saveData.endlessBestDay);
                 yield return new WaitUntil(() => !_dayResultUI.IsShowing);
             }
             else

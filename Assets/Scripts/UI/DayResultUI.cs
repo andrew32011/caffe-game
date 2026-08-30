@@ -96,12 +96,21 @@ public class DayResultUI : MonoBehaviour
 
     // ─── Публичное API ───────────────────────────────────────────────────────
 
-    /// <summary>Показывает экран результатов дня.</summary>
-    public void Show(int dayNumber, int coinsEarned, string summaryText, int comboCount = 0)
+    // Батч 11: бесконечный режим — если задан, показываем «плашку» бесконечного дня
+    // вместо «ДЕНЬ N ЗАВЕРШЁН» и переиспользуем трекер под рекорд.
+    private int _endlessBestDay;
+
+    /// <summary>Показывает экран результатов дня. В бесконечном режиме передать
+    /// <paramref name="titleOverride"/> (напр. «Бесконечный день N») и текущий рекорд
+    /// <paramref name="endlessBestDay"/> — тогда трекер «Путь к 10 000» превращается в строку рекорда.</summary>
+    public void Show(int dayNumber, int coinsEarned, string summaryText, int comboCount = 0,
+                     string titleOverride = null, int endlessBestDay = 0)
     {
         IsShowing = true;
+        _endlessBestDay = endlessBestDay;
 
-        if (_dayNumberText  != null) _dayNumberText.text  = Loc.T($"ДЕНЬ {dayNumber} ЗАВЕРШЁН", $"DAY {dayNumber} COMPLETE");
+        if (_dayNumberText  != null) _dayNumberText.text  = titleOverride
+            ?? Loc.T($"ДЕНЬ {dayNumber} ЗАВЕРШЁН", $"DAY {dayNumber} COMPLETE");
         if (_coinsEarnedText!= null) _coinsEarnedText.text= "+" + coinsEarned + Loc.T(" монет", " coins");
         if (_totalCoinsText != null) _totalCoinsText.text = Loc.T("Всего: ", "Total: ") + (GameManager.Instance?.TotalCoins ?? 0) + Loc.T(" монет", " coins");
         if (_dayEndText     != null) _dayEndText.text     = summaryText;
@@ -280,6 +289,23 @@ public class DayResultUI : MonoBehaviour
     // ─── Батч 6: трекер «Путь к 10 000» с прогнозом темпа ─────────────────────
     private void UpdateJourneyTracker(int day)
     {
+        // Батч 11: в бесконечном режиме цель 10 000 уже пройдена — переиспользуем трекер
+        // под рекорд «самого дальнего дня» (плашка вовлечения вместо бессмысленного прогресса).
+        if (_endlessBestDay > 0)
+        {
+            if (_journeyFill != null) { _journeyFill.fillAmount = 1f; _journeyFill.color = new Color(0.95f, 0.8f, 0.3f); }
+            if (_journeyProgressText != null)
+                _journeyProgressText.text = Loc.T($"Рекорд: бесконечный день {_endlessBestDay}",
+                                                  $"Record: endless day {_endlessBestDay}");
+            if (_journeyForecastText != null)
+            {
+                _journeyForecastText.color = new Color(0.95f, 0.8f, 0.3f);
+                _journeyForecastText.text  = Loc.T("Держись как можно дольше — ставь рекорды!",
+                                                   "Last as long as you can — set records!");
+            }
+            return;
+        }
+
         int total    = GameManager.Instance?.TotalCoins ?? 0;
         int goal     = CoinsUI.JourneyGoal;      // 10000
         int finalDay = Difficulty.FinalDay;      // 40

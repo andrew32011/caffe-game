@@ -10,6 +10,7 @@
 /// Зависимости: GameManager, AudioController, UiEffects, Loc, TMPro
 /// SDK: Нет
 /// </summary>
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -25,6 +26,12 @@ public class UpgradeShopUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] _infoTexts;  // 3
     [SerializeField] private Button[]          _buyButtons; // 3
     [SerializeField] private TextMeshProUGUI[] _buyLabels;  // 3
+
+    [Header("Батч 11: шкалы мастерства «сейчас/станет» (опц.)")]
+    [Tooltip("Заполнение = текущий уровень / максимум. Показывает накопленный эффект.")]
+    [SerializeField] private Image[] _effectFills;  // 3 — «сейчас»
+    [Tooltip("Полупрозрачный слой = уровень после покупки. Разница = прибавка от улучшения.")]
+    [SerializeField] private Image[] _effectGhosts; // 3 — «станет»
 
     private const int RowCount = 3;
 
@@ -90,7 +97,51 @@ public class UpgradeShopUI : MonoBehaviour
 
             SetText(_buyLabels, i, cost < 0 ? Loc.T("Максимум", "Max")
                                             : Loc.T($"Купить — {cost}", $"Buy — {cost}"));
+
+            UpdateBar(i, level); // Батч 11: шкала «сейчас/станет»
         }
+    }
+
+    // ─── Батч 11: визуализация мастерства (шкала «сейчас/станет») ──────────────
+    private Coroutine[] _fillCo;
+
+    private void UpdateBar(int i, int level)
+    {
+        float max  = GameManager.UpgradeMaxLevel;
+        float cur  = Mathf.Clamp01(level / max);
+        bool  maxed = level >= GameManager.UpgradeMaxLevel;
+        float next = maxed ? cur : Mathf.Clamp01((level + 1) / max);
+
+        if (_effectGhosts != null && i < _effectGhosts.Length && _effectGhosts[i] != null)
+        {
+            _effectGhosts[i].gameObject.SetActive(!maxed);       // «станет» скрыто на максимуме
+            _effectGhosts[i].fillAmount = next;
+        }
+
+        if (_effectFills != null && i < _effectFills.Length && _effectFills[i] != null)
+        {
+            if (_fillCo == null) _fillCo = new Coroutine[RowCount];
+            if (i < _fillCo.Length)
+            {
+                if (_fillCo[i] != null) StopCoroutine(_fillCo[i]);
+                _fillCo[i] = StartCoroutine(AnimateFill(_effectFills[i], cur));
+            }
+        }
+    }
+
+    private IEnumerator AnimateFill(Image img, float target)
+    {
+        float from = img.fillAmount;
+        // При заметном росте (покупка) — плавная анимация; иначе выставляем сразу.
+        if (Mathf.Abs(target - from) < 0.001f) { img.fillAmount = target; yield break; }
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.unscaledDeltaTime * 2.5f;
+            img.fillAmount = Mathf.Lerp(from, target, Mathf.SmoothStep(0f, 1f, t));
+            yield return null;
+        }
+        img.fillAmount = target;
     }
 
     private static void SetText(TextMeshProUGUI[] arr, int i, string text)

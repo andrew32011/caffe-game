@@ -63,6 +63,7 @@ public class DayController : MonoBehaviour
     private int  _currentDayNumber = 1;
     private bool _daySuccess       = false;
     private float _specialDayMult  = 1f;  // Батч 6: ставка особого дня (×1.3 на днях 8/16/24/32/40)
+    private bool _rushDay          = false; // Батч 11: «Час пик» — бонус за темп подачи
 
     /// <summary>Батч 6: «Особый гость» — каждый 8-й день (пик вовлечения).</summary>
     public static bool IsSpecialDay(int day) => day > 0 && day % 8 == 0;
@@ -89,6 +90,10 @@ public class DayController : MonoBehaviour
         bool special = IsSpecialDay(dayData.dayNumber);
         _specialDayMult = special ? 1.3f : 1f;
         _craftingSystem.SetExtraTolerance(special ? -0.02f : 0f);
+
+        // Батч 11: «Час пик» — день с бонусом за темп подачи (в endless всегда, в сюжете периодически).
+        bool endless = GameManager.Instance != null && GameManager.Instance.EndlessActive;
+        _rushDay = RushController.IsRushDay(dayData.dayNumber, endless);
 
         _dialogue?.ShowDayIntro(dayData.dayNumber);
         yield return new WaitForSeconds(2f);
@@ -122,8 +127,35 @@ public class DayController : MonoBehaviour
         int startIndex = GameManager.Instance != null ? GameManager.Instance.ResumeCustomerIndex : 0;
         if (startIndex < 0 || startIndex >= dayData.customers.Count) startIndex = 0;
 
+        // Батч 11: плашка «Часа пик» (очередь = сколько гостей осталось на день).
+        if (_rushDay)
+        {
+            RushHudUI.Instance?.BeginRush(dayData.customers.Count - startIndex);
+
+            // Анонс поп-апом — только в СЮЖЕТНЫЕ час-пик дни (там это событие). В endless
+            // каждый день час-пиковый, поэтому полагаемся на постоянную плашку без спама.
+            if (!endless)
+            {
+                _dialogue?.ShowMessage(
+                    Loc.T("Час пик! Гости идут потоком — подавай быстрее ради прибавки к темпу.",
+                          "Rush hour! Guests keep coming — serve faster for a tempo bonus."), 2.8f);
+                yield return new WaitForSeconds(1.5f);
+            }
+
+            // Разъяснение механики — один раз за всё время (и в сюжете, и в endless).
+            if (GameManager.Instance != null && GameManager.Instance.MarkTipShown("tip_rush") && _dialogue != null)
+            {
+                _dialogue.ShowMessage(
+                    Loc.T("В час пик успевай подать быстро — это не штраф, а бонус к оплате за скорость.",
+                          "In rush hour, serve quickly — no penalty, just a speed bonus to your pay."), 3f);
+                yield return new WaitForSeconds(2f);
+            }
+        }
+
         for (int ci = startIndex; ci < dayData.customers.Count; ci++)
         {
+            if (_rushDay) RushHudUI.Instance?.SetQueue(dayData.customers.Count - ci); // осталось гостей, включая текущего
+
             yield return StartCoroutine(
                 ServeCustomer(dayData.customers[ci], dayData.coinsPerCorrectOrder));
 
@@ -133,9 +165,10 @@ public class DayController : MonoBehaviour
             yield return new WaitForSeconds(1f); // Пауза между гостями
         }
 
-        // День завершён — сбрасываем внутридневной индекс и убираем индикатор комбо.
+        // День завершён — сбрасываем внутридневной индекс и убираем индикатор комбо/часа пик.
         GameManager.Instance?.SetCustomerIndex(0);
         UiEffects.Instance?.ShowCombo(0);
+        RushHudUI.Instance?.EndRush();
 
         // Батч 6: награда за выполненный «Заказ дня» (входит в дневную выручку).
         int challengeBonus = _dailyChallenge != null ? _dailyChallenge.Claim() : 0;
@@ -213,7 +246,13 @@ public class DayController : MonoBehaviour
         // Батч 6: апселл «любимый топпинг» — просьба доступна при симпатии ≥60%.
         _craftingSystem.SetFavorite(CharacterNames.FavoriteTopping(entry.characterType), stored >= 0.6f);
         _craftingSystem.Show();
+        // Батч 11: замер темпа приготовления (только в час пик) — по масштабируемому времени,
+        // чтобы пауза настроек честно замораживала и шкалу, и бонус.
+        float craftStart = Time.time;
+        if (_rushDay) RushHudUI.Instance?.StartTimer(RushController.RushSeconds);
         yield return new WaitUntil(() => _craftingSystem.IsOrderReady);
+        float craftElapsed = Time.time - craftStart;
+        if (_rushDay) RushHudUI.Instance?.StopTimer();
         _craftingSystem.Hide();
 
         // 6. Оценка результата (доля совпавших параметров 0..1)
@@ -280,8 +319,17 @@ public class DayController : MonoBehaviour
         float combo   = UpdateCombo(result);
         float precision = _craftingSystem.PrecisionBonus; // Батч 6: ×1.1 за идеальное попадание в центр
         float favoriteMult = _craftingSystem.FavoriteAdded ? 1.08f : 1f; // Батч 6: апселл любимого топпинга
-        int payment = Mathf.RoundToInt(dayBase * result * (0.5f + tipMood) * early * upgMult * combo * precision * favoriteMult);
+        float speedMult = _rushDay ? RushController.SpeedMultiplier(craftElapsed) : 1f; // Батч 11: бонус за темп
+        int payment = Mathf.RoundToInt(dayBase * result * (0.5f + tipMood) * early * upgMult * combo * precision * favoriteMult * speedMult);
         GameManager.Instance?.AddCoins(payment);
+
+        // Батч 11: похвала «Быстро!» за подачу в темп (только осмысленный бонус, без спама).
+        if (_rushDay && RushController.InTime(craftElapsed) && speedMult > 1.02f)
+        {
+            int spct = Mathf.RoundToInt((speedMult - 1f) * 100f);
+            UiEffects.Instance?.FloatingText(Loc.T($"Быстро! +{spct}%", $"Fast! +{spct}%"),
+                                             new Color(0.5f, 0.9f, 1f));
+        }
         _coinsEarnedToday += payment - _craftingSystem.CurrentDrinkCost;
 
         // Батч 6: прогресс «Заказа дня» по этому напитку.

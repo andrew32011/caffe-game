@@ -215,6 +215,10 @@ public static class CoffeGameSceneSetup
         var adPrompt = canvasGO.AddComponent<AdRemovalPrompt>();
         new W(adPrompt).Ref("_font", UiFont()).Apply();
 
+        // ── HUD «Часа пик» (Батч 11): плашка темпа + очередь; строит свой UI в коде ──
+        var rushHud = canvasGO.AddComponent<RushHudUI>();
+        new W(rushHud).Ref("_font", UiFont()).Apply();
+
         // ── Панель машины: 2 вертикальных заполнения (температура, объём) ────
         var machinePanel = Panel("MachinePanel", ct, new Vector2(0.35f, 0.25f), new Vector2(0.65f, 0.75f), new Color(0.06f, 0.06f, 0.1f, 0.9f));
         var tempFill   = VerticalBar("TempBar",   machinePanel.transform, new Vector2(0.12f, 0.18f), new Vector2(0.42f, 0.82f), new Color(0.9f, 0.4f, 0.2f));
@@ -344,13 +348,19 @@ public static class CoffeGameSceneSetup
         var shopInfos  = new TextMeshProUGUI[3];
         var shopBuys   = new Button[3];
         var shopBuyLbl = new TextMeshProUGUI[3];
+        var shopFill   = new Image[3]; // Батч 11: текущий эффект (шкала «сейчас»)
+        var shopGhost  = new Image[3]; // Батч 11: эффект после покупки (полупрозрачный «станет»)
         for (int i = 0; i < 3; i++)
         {
             float top = 0.84f - i * 0.235f;
             float bot = top - 0.205f;
             var row = Panel($"UpgradeRow{i}", shopPanel.transform, new Vector2(0.05f, bot), new Vector2(0.95f, top), new Color(1f, 1f, 1f, 0.04f));
-            shopTitles[i] = Text($"UpgTitle{i}", row.transform, "—", 26, TextAlignmentOptions.TopLeft, new Vector2(0.03f, 0.52f), new Vector2(0.63f, 0.96f));
-            shopInfos[i]  = Text($"UpgInfo{i}",  row.transform, "—", 19, TextAlignmentOptions.TopLeft, new Vector2(0.03f, 0.04f), new Vector2(0.63f, 0.52f));
+            shopTitles[i] = Text($"UpgTitle{i}", row.transform, "—", 26, TextAlignmentOptions.TopLeft, new Vector2(0.03f, 0.56f), new Vector2(0.63f, 0.97f));
+            shopInfos[i]  = Text($"UpgInfo{i}",  row.transform, "—", 18, TextAlignmentOptions.TopLeft, new Vector2(0.03f, 0.28f), new Vector2(0.63f, 0.55f));
+            // Батч 11: визуализация мастерства — шкала «сейчас/станет» (до/после апгрейда).
+            var barBg = Panel($"UpgBarBG{i}", row.transform, new Vector2(0.03f, 0.07f), new Vector2(0.63f, 0.23f), new Color(0f, 0f, 0f, 0.5f));
+            shopGhost[i] = RowFill($"UpgGhost{i}", barBg.transform, new Color(0.42f, 0.85f, 0.45f, 0.35f)); // «станет» (сзади)
+            shopFill[i]  = RowFill($"UpgFill{i}",  barBg.transform, new Color(0.42f, 0.85f, 0.45f, 1f));    // «сейчас» (спереди)
             var buy = Btn($"BtnUpg{i}", row.transform, "Купить");
             SetRect(buy.GetComponent<RectTransform>(), new Vector2(0.66f, 0.2f), new Vector2(0.97f, 0.8f));
             shopBuys[i]   = buy;
@@ -366,6 +376,8 @@ public static class CoffeGameSceneSetup
             .Arr("_infoTexts", shopInfos)
             .Arr("_buyButtons", shopBuys)
             .Arr("_buyLabels", shopBuyLbl)
+            .Arr("_effectFills", shopFill)
+            .Arr("_effectGhosts", shopGhost)
             .Apply();
         ApplyPanelSprite(shopPanel);
         shopPanel.SetActive(false);
@@ -432,9 +444,13 @@ public static class CoffeGameSceneSetup
         SetRect(fullscreenBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.335f), new Vector2(0.9f, 0.41f));
         var fullscreenLabel = fullscreenBtn.GetComponentInChildren<TextMeshProUGUI>();
         var leaderboardBtn = Btn("BtnLeaderboard", settingsPanel.transform, "Таблица лидеров");
-        SetRect(leaderboardBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.225f), new Vector2(0.9f, 0.30f));
+        SetRect(leaderboardBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.245f), new Vector2(0.9f, 0.315f));
+        // Батч 11: рекорды Бесконечного режима (кнопка активна лишь после прохождения сюжета — SettingsUI сам скрывает).
+        var endlessLbBtn = Btn("BtnEndlessLeaderboard", settingsPanel.transform, "Рекорды: бесконечный режим");
+        SetRect(endlessLbBtn.GetComponent<RectTransform>(), new Vector2(0.1f, 0.15f), new Vector2(0.9f, 0.22f));
+        endlessLbBtn.gameObject.SetActive(false);
         var settingsClose = Btn("BtnSettingsClose", settingsPanel.transform, "Закрыть");
-        SetRect(settingsClose.GetComponent<RectTransform>(), new Vector2(0.3f, 0.06f), new Vector2(0.7f, 0.16f));
+        SetRect(settingsClose.GetComponent<RectTransform>(), new Vector2(0.3f, 0.04f), new Vector2(0.7f, 0.13f));
         ApplyPanelSprite(settingsPanel);
         settingsPanel.SetActive(false);
 
@@ -457,6 +473,25 @@ public static class CoffeGameSceneSetup
         ApplyPanelSprite(lbPanel);
         lbPanel.SetActive(false);
 
+        // ── Таблица лидеров Бесконечного режима (Батч 11): счёт = самый дальний день ──
+        var elbPanel = Panel("EndlessLeaderboardPanel", ct, new Vector2(0.3f, 0.16f), new Vector2(0.7f, 0.86f), new Color(0.05f, 0.05f, 0.12f, 0.98f));
+        Text("EndlessLeaderboardTitle", elbPanel.transform, "Рекорды: бесконечный режим", 30, TextAlignmentOptions.Top, new Vector2(0.05f, 0.9f), new Vector2(0.95f, 0.99f));
+        var elbEntries = LegacyText("ELBEntries", elbPanel.transform, new Vector2(0.08f, 0.18f), new Vector2(0.92f, 0.88f));
+        var elbClose = Btn("BtnEndlessLeaderboardClose", elbPanel.transform, "Закрыть");
+        SetRect(elbClose.GetComponent<RectTransform>(), new Vector2(0.35f, 0.04f), new Vector2(0.65f, 0.14f));
+        var elbComp = elbPanel.AddComponent<YG.LeaderboardYG>();
+        elbComp.nameLB          = GameManager.EndlessLeaderboardName; // "endless" — создать таблицу в консоли Яндекса
+        elbComp.entriesText     = elbEntries;
+        elbComp.advanced        = false;
+        elbComp.updateLBMethod  = YG.LeaderboardYG.UpdateLBMethod.OnEnable;
+        elbComp.quantityTop     = 3;
+        elbComp.quantityAround  = 6;
+        elbComp.maxQuantityPlayers = 20;
+        elbComp.playerPhoto     = YG.LeaderboardYG.PlayerPhoto.NonePhoto;
+        EditorUtility.SetDirty(elbComp);
+        ApplyPanelSprite(elbPanel);
+        elbPanel.SetActive(false);
+
         // SettingsUI вешаем на ВСЕГДА АКТИВНЫЙ Canvas (иначе кнопка «Меню» не подпишется,
         // пока панель скрыта). Панели он включает/выключает сам.
         var settings = canvasGO.AddComponent<SettingsUI>();
@@ -472,6 +507,9 @@ public static class CoffeGameSceneSetup
             .Ref("_leaderboardButton", leaderboardBtn)
             .Ref("_leaderboardPanel", lbPanel)
             .Ref("_leaderboardCloseButton", lbClose)
+            .Ref("_endlessLbButton", endlessLbBtn)
+            .Ref("_endlessLbPanel", elbPanel)
+            .Ref("_endlessLbCloseButton", elbClose)
             .Apply();
 
         // ── Журнал гостей «Завсегдатаи» (Батч 6) ────────────────────────────
@@ -1277,6 +1315,24 @@ public static class CoffeGameSceneSetup
 
         var go = new GameObject(name, typeof(RectTransform), typeof(Image));
         go.transform.SetParent(bg.transform, false);
+        SetRect((RectTransform)go.transform, Vector2.zero, Vector2.one);
+        var img = go.GetComponent<Image>();
+        img.color = color;
+        img.sprite = WhiteSprite();
+        img.type = Image.Type.Filled;
+        img.fillMethod = Image.FillMethod.Horizontal;
+        img.fillOrigin = (int)Image.OriginHorizontal.Left;
+        img.fillAmount = 0f;
+        img.raycastTarget = false;
+        return img;
+    }
+
+    // Заполняющий слой (Filled, Horizontal) на весь родитель — для наложенных шкал
+    // «сейчас/станет» в магазине апгрейдов (Батч 11). Родитель служит фоном.
+    static Image RowFill(string name, Transform parent, Color color)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+        go.transform.SetParent(parent, false);
         SetRect((RectTransform)go.transform, Vector2.zero, Vector2.one);
         var img = go.GetComponent<Image>();
         img.color = color;

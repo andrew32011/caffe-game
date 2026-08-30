@@ -33,6 +33,12 @@ public class SettingsUI : MonoBehaviour
     [SerializeField] private GameObject _leaderboardPanel;
     [SerializeField] private Button _leaderboardCloseButton;
 
+    [Header("Таблица лидеров: Бесконечный режим (Батч 11)")]
+    [Tooltip("Кнопка показывается только когда бесконечный режим уже открыт (пройден сюжет).")]
+    [SerializeField] private Button _endlessLbButton;
+    [SerializeField] private GameObject _endlessLbPanel;
+    [SerializeField] private Button _endlessLbCloseButton;
+
     private bool _ready;
     private bool _prevInputLocked;
 
@@ -43,6 +49,8 @@ public class SettingsUI : MonoBehaviour
         if (_fullscreenButton != null) _fullscreenButton.onClick.AddListener(ToggleFullscreen);
         if (_leaderboardButton != null) _leaderboardButton.onClick.AddListener(OpenLeaderboard);
         if (_leaderboardCloseButton != null) _leaderboardCloseButton.onClick.AddListener(CloseLeaderboard);
+        if (_endlessLbButton != null) _endlessLbButton.onClick.AddListener(OpenEndlessLeaderboard);
+        if (_endlessLbCloseButton != null) _endlessLbCloseButton.onClick.AddListener(CloseEndlessLeaderboard);
 
         if (_musicSlider != null) _musicSlider.onValueChanged.AddListener(OnMusicChanged);
         if (_sfxSlider   != null) _sfxSlider.onValueChanged.AddListener(OnSfxChanged);
@@ -50,6 +58,7 @@ public class SettingsUI : MonoBehaviour
 
         if (_panel != null) _panel.SetActive(false);
         if (_leaderboardPanel != null) _leaderboardPanel.SetActive(false);
+        if (_endlessLbPanel != null) _endlessLbPanel.SetActive(false);
     }
 
     public void Open()
@@ -66,6 +75,11 @@ public class SettingsUI : MonoBehaviour
         _ready = true;
 
         UpdateFullscreenLabel();
+
+        // Кнопку рекордов бесконечного режима показываем только когда режим уже открыт.
+        if (_endlessLbButton != null)
+            _endlessLbButton.gameObject.SetActive(GameManager.Instance != null && GameManager.Instance.EndlessActive);
+
         if (_panel != null) _panel.SetActive(true);
 
         // Пауза: морозим время (корутины дня) и блокируем клики по предметам.
@@ -134,5 +148,18 @@ public class SettingsUI : MonoBehaviour
     private void CloseLeaderboard()
     {
         if (_leaderboardPanel != null) _leaderboardPanel.SetActive(false);
+    }
+
+    // ─── Таблица лидеров: Бесконечный режим (Батч 11) ─────────────────────────
+
+    private void OpenEndlessLeaderboard()
+    {
+        GameManager.Instance?.SubmitEndlessLeaderboard(); // обновляем свой рекорд перед показом
+        if (_endlessLbPanel != null) _endlessLbPanel.SetActive(true); // LeaderboardYG сам загрузит (OnEnable)
+    }
+
+    private void CloseEndlessLeaderboard()
+    {
+        if (_endlessLbPanel != null) _endlessLbPanel.SetActive(false);
     }
 }
