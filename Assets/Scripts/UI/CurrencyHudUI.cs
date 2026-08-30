@@ -14,14 +14,28 @@ public class CurrencyHudUI : MonoBehaviour
 {
     public static CurrencyHudUI Instance { get; private set; }
 
+    // Батч 13: иконки валют (спрайты Mini UI). Задаёт билдер; если пусто — цветные «пилюли».
+    [SerializeField] private Sprite _gemIcon;
+    [SerializeField] private Sprite _tokenIcon;
+    [SerializeField] private Sprite _keyIcon;
+
     private TMP_FontAsset _font;
     private GameObject _gemRow, _tokenRow, _keyRow;
     private TextMeshProUGUI _gemText, _tokenText, _keyText;
+    private bool _built;
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+        EnsureBuilt(); // самособирается и когда объект создан билдером (иконки уже привязаны)
+    }
+
+    private void EnsureBuilt()
+    {
+        if (_built) return;
+        _built = true;
+        Build();
     }
 
     public static CurrencyHudUI Ensure()
@@ -29,9 +43,9 @@ public class CurrencyHudUI : MonoBehaviour
         if (Instance == null)
         {
             var go = new GameObject("CurrencyHud");
-            Instance = go.AddComponent<CurrencyHudUI>();
-            Instance.Build();
+            Instance = go.AddComponent<CurrencyHudUI>(); // Awake построит
         }
+        Instance.EnsureBuilt();
         return Instance;
     }
 
@@ -79,25 +93,46 @@ public class CurrencyHudUI : MonoBehaviour
         vlg.spacing = 6f; vlg.childControlHeight = true; vlg.childControlWidth = true;
         vlg.childForceExpandHeight = true; vlg.childForceExpandWidth = true;
 
-        _gemRow   = MakeRow(col.transform, new Color(0.20f, 0.35f, 0.55f, 0.92f), Loc.T("Кристаллы", "Gems"),  out _gemText);
-        _tokenRow = MakeRow(col.transform, new Color(0.45f, 0.35f, 0.15f, 0.92f), Loc.T("Жетоны", "Tokens"),   out _tokenText);
-        _keyRow   = MakeRow(col.transform, new Color(0.40f, 0.28f, 0.12f, 0.92f), Loc.T("Ключи", "Keys"),      out _keyText);
+        // Строка «Кристаллы» — кликабельна: открывает магазин кристаллов (Батч 13).
+        _gemRow   = MakeRow(col.transform, new Color(0.20f, 0.35f, 0.55f, 0.92f), Loc.T("Кристаллы", "Gems"),  _gemIcon,   out _gemText, () => GemShopUI.Ensure().Open());
+        _tokenRow = MakeRow(col.transform, new Color(0.45f, 0.35f, 0.15f, 0.92f), Loc.T("Жетоны", "Tokens"),   _tokenIcon, out _tokenText, null);
+        _keyRow   = MakeRow(col.transform, new Color(0.40f, 0.28f, 0.12f, 0.92f), Loc.T("Ключи", "Keys"),      _keyIcon,   out _keyText, null);
 
         Refresh();
     }
 
-    private GameObject MakeRow(Transform parent, Color bg, string caption, out TextMeshProUGUI amount)
+    private GameObject MakeRow(Transform parent, Color bg, string caption, Sprite icon, out TextMeshProUGUI amount, System.Action onClick)
     {
         var row = new GameObject("Row", typeof(RectTransform), typeof(Image));
         row.transform.SetParent(parent, false);
         row.GetComponent<Image>().color = bg;
 
-        var cap = MakeText("Caption", row.transform, new Vector2(0.05f, 0f), new Vector2(0.62f, 1f), 20, TextAlignmentOptions.Left);
+        // Иконка слева (если задана билдером), иначе подпись занимает её место.
+        bool hasIcon = icon != null;
+        if (hasIcon)
+        {
+            var ic = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+            ic.transform.SetParent(row.transform, false);
+            var irt = (RectTransform)ic.transform;
+            irt.anchorMin = new Vector2(0.03f, 0.12f); irt.anchorMax = new Vector2(0.24f, 0.88f);
+            irt.offsetMin = irt.offsetMax = Vector2.zero;
+            var iimg = ic.GetComponent<Image>();
+            iimg.sprite = icon; iimg.preserveAspect = true; iimg.raycastTarget = false;
+        }
+
+        float capLeft = hasIcon ? 0.27f : 0.06f;
+        var cap = MakeText("Caption", row.transform, new Vector2(capLeft, 0f), new Vector2(0.66f, 1f), 20, TextAlignmentOptions.Left);
         cap.text = caption;
 
-        amount = MakeText("Amount", row.transform, new Vector2(0.62f, 0f), new Vector2(0.95f, 1f), 24, TextAlignmentOptions.Right);
+        amount = MakeText("Amount", row.transform, new Vector2(0.66f, 0f), new Vector2(0.96f, 1f), 24, TextAlignmentOptions.Right);
         amount.text = "0";
         amount.fontStyle = FontStyles.Bold;
+
+        if (onClick != null)
+        {
+            var btn = row.AddComponent<Button>();
+            btn.onClick.AddListener(() => onClick());
+        }
         return row;
     }
 

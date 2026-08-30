@@ -30,12 +30,23 @@ public class DailyBonusUI : MonoBehaviour
     [SerializeField] private int _perDayStep = 25;
     [SerializeField] private int _maxReward  = 250;
 
+    [Header("Батч 13: 7-дневный календарь + джекпот")]
+    [Tooltip("Кристаллы-джекпот на 7-й день цикла серии заходов.")]
+    [SerializeField] private int _jackpotGems = 25;
+
     private const string RewardId = "daily_double";
+    private const int CycleLen = 7;
 
     private bool _claimed;
     private bool _doubled;
     private bool _waitingAd;
     private int  _reward;
+    private int  _cycleDay;   // позиция в 7-дневном цикле (1..7)
+    private bool _jackpot;    // сегодня 7-й день → кристаллы
+
+    // Календарь (строится в коде один раз, поверх панели билдера).
+    private bool _calBuilt;
+    private Image[] _cellBg = new Image[CycleLen];
 
     /// <summary>Показывает бонус, если сегодня его ещё не получали. Awaitable.</summary>
     public IEnumerator RunIfDue()
@@ -59,8 +70,17 @@ public class DailyBonusUI : MonoBehaviour
         _reward  = Mathf.Min(_maxReward, _baseReward + (streak - 1) * _perDayStep);
         _claimed = _doubled = _waitingAd = false;
 
+        // Батч 13: позиция в 7-дневном цикле; 7-й день — джекпот-кристаллы.
+        _cycleDay = ((streak - 1) % CycleLen) + 1;
+        _jackpot  = _cycleDay == CycleLen;
+        BuildCalendar();
+        HighlightCalendar(_cycleDay);
+
         if (_titleText  != null) _titleText.text  = Loc.T($"Бонус за вход — день {streak}", $"Login bonus — day {streak}");
-        if (_rewardText != null) _rewardText.text = "+" + _reward + Loc.T(" монет", " coins");
+        if (_rewardText != null)
+            _rewardText.text = _jackpot
+                ? "+" + _reward + Loc.T(" монет", " coins") + "  +" + _jackpotGems + Loc.T(" кристаллов!", " gems!")
+                : "+" + _reward + Loc.T(" монет", " coins");
         if (_claimLabel != null) _claimLabel.text = Loc.T("Забрать", "Claim");
         if (_doubleLabel!= null) _doubleLabel.text= Loc.T($"Удвоить (+{_reward}) — реклама", $"Double (+{_reward}) — ad");
 
@@ -88,6 +108,12 @@ public class DailyBonusUI : MonoBehaviour
         gm.DailyBonusStreak   = streak;
         gm.AddCoins(_reward);
         if (_doubled) gm.AddCoins(_reward);
+        // Батч 13: джекпот-кристаллы на 7-й день цикла (не-платный источник премиума).
+        if (_jackpot)
+        {
+            gm.AddGems(_jackpotGems);
+            UiEffects.Instance?.FloatingText("+" + _jackpotGems + Loc.T(" кристаллов", " gems"), new Color(0.5f, 0.8f, 1f));
+        }
         gm.SaveGame();
         AudioController.Instance?.PlayCoin();
         UiEffects.Instance?.FloatingText("+" + (_doubled ? _reward * 2 : _reward), new Color(1f, 0.85f, 0.25f));
@@ -98,6 +124,66 @@ public class DailyBonusUI : MonoBehaviour
 #if RewardedAdv_yg
         YG2.onRewardAdv -= OnReward;
 #endif
+    }
+
+    // ─── Батч 13: 7-дневный календарь (строится в коде поверх панели билдера) ──
+    private void BuildCalendar()
+    {
+        if (_calBuilt || _panel == null) return;
+        _calBuilt = true;
+
+        var probe = _titleText != null ? _titleText.font : null;
+        const float x0 = 0.06f, x1 = 0.94f, yb = 0.62f, yt = 0.77f;
+        float w = (x1 - x0) / CycleLen;
+
+        for (int i = 0; i < CycleLen; i++)
+        {
+            bool last = i == CycleLen - 1;
+            var cell = new GameObject($"CalCell{i}", typeof(RectTransform), typeof(Image));
+            cell.transform.SetParent(_panel.transform, false);
+            var rt = (RectTransform)cell.transform;
+            rt.anchorMin = new Vector2(x0 + w * i + 0.006f, yb);
+            rt.anchorMax = new Vector2(x0 + w * (i + 1) - 0.006f, yt);
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            var img = cell.GetComponent<Image>();
+            img.color = new Color(1f, 1f, 1f, 0.10f);
+            img.raycastTarget = false;
+            _cellBg[i] = img;
+
+            // Верх: номер дня. Низ: тип награды (кристаллы на 7-й день).
+            MakeCellText($"Num{i}", cell.transform, new Vector2(0.04f, 0.44f), new Vector2(0.96f, 0.98f), 18,
+                (i + 1).ToString(), last ? new Color(0.6f, 0.85f, 1f) : Color.white, probe, FontStyles.Bold);
+            MakeCellText($"Rw{i}", cell.transform, new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.44f), 13,
+                last ? Loc.T("крист.", "gems") : Loc.T("монеты", "coins"),
+                last ? new Color(0.6f, 0.85f, 1f) : new Color(0.85f, 0.85f, 0.9f), probe, FontStyles.Normal);
+        }
+    }
+
+    private void HighlightCalendar(int cycleDay)
+    {
+        for (int i = 0; i < CycleLen; i++)
+        {
+            if (_cellBg[i] == null) continue;
+            bool current = (i + 1) == cycleDay;
+            bool jackpot = i == CycleLen - 1;
+            _cellBg[i].color = current
+                ? new Color(0.95f, 0.8f, 0.3f, 0.85f)                 // текущий день — золотой
+                : (jackpot ? new Color(0.25f, 0.45f, 0.7f, 0.45f)     // джекпот-ячейка — синеватая
+                           : new Color(1f, 1f, 1f, 0.10f));
+        }
+    }
+
+    private void MakeCellText(string name, Transform parent, Vector2 aMin, Vector2 aMax, int size,
+        string content, Color color, TMP_FontAsset font, FontStyles style)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
+        go.transform.SetParent(parent, false);
+        var rt = (RectTransform)go.transform;
+        rt.anchorMin = aMin; rt.anchorMax = aMax; rt.offsetMin = rt.offsetMax = Vector2.zero;
+        var t = go.GetComponent<TextMeshProUGUI>();
+        if (font != null) t.font = font;
+        t.text = content; t.fontSize = size; t.alignment = TextAlignmentOptions.Center; t.color = color;
+        t.fontStyle = style; t.raycastTarget = false; t.enableAutoSizing = true; t.fontSizeMin = 8; t.fontSizeMax = size;
     }
 
     private void OnDoubleClicked()

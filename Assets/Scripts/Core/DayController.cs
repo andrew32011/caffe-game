@@ -104,6 +104,7 @@ public class DayController : MonoBehaviour
         // Батч 12 (A): объявляем новую механику, если она открылась к этому дню
         // (лут/кристаллы/кастомизация). В endless метод сам ничего не делает.
         ProgressionManager.CheckDayUnlocks(dayData.dayNumber);
+        CustomizationUI.Instance?.RefreshBadgeVisibility(); // Батч 13: показать бейдж аватара при разблокировке (D4)
 
         if (special)
         {

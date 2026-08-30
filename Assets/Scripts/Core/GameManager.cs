@@ -137,6 +137,8 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => YG2.isSDKEnabled);
         LoadGame();
         CurrencyHudUI.Ensure(); // Батч 12-B: HUD кристаллов/жетонов/ключей (по разблокировкам)
+        CustomizationUI.Instance?.ApplySaved(); // Батч 13: применить сохранённые аватар/тему
+        CustomizationUI.Instance?.RefreshBadgeVisibility();
         TryGrantOfflineIncome(); // Батч 12-E: «кофейня работала, пока тебя не было» (крючок возврата)
         _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume, _saveData.voiceVolume); // Батч 4 + голоса
         if (!_sessionReadyCalled)            // 1.19.2: игрок может начинать (один раз за сессию)
@@ -337,8 +339,15 @@ public class GameManager : MonoBehaviour
             // После всплывающей рекламы на переходе к дню (в т.ч. из сцены сна) — короткое
             // ненавязчивое напоминание, что рекламу можно убрать за донат и поддержать
             // автора. Не показываем на самом первом дне и если реклама уже отключена.
+            // Батч 13: на дне 3 (кристаллы уже открыты) вместо напоминания — таймовый оффер
+            // «Стартовый набор» с отсчётом (один раз за сессию); в остальные дни — напоминание.
             if (day > 1 && !_saveData.adsDisabled)
-                AdRemovalPrompt.Instance?.ShowAfterAd();
+            {
+                if (day == 3 && ProgressionManager.IsUnlocked(ProgressionManager.Feature.Gems))
+                    TimedOfferUI.Ensure().ShowOffer();
+                else
+                    AdRemovalPrompt.Instance?.ShowAfterAd();
+            }
 
             // Пункт 1: перед финальным днём проверяем «цель путешествия» (10000 монет).
             // Не хватило — даём выбор: начать заново с 1-го дня (копить) или купить монеты.
@@ -702,6 +711,12 @@ public class GameManager : MonoBehaviour
     public bool SpendTokens(int n){ if (_saveData.tokens < n) return false; _saveData.tokens -= n; SaveGame(); CurrencyHudUI.Instance?.Refresh(); return true; }
     public void AddKeys(int n)    { _saveData.keys   = Mathf.Max(0, _saveData.keys   + n); SaveGame(); CurrencyHudUI.Instance?.Refresh(); }
     public bool SpendKeys(int n)  { if (_saveData.keys   < n) return false; _saveData.keys   -= n; SaveGame(); CurrencyHudUI.Instance?.Refresh(); return true; }
+
+    // ─── Батч 13: кастомизация (аватар/тема) ────────────────────────────────────
+    public int AvatarId => _saveData.avatarId;
+    public int ThemeId  => _saveData.themeId;
+    public void SetAvatar(int id) { _saveData.avatarId = Mathf.Max(0, id); SaveGame(); }
+    public void SetTheme(int id)  { _saveData.themeId  = Mathf.Max(0, id); SaveGame(); }
 
     /// <summary>Запустить покупку кристаллов (UI-кнопки магазина зовут это).</summary>
     public void BuyGems(string productId)

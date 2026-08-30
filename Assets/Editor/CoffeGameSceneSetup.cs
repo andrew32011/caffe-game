@@ -399,17 +399,18 @@ public static class CoffeGameSceneSetup
         ApplyPanelSprite(journeyPanel);
         journeyPanel.SetActive(false);
 
-        // ── Ежедневный бонус (Батч 2) ───────────────────────────────────────
-        var bonusPanel = Panel("DailyBonusPanel", ct, new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.7f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
+        // ── Ежедневный бонус (Батч 2) + 7-дневный календарь (Батч 13) ────────
+        // Панель выше: в полосе y≈0.62–0.77 DailyBonusUI строит календарь в коде.
+        var bonusPanel = Panel("DailyBonusPanel", ct, new Vector2(0.28f, 0.24f), new Vector2(0.72f, 0.78f), new Color(0.05f, 0.05f, 0.12f, 0.97f));
         var bonusGift  = IconImage("DailyBonusIcon", bonusPanel.transform, "Assets/Mini UI/Icons/Gift.png",
-            new Vector2(0.4f, 0.62f), new Vector2(0.6f, 0.9f));
-        var bonusTitle = Text("DailyBonusTitle", bonusPanel.transform, "Бонус за вход", 30, TextAlignmentOptions.Center, new Vector2(0.05f, 0.5f), new Vector2(0.95f, 0.62f));
-        var bonusReward= Text("DailyBonusReward", bonusPanel.transform, "+50 монет", 40, TextAlignmentOptions.Center, new Vector2(0.05f, 0.38f), new Vector2(0.95f, 0.5f));
+            new Vector2(0.42f, 0.80f), new Vector2(0.58f, 0.96f));
+        var bonusTitle = Text("DailyBonusTitle", bonusPanel.transform, "Бонус за вход", 28, TextAlignmentOptions.Center, new Vector2(0.05f, 0.52f), new Vector2(0.95f, 0.615f));
+        var bonusReward= Text("DailyBonusReward", bonusPanel.transform, "+50 монет", 34, TextAlignmentOptions.Center, new Vector2(0.05f, 0.40f), new Vector2(0.95f, 0.51f));
         var btnClaim   = Btn("BtnBonusClaim", bonusPanel.transform, "Забрать");
-        SetRect(btnClaim.GetComponent<RectTransform>(), new Vector2(0.15f, 0.22f), new Vector2(0.85f, 0.34f));
+        SetRect(btnClaim.GetComponent<RectTransform>(), new Vector2(0.15f, 0.24f), new Vector2(0.85f, 0.35f));
         var btnClaimLabel = btnClaim.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         var btnBonusDouble = Btn("BtnBonusDouble", bonusPanel.transform, "Удвоить — реклама");
-        SetRect(btnBonusDouble.GetComponent<RectTransform>(), new Vector2(0.15f, 0.07f), new Vector2(0.85f, 0.19f));
+        SetRect(btnBonusDouble.GetComponent<RectTransform>(), new Vector2(0.15f, 0.09f), new Vector2(0.85f, 0.20f));
         var btnBonusDoubleLabel = btnBonusDouble.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         var dailyBonus = bonusPanel.AddComponent<DailyBonusUI>();
         new W(dailyBonus)
@@ -510,6 +511,55 @@ public static class CoffeGameSceneSetup
             .Ref("_endlessLbButton", endlessLbBtn)
             .Ref("_endlessLbPanel", elbPanel)
             .Ref("_endlessLbCloseButton", elbClose)
+            .Apply();
+
+        // ── Валютный HUD с иконками (Батч 13) ────────────────────────────────
+        // CurrencyHudUI строит свой Canvas в рантайме; здесь лишь привязываем иконки Mini UI.
+        var currencyHudGO = Child(root, "CurrencyHud");
+        var currencyHud = currencyHudGO.AddComponent<CurrencyHudUI>();
+        new W(currencyHud)
+            .Ref("_gemIcon",   Spr("Assets/Mini UI/Icons/Blue Gem.png"))
+            .Ref("_tokenIcon", Spr("Assets/Mini UI/Icons/Bronze Ticket.png"))
+            .Ref("_keyIcon",   Spr("Assets/Mini UI/Icons/Golden Key.png"))
+            .Apply();
+
+        // ── Экран оформления (аватар + тема) + бейдж аватара на HUD (Батч 13) ──
+        var custPanel = Panel("CustomizationPanel", ct, new Vector2(0.15f, 0.12f), new Vector2(0.85f, 0.88f), new Color(0.05f, 0.05f, 0.12f, 0.98f));
+        var custClose = Btn("BtnCustomizationClose", custPanel.transform, "Закрыть");
+        SetRect(custClose.GetComponent<RectTransform>(), new Vector2(0.35f, 0.035f), new Vector2(0.65f, 0.12f));
+        ApplyPanelSprite(custPanel);
+        custPanel.SetActive(false);
+
+        // Бейдж аватара (левый верх HUD), тап открывает оформление; виден лишь после D4.
+        var avatarBadgeGO = new GameObject("AvatarBadge", typeof(RectTransform), typeof(Image), typeof(Button));
+        avatarBadgeGO.transform.SetParent(ct, false);
+        SetRect((RectTransform)avatarBadgeGO.transform, new Vector2(0.012f, 0.875f), new Vector2(0.075f, 0.975f));
+        var avatarImg = avatarBadgeGO.GetComponent<Image>();
+        avatarImg.sprite = Spr("Assets/Mini UI/Avatars/Avatar 1.png");
+        avatarImg.preserveAspect = true;
+        var avatarBtn = avatarBadgeGO.GetComponent<Button>();
+        avatarBtn.targetGraphic = avatarImg;
+        avatarBadgeGO.AddComponent<ButtonClickSound>();
+
+        // Спрайты: первые 8 аватаров + набор тем (DARK — дефолт, совпадает с базовой панелью).
+        var avatarSprites = new Sprite[8];
+        for (int i = 0; i < avatarSprites.Length; i++)
+            avatarSprites[i] = Spr($"Assets/Mini UI/Avatars/Avatar {i + 1}.png");
+        const string themeDir = "Assets/Mini UI/9 Splice Panels/Dark Theme RoundEdge Panels/Dark Theme RoundEdge ";
+        var themeNames = new[] { "DARK", "BLUE", "GREEN", "PURPLE", "RED", "CYAN", "ORANGE", "PINK" };
+        var themeSprites = new Sprite[themeNames.Length];
+        for (int i = 0; i < themeNames.Length; i++)
+            themeSprites[i] = Spr(themeDir + themeNames[i] + ".png");
+
+        // На ВСЕГДА АКТИВНЫЙ Canvas (панель скрыта — иначе Awake не подпишет бейдж/не применит тему).
+        var customization = canvasGO.AddComponent<CustomizationUI>();
+        new W(customization)
+            .Ref("_panel", custPanel)
+            .Ref("_closeButton", custClose)
+            .Ref("_avatarBadge", avatarImg)
+            .Ref("_avatarBadgeButton", avatarBtn)
+            .Arr("_avatarSprites", avatarSprites)
+            .Arr("_themeSprites", themeSprites)
             .Apply();
 
         // ── Журнал гостей «Завсегдатаи» (Батч 6) ────────────────────────────
@@ -1139,6 +1189,8 @@ public static class CoffeGameSceneSetup
             img.color = Color.white;
             img.pixelsPerUnitMultiplier = 8f; // пункт 5
         }
+        // Батч 13: помечаем панель темизируемой — сменит спрайт под выбранную тему (UiTheme).
+        if (panel.GetComponent<ThemedPanel>() == null) panel.AddComponent<ThemedPanel>();
     }
 
     // Применяет спрайт-кнопку Mini UI (пункт 4) с pixelsPerUnitMultiplier = 4 (пункт 5).
@@ -1163,6 +1215,9 @@ public static class CoffeGameSceneSetup
     }
 
     // Иконка-картинка из ассета на Canvas
+    // Загрузка спрайта по пути (Батч 13: иконки валют, аватары, темы).
+    static Sprite Spr(string path) => AssetDatabase.LoadAssetAtPath<Sprite>(path);
+
     static Image IconImage(string name, Transform parent, string assetPath, Vector2 aMin, Vector2 aMax)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(Image));
