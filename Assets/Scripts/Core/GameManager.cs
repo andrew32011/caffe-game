@@ -90,6 +90,10 @@ public class GameManager : MonoBehaviour
         YG2.onOpenAnyAdv      += OnAdOpened;
         YG2.onCloseAnyAdv     += OnAdClosed;
 
+        // Батч 12-B: покупки кристаллов (сосуществует с обработчиками no_ads/coins_pack,
+        // каждый игнорирует чужие товары).
+        YG2.onPurchaseSuccess += OnGemPurchase;
+
         // Этапами управляет DayController — отключаем автозапуск этапа 0,
         // иначе гость пойдёт к стойке до начала дня
         if (_stages != null)
@@ -106,6 +110,7 @@ public class GameManager : MonoBehaviour
         YG2.onFocusWindowGame -= OnWindowFocusChanged;
         YG2.onOpenAnyAdv      -= OnAdOpened;
         YG2.onCloseAnyAdv     -= OnAdClosed;
+        YG2.onPurchaseSuccess -= OnGemPurchase;
     }
 
     // Пауза звука и геймплея на время полноэкранной рекламы (требование 4.7).
@@ -131,6 +136,7 @@ public class GameManager : MonoBehaviour
         // только потом читаем прогресс. Обновление страницы не теряет данные.
         yield return new WaitUntil(() => YG2.isSDKEnabled);
         LoadGame();
+        CurrencyHudUI.Ensure(); // Батч 12-B: HUD кристаллов/жетонов/ключей (по разблокировкам)
         _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume, _saveData.voiceVolume); // Батч 4 + голоса
         if (!_sessionReadyCalled)            // 1.19.2: игрок может начинать (один раз за сессию)
         {
@@ -665,6 +671,58 @@ public class GameManager : MonoBehaviour
     public void AddCoins(int amount)
     {
         _saveData.totalCoins += amount;
+    }
+
+    // ─── Батч 12-B: тройная экономика (кристаллы, жетоны, ключи) ────────────────
+    // ⚠️ Товары кристаллов завести в консоли Яндекс Игр с этими ID.
+    public const string GemsSmallId   = "gems_small";   // consumable
+    public const string GemsMediumId  = "gems_medium";  // consumable
+    public const string GemsLargeId   = "gems_large";   // consumable
+    public const string StarterPackId = "starter_pack"; // non-consumable, разовый
+
+    public int Gems   => _saveData.gems;
+    public int Tokens => _saveData.tokens;
+    public int Keys   => _saveData.keys;
+
+    public void AddGems(int n)    { _saveData.gems   = Mathf.Max(0, _saveData.gems   + n); SaveGame(); CurrencyHudUI.Instance?.Refresh(); }
+    public bool SpendGems(int n)  { if (_saveData.gems   < n) return false; _saveData.gems   -= n; SaveGame(); CurrencyHudUI.Instance?.Refresh(); return true; }
+    public void AddTokens(int n)  { _saveData.tokens = Mathf.Max(0, _saveData.tokens + n); SaveGame(); CurrencyHudUI.Instance?.Refresh(); }
+    public bool SpendTokens(int n){ if (_saveData.tokens < n) return false; _saveData.tokens -= n; SaveGame(); CurrencyHudUI.Instance?.Refresh(); return true; }
+    public void AddKeys(int n)    { _saveData.keys   = Mathf.Max(0, _saveData.keys   + n); SaveGame(); CurrencyHudUI.Instance?.Refresh(); }
+    public bool SpendKeys(int n)  { if (_saveData.keys   < n) return false; _saveData.keys   -= n; SaveGame(); CurrencyHudUI.Instance?.Refresh(); return true; }
+
+    /// <summary>Запустить покупку кристаллов (UI-кнопки магазина зовут это).</summary>
+    public void BuyGems(string productId)
+    {
+        Analytics.Send("purchase_start", "product", productId);
+        YG2.BuyPayments(productId);
+    }
+
+    // Начисление кристаллов по факту покупки. Чужие товары (no_ads/coins_pack) игнорируем —
+    // их обрабатывают AdRemovalPrompt / JourneyGateUI.
+    private void OnGemPurchase(string id)
+    {
+        int grantGems = 0;
+        bool consumable = true;
+        switch (id)
+        {
+            case GemsSmallId:   grantGems = 50;  break;
+            case GemsMediumId:  grantGems = 170; break;
+            case GemsLargeId:   grantGems = 500; break;
+            case StarterPackId: grantGems = 100; AddCoins(2000); _saveData.adsDisabled = true; consumable = false; break;
+            default: return; // не наш товар
+        }
+
+        _saveData.gems += grantGems;
+        if (consumable) YG2.ConsumePurchaseByID(id); // расходник — иначе не купить повторно
+        SaveGame();
+        CurrencyHudUI.Instance?.Refresh();
+        Analytics.Bought(id);
+        AudioController.Instance?.PlayCoin();
+        RewardPopupUI.Ensure().Show(
+            Loc.T("Спасибо за покупку!", "Thank you!"),
+            Loc.T($"+{grantGems} кристаллов", $"+{grantGems} gems"),
+            new Color(0.35f, 0.7f, 0.95f), 3.5f);
     }
 
     // ─── Батч 6: перенос комбо на следующий день (rewarded «Сохранить комбо») ──
