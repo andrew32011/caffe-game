@@ -137,6 +137,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => YG2.isSDKEnabled);
         LoadGame();
         CurrencyHudUI.Ensure(); // Батч 12-B: HUD кристаллов/жетонов/ключей (по разблокировкам)
+        TryGrantOfflineIncome(); // Батч 12-E: «кофейня работала, пока тебя не было» (крючок возврата)
         _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume, _saveData.voiceVolume); // Батч 4 + голоса
         if (!_sessionReadyCalled)            // 1.19.2: игрок может начинать (один раз за сессию)
         {
@@ -935,7 +936,42 @@ public class GameManager : MonoBehaviour
     /// игрока: после каждого гостя, дня, обучения, покупки (требования 1.9, 1.13.3).</summary>
     public void SaveGame()
     {
-        if (YG2.isSDKEnabled) YG2.SaveProgress();
+        // Батч 12-E: отмечаем «последнюю активность» — база для оффлайн-дохода при следующем входе.
+        if (YG2.isSDKEnabled)
+        {
+            _saveData.lastSeenUnix = NowUnix();
+            YG2.SaveProgress();
+        }
+    }
+
+    private static long NowUnix() => System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+    // ─── Батч 12-E: оффлайн-доход («кофейня работала, пока тебя не было») ────────
+    private void TryGrantOfflineIncome()
+    {
+        long last = _saveData.lastSeenUnix;
+        long now  = NowUnix();
+        _saveData.lastSeenUnix = now; // отметка на будущее
+
+        // Не начисляем на первом запуске/во время обучения (нет базы времени).
+        if (last <= 0 || _saveData.currentDay < 1 || !_saveData.tutorialDone) return;
+
+        long elapsed = now - last;
+        if (elapsed < 600) return; // меньше 10 минут — пропускаем
+
+        long cappedSec  = System.Math.Min(elapsed, 8L * 3600L); // кап 8 часов
+        int  ratePerHour = 60 + _saveData.currentDay * 20;
+        int  income = (int)(cappedSec / 3600.0 * ratePerHour);
+        if (income < 20) return;
+
+        _saveData.totalCoins += income;
+        SaveGame();
+        Analytics.Send("offline_income", "coins", income.ToString());
+        RewardPopupUI.Ensure().Show(
+            Loc.T("С возвращением!", "Welcome back!"),
+            Loc.T($"Пока тебя не было, кофейня заработала +{income} монет.",
+                  $"While you were away, the café earned +{income} coins."),
+            new Color(0.95f, 0.8f, 0.3f), 4f);
     }
 
     private void LoadGame()
