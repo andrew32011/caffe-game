@@ -62,6 +62,8 @@ public class DayController : MonoBehaviour
     private int  _coinsEarnedToday = 0;   // чистая прибыль за день (может быть < 0)
     private int  _currentDayNumber = 1;
     private bool _daySuccess       = false;
+    private float _dayStartTime     = 0f;  // Батч 12-F: для метрики «время до первой подачи»
+    private static bool _firstServeReported = false; // разово за сессию (первый день)
     private float _specialDayMult  = 1f;  // Батч 6: ставка особого дня (×1.3 на днях 8/16/24/32/40)
     private bool _rushDay          = false; // Батч 11: «Час пик» — бонус за темп подачи
 
@@ -95,8 +97,9 @@ public class DayController : MonoBehaviour
         bool endless = GameManager.Instance != null && GameManager.Instance.EndlessActive;
         _rushDay = RushController.IsRushDay(dayData.dayNumber, endless);
 
+        _dayStartTime = Time.time; // Батч 12-F: отсчёт до первой подачи (метрика first_serve_time)
         _dialogue?.ShowDayIntro(dayData.dayNumber);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.2f); // Батч 12-F: быстрее в геймплей (было 2s)
 
         // Батч 12 (A): объявляем новую механику, если она открылась к этому дню
         // (лут/кристаллы/кастомизация). В endless метод сам ничего не делает.
@@ -260,6 +263,14 @@ public class DayController : MonoBehaviour
         if (_rushDay) RushHudUI.Instance?.StartTimer(RushController.RushSeconds);
         yield return new WaitUntil(() => _craftingSystem.IsOrderReady);
         float craftElapsed = Time.time - craftStart;
+
+        // Батч 12-F: метрика «время до первой подачи» (ключ FTUE — цель <90с на дне 1).
+        if (!_firstServeReported && _currentDayNumber == 1)
+        {
+            _firstServeReported = true;
+            Analytics.Send("first_serve_time", "seconds",
+                           Mathf.RoundToInt(Time.time - _dayStartTime).ToString());
+        }
         if (_rushDay) RushHudUI.Instance?.StopTimer();
         _craftingSystem.Hide();
 

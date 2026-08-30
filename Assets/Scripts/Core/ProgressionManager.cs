@@ -58,6 +58,27 @@ public static class ProgressionManager
         }
     }
 
+    /// <summary>Короткое локализованное имя фичи (для тизера «завтра откроется»).</summary>
+    public static string FeatureName(Feature f)
+    {
+        switch (f)
+        {
+            case Feature.LootChests:    return Loc.T("сундуки и подарки", "chests & gifts");
+            case Feature.Gems:          return Loc.T("кристаллы", "gems");
+            default:                    return Loc.T("кастомизация кофейни", "café customization");
+        }
+    }
+
+    /// <summary>Имя фичи, которая откроется в указанный день (для тизера-Зейгарника), или null.</summary>
+    public static string NextUnlockName(int day)
+    {
+        if (!YG2.isSDKEnabled || YG2.saves.endlessMode) return null;
+        foreach (Feature f in System.Enum.GetValues(typeof(Feature)))
+            if (UnlockDay(f) == day && !YG2.saves.unlockedFeatures.Contains(f.ToString()))
+                return FeatureName(f);
+        return null;
+    }
+
     private static void Announce(Feature f)
     {
         string title = Loc.T("Новое открыто!", "New unlocked!");

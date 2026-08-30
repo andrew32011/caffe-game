@@ -436,6 +436,15 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(2f);
             }
 
+            // Батч 12-F: тизер разблокировки завтра (Зейгарник — причина вернуться).
+            string nextUnlock = ProgressionManager.NextUnlockName(day + 1);
+            if (day < 40 && nextUnlock != null && _dialogue != null)
+            {
+                _dialogue.ShowMessage(
+                    Loc.T($"Завтра откроется: {nextUnlock}!", $"Unlocks tomorrow: {nextUnlock}!"), 2.5f);
+                yield return new WaitForSeconds(2f);
+            }
+
             // ─── Переход к следующему дню ────────────────────────────────────
             _saveData.currentDay++;
             SaveGame();
