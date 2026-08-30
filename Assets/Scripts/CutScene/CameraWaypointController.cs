@@ -82,8 +82,27 @@ public class SmoothCameraWaypointController : MonoBehaviour
     {
         if (waypoints.Count == 0)
         {
-            Debug.LogWarning("��� ����������� �����. �������� �� � ����������.");
+#if UNITY_EDITOR
+            Debug.LogWarning("Нет путевых точек. Добавьте их в инспекторе.");
+#endif
             return;
+        }
+
+        StartCoroutine(BeginFlythroughOrSkip());
+    }
+
+    /// <summary>Первый вход — запускаем кинематографический пролёт. Возвращающийся игрок
+    /// (интро уже просмотрено) НЕ переигрывает пролёт — сразу грузим основную сцену.
+    /// Это ключевой фикс first-impression: раньше пропуск срабатывал лишь ПОСЛЕ пролёта.</summary>
+    private System.Collections.IEnumerator BeginFlythroughOrSkip()
+    {
+        float wait = 0f;
+        while (!YG.YG2.isSDKEnabled && wait < 2f) { wait += Time.unscaledDeltaTime; yield return null; }
+
+        if (YG.YG2.isSDKEnabled && YG.YG2.saves.introSeen)
+        {
+            SceneManager.LoadScene(1);
+            yield break;
         }
 
         SetTargetWaypoint(currentWaypointIndex);
@@ -180,14 +199,14 @@ public class SmoothCameraWaypointController : MonoBehaviour
 
             if (isAtFinalWaypoint && enableFinalFovControl)
             {
-                // ��������� ��������� FOV � �������� ������ ��������
+                // Достигли финальной точки — начинаем плавную смену FOV.
                 currentFov = cam.fieldOfView;
                 fovTimer = 0f;
                 isChangingFov = false;
-                Debug.Log("���������� ��������� �����. �������� ����� ���������� FOV...");
             }
-
-            Debug.Log($"���������� ����� {currentWaypointIndex + 1}/{waypoints.Count}");
+#if UNITY_EDITOR
+            Debug.Log($"Достигнута точка {currentWaypointIndex + 1}/{waypoints.Count}");
+#endif
         }
 
         // ��������� ��������� ���������� ��� ���������

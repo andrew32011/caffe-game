@@ -23,10 +23,12 @@ public class IntroStoryUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _storyText;
     [SerializeField] private Button _continueButton;
     [SerializeField] private TextMeshProUGUI _continueLabel;
+    [Tooltip("Кнопка «Пропустить» (верх-право): активна сразу, минует форс-ожидание.")]
+    [SerializeField] private Button _skipButton;
 
     [Header("Настройки")]
-    [Tooltip("Через сколько секунд кнопка «Продолжить» загорается.")]
-    [SerializeField] private float _activateDelay = 2f;
+    [Tooltip("Через сколько секунд кнопка «Продолжить» загорается (короткое — меньше трения).")]
+    [SerializeField] private float _activateDelay = 0.5f;
     [Tooltip("Индекс основной сцены в Build Settings (обычно 1).")]
     [SerializeField] private int _mainSceneIndex = 1;
 
@@ -74,6 +76,8 @@ public class IntroStoryUI : MonoBehaviour
 
     private IEnumerator Routine()
     {
+        Analytics.Send(Analytics.IntroStart); // первый вход: показываем историю
+
         if (_storyText != null) _storyText.text = StoryText();
         SetButtonLit(false); // серая и неактивная
 
@@ -81,6 +85,16 @@ public class IntroStoryUI : MonoBehaviour
         {
             _continueButton.onClick.RemoveListener(OnContinue);
             _continueButton.onClick.AddListener(OnContinue);
+        }
+
+        // Кнопка «Пропустить» активна СРАЗУ — нетерпеливый игрок прыгает в игру,
+        // не дожидаясь отсчёта «Продолжить» (снимаем трение первых секунд).
+        if (_skipButton != null)
+        {
+            _skipButton.onClick.RemoveListener(OnSkip);
+            _skipButton.onClick.AddListener(OnSkip);
+            _skipButton.interactable = true;
+            _skipButton.gameObject.SetActive(true);
         }
 
         if (_group != null)
@@ -122,28 +136,35 @@ public class IntroStoryUI : MonoBehaviour
 
     private void OnContinue()
     {
+        Analytics.Send(Analytics.IntroComplete);
+        Proceed();
+    }
+
+    private void OnSkip()
+    {
+        Analytics.Send(Analytics.IntroSkip);
+        Proceed();
+    }
+
+    private void Proceed()
+    {
         if (_continueButton != null) _continueButton.interactable = false;
+        if (_skipButton != null)     _skipButton.interactable = false;
         Time.timeScale = 1f;
         SceneManager.LoadScene(_mainSceneIndex);
     }
 
+    // Короткая, «ударная» подача (по правилу first-impression: не стена текста).
+    // Полную легенду можно раскрыть позже в игре (первый «Сон»/меню истории).
     private string StoryText()
     {
         return Loc.T(
-            "В маленькой кофейне на самом краю миров жила Мира — и не было её сердцу " +
-            "теплее места, чем рядом с её возлюбленным, Каем.\n\n" +
-            "Они должны были обвенчаться на рассвете. Но в последнюю ночь перед свадьбой " +
-            "за Каем пришли из тумана — и унесли его за грань, во тьму Зеркального Ущелья.\n\n" +
-            "Теперь у Миры остались лишь аромат кофе, пустой стул напротив и одно обещание: " +
-            "найти Кая, чего бы это ни стоило.\n\n" +
-            "Свари надежду — по чашке за раз. И пусть она приведёт тебя к нему.",
+            "За Каем пришли из тумана в ночь перед свадьбой — и унесли за грань, во тьму.\n\n" +
+            "У Миры остались лишь аромат кофе и обещание найти его.\n\n" +
+            "Свари надежду — по чашке за раз.",
 
-            "In a little coffee house at the very edge of the worlds lived Mira — and her heart " +
-            "knew no warmer place than beside her beloved, Kai.\n\n" +
-            "They were to be wed at dawn. But on the last night before the wedding, they came for " +
-            "Kai out of the fog — and carried him beyond the veil, into the dark of the Mirror Gorge.\n\n" +
-            "Now all Mira has left is the scent of coffee, an empty chair across the table, and a " +
-            "single promise: to find Kai, whatever it takes.\n\n" +
-            "Brew hope — one cup at a time. And may it lead you to him.");
+            "They took Kai into the fog the night before the wedding — beyond the veil, into the dark.\n\n" +
+            "All Mira has left is the scent of coffee and a promise to find him.\n\n" +
+            "Brew hope — one cup at a time.");
     }
 }

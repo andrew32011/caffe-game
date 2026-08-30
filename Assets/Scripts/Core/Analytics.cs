@@ -32,6 +32,9 @@ public static class Analytics
     public const string EndlessStart   = "endless_start";   // включён бесконечный режим
     public const string PromptShown    = "prompt_shown";    // param: which(review/shortcut)
     public const string PromptAccepted = "prompt_accepted"; // param: which(review/shortcut)
+    public const string IntroStart     = "intro_start";     // показан пролёт/история (первый вход)
+    public const string IntroSkip      = "intro_skip";      // игрок нажал «Пропустить»
+    public const string IntroComplete  = "intro_complete";  // игрок дочитал и нажал «Продолжить»
 
     // ─── Обёртки (безопасно принимают отсутствие данных) ───────────────────────
 

@@ -58,6 +58,12 @@ public static class IntroSceneSetup
         btn.transition = Selectable.Transition.None; // цвет ведём вручную (серая/активная)
         var label = btn.GetComponentInChildren<TextMeshProUGUI>();
 
+        // ── Кнопка «Пропустить» (верх-право) — активна сразу, минует форс-ожидание ─
+        var skip = Btn("BtnSkipIntro", panel.transform, "Пропустить");
+        SetRect(skip.GetComponent<RectTransform>(), new Vector2(0.82f, 0.90f), new Vector2(0.985f, 0.975f));
+        var skipLabel = skip.GetComponentInChildren<TextMeshProUGUI>();
+        if (skipLabel != null) skipLabel.gameObject.AddComponent<LocalizeYG>().Set("Пропустить", "Skip");
+
         // ── Логика ─────────────────────────────────────────────────────────────
         var intro = canvasGO.AddComponent<IntroStoryUI>();
         var so = new SerializedObject(intro);
@@ -65,6 +71,7 @@ public static class IntroSceneSetup
         SetRef(so, "_storyText", story);
         SetRef(so, "_continueButton", btn);
         SetRef(so, "_continueLabel", label);
+        SetRef(so, "_skipButton", skip);
         so.ApplyModifiedPropertiesWithoutUndo();
 
         // ВСЕ кнопки/панели ВСЕЙ сцены интро → pixelsPerUnitMultiplier = 4
