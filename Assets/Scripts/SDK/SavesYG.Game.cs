@@ -71,5 +71,27 @@ namespace YG
         // ─── Промпты вовлечения (показываем один раз) ───────────────────────────
         public bool shortcutAsked = false; // предложили добавить ярлык на рабочий стол (после дня 1)
         public bool reviewAsked   = false; // предложили оценить игру (после дня 3)
+
+        // ═══ Батч 12 (удержание/экономика) ═══════════════════════════════════════
+
+        // A: какие фичи уже открыты (по расписанию дней) — чтобы объявить разблокировку 1 раз.
+        public List<string> unlockedFeatures = new List<string>();
+
+        // B: тройная экономика — премиум-валюта и собираемые жетоны (монеты = totalCoins).
+        public int gems   = 0; // кристаллы (премиум): IAP/rewarded/майлстоуны
+        public int tokens = 0; // жетоны (лут/ивент): собираются с дропа, тратятся на декор/ключи
+
+        // C: лут — ключи и таймер бесплатного сундука (unix-время следующего открытия).
+        public int  keys            = 0;
+        public long freeChestReady  = 0; // unix-время, когда бесплатный сундук снова готов
+
+        // D: кастомизация (владение) — выбранный аватар и тема кофейни; купленные наборы.
+        public int          avatarId = 0;
+        public int          themeId  = 0;
+        public List<string> ownedCustomizations = new List<string>(); // ключи купленных аватаров/тем
+        public List<string> achievementsClaimed = new List<string>(); // выданные достижения
+
+        // E: возвратный крючок — время последнего выхода (для оффлайн-дохода).
+        public long lastSeenUnix = 0;
     }
 }

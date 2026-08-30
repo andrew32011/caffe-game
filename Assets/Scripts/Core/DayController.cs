@@ -98,6 +98,10 @@ public class DayController : MonoBehaviour
         _dialogue?.ShowDayIntro(dayData.dayNumber);
         yield return new WaitForSeconds(2f);
 
+        // Батч 12 (A): объявляем новую механику, если она открылась к этому дню
+        // (лут/кристаллы/кастомизация). В endless метод сам ничего не делает.
+        ProgressionManager.CheckDayUnlocks(dayData.dayNumber);
+
         if (special)
         {
             _dialogue?.ShowMessage(
