@@ -393,6 +393,7 @@ public class GameManager : MonoBehaviour
 
             YG2.GameplayStop();
             Analytics.DayCompleted(day, _dayController.CoinsEarnedToday); // метрика: день пройден
+            Achievements.CheckAll(); // Батч 12-D: майлстоуны → кристаллы
 
             // ─── Экран результатов дня ──────────────────────────────────────
             // Деньги меняются живьём в процессе дня (списание себестоимости +
@@ -549,6 +550,7 @@ public class GameManager : MonoBehaviour
 
             // Рекорд бесконечного режима (самый дальний достигнутый день).
             if (eDay > _saveData.endlessBestDay) _saveData.endlessBestDay = eDay;
+            Achievements.CheckAll(); // Батч 12-D: майлстоуны endless → кристаллы
 
             // ─── Экран результатов (деньги уже начислены в процессе дня) ─────────
             _currentPhase = GamePhase.DayResult;
