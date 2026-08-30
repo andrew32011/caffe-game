@@ -190,6 +190,10 @@ public class DayController : MonoBehaviour
         // Пункт 9: провала по «3 ошибкам» больше нет. День считается провальным
         // только если кофейня отработала в минус (экономика — см. _coinsEarnedToday).
         _daySuccess = _coinsEarnedToday >= 0;
+
+        // Батч 12-C: «сундук дня» — гарантированная награда за успешный день (не на провале,
+        // чтобы рестарт дня не выдавал сундук повторно).
+        if (_daySuccess) LootSystem.GrantDayChest(_currentDayNumber);
     }
 
     // ─── Один гость ───────────────────────────────────────────────────────────
@@ -335,6 +339,9 @@ public class DayController : MonoBehaviour
                                              new Color(0.5f, 0.9f, 1f));
         }
         _coinsEarnedToday += payment - _craftingSystem.CurrentDrinkCost;
+
+        // Батч 12-C: переменный лут-дроп за обслуженного гостя (гейтится разблокировкой).
+        LootSystem.RollDrop(_currentDayNumber, stars);
 
         // Батч 6: прогресс «Заказа дня» по этому напитку.
         _dailyChallenge?.ReportDrink(payment, stars, _craftingSystem.ChosenToppingCount,
