@@ -55,7 +55,6 @@ public static class Achievements
             if (!a.Done(save)) continue;
 
             save.achievementsClaimed.Add(a.Id);
-            gm.AddGems(a.Gems); // AddGems сам сохраняет и обновляет HUD
             gainedGems += a.Gems;
             gainedCount++;
             Analytics.Send("achievement", "id", a.Id);
@@ -63,6 +62,9 @@ public static class Achievements
 
         if (gainedCount > 0)
         {
+            // Перф: одно облачное сохранение на все закрытые за раз достижения (а не N).
+            gm.AddGems(gainedGems); // AddGems сохраняет и обновляет HUD один раз
+
             string title = gainedCount == 1
                 ? Loc.T("Достижение!", "Achievement!")
                 : Loc.T($"Достижений: {gainedCount}!", $"{gainedCount} achievements!");

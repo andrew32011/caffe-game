@@ -66,10 +66,17 @@ public class TimedOfferUI : MonoBehaviour
     private IEnumerator Countdown()
     {
         float t = _seconds;
+        int lastShown = -1;
         while (t > 0f)
         {
-            if (_timerText != null)
-                _timerText.text = Loc.T($"Осталось {Mathf.CeilToInt(t)} с", $"{Mathf.CeilToInt(t)}s left");
+            // Перф: обновляем подпись (аллокация строки + rebuild меша TMP) только при
+            // смене целой секунды, а не каждый кадр.
+            int sec = Mathf.CeilToInt(t);
+            if (sec != lastShown && _timerText != null)
+            {
+                lastShown = sec;
+                _timerText.text = Loc.T($"Осталось {sec} с", $"{sec}s left");
+            }
             t -= Time.unscaledDeltaTime;
             yield return null;
         }
