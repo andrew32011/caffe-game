@@ -522,6 +522,58 @@ public static class CoffeGameSceneSetup
             .Ref("_gemIcon", Spr("Assets/Mini UI/Icons/Blue Gem.png"))
             .Apply();
 
+        // ── Обустройство кофейни (Батч 15): предразмещённая мебель в зале ───────────
+        // Билдер ИНСТАНЦИРУЕТ префабы мебели прямо в зал (RenoStages внутри Basement/CofeBasis),
+        // по одному на стадию, ОДИН раз (персистентно) — правь позиции/масштаб в редакторе,
+        // сохранятся. Визуализатор в игре включает их по прогрессу.
+        var renoPaths = new[]
+        {
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Furniture/Desk.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Furniture/Chair.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Furniture/Carpet_Red.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Furniture/Bench.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Lamps/Chandelier.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Clutter/Book_Big_Brown.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Furniture/Banner.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Lamps/Candlestick_Triple.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Furniture/Barrel_Big.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Clutter/CrystalBall.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Clutter/Amphora.prefab",
+            "Assets/PrefsAll/LowPolyDungeon/Prefabs/Tiles/Balcony.prefab",
+        };
+        int renoCount = renoPaths.Length;
+
+        // Мебель ПРЕДРАЗМЕЩАЕМ прямо в зал (внутри Basement/CofeBasis), в персистентном
+        // RenoStages — по одному объекту на стадию. Билдер инстанцирует их ОДИН раз (если
+        // ещё нет), чтобы ручная расстановка/масштаб сохранялись между пересборками.
+        // Визуализатор в игре лишь включает их по прогрессу; в редакторе они видимы для правки.
+        var cafeParent = GameObject.Find("Basement") ?? GameObject.Find("CofeBasis") ?? GameObject.Find("CofeBasis ");
+        Transform stagesRoot = null;
+        if (cafeParent != null) stagesRoot = cafeParent.transform.Find("RenoStages");
+        if (stagesRoot == null) { var found = GameObject.Find("RenoStages"); if (found != null) stagesRoot = found.transform; }
+        if (stagesRoot == null)
+        {
+            var srGo = new GameObject("RenoStages");
+            if (cafeParent != null) srGo.transform.SetParent(cafeParent.transform, false);
+            stagesRoot = srGo.transform;
+        }
+        var stageObjects = new GameObject[renoCount];
+        for (int i = 0; i < renoCount; i++)
+        {
+            var existing = stagesRoot.Find($"RenoStage_{i}");
+            if (existing != null) { stageObjects[i] = existing.gameObject; continue; }
+            var prefab = Pref(renoPaths[i]);
+            GameObject inst = prefab != null ? (GameObject)PrefabUtility.InstantiatePrefab(prefab, stagesRoot) : new GameObject($"RenoStage_{i}");
+            inst.name = $"RenoStage_{i}";
+            inst.transform.SetParent(stagesRoot, false);
+            // Черновой спред ЛОКАЛЬНО у центра зала — ПЕРЕСТАВЬ/ОТМАСШТАБИРУЙ по залу (сохранится).
+            inst.transform.localPosition = new Vector3(-2.5f + (i % 6) * 1.0f, 0f, 2.0f + (i / 6) * 1.2f);
+            stageObjects[i] = inst;
+        }
+        var renoVisGO = Child(root, "RenovationVisualizer");
+        var renoVis = renoVisGO.AddComponent<RenovationVisualizer>();
+        new W(renoVis).Arr("_stageObjects", stageObjects).Apply();
+
         // ── Журнал гостей «Завсегдатаи» (Батч 6) ────────────────────────────
         // HUD-иконка «Журнал» (средняя в правом доке).
         var journalOpenBtn = IconBtn("BtnJournal", ct, "Assets/Mini UI/Icons/Book.png", "Журнал");
@@ -1175,6 +1227,9 @@ public static class CoffeGameSceneSetup
     // Иконка-картинка из ассета на Canvas
     // Загрузка спрайта по пути (Батч 13: иконки валют, аватары, темы).
     static Sprite Spr(string path) => AssetDatabase.LoadAssetAtPath<Sprite>(path);
+
+    // Загрузка префаба по пути (Батч 15: мебель обустройства).
+    static GameObject Pref(string path) => AssetDatabase.LoadAssetAtPath<GameObject>(path);
 
     static Image IconImage(string name, Transform parent, string assetPath, Vector2 aMin, Vector2 aMax)
     {

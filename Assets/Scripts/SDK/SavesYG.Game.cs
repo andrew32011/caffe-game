@@ -93,5 +93,33 @@ namespace YG
 
         // E: возвратный крючок — время последнего выхода (для оффлайн-дохода).
         public long lastSeenUnix = 0;
+
+        // ═══ Батч 15: обустройство кофейни (главный сток монет + мета-прогресс) ═══
+        public int renovationStage  = 0; // сколько проектов обустройства завершено
+        public int renovationBanked = 0; // монет уже вложено в текущий проект (копим до цены)
+
+        // Батч 15: ежедневная доска задач — какие из 3 задач дня уже забраны (индексы 0..2),
+        // дата активной доски (yyyyMMdd) и забран ли бонус «все три».
+        public string dailyTasksDate  = "";
+        public List<int> dailyTasksClaimed = new List<int>();
+        public bool dailyTasksBonusClaimed = false;
+
+        // ─── Батч 15 (Фаза B): отношения / рецепты / альбом ─────────────────────
+        // Опыт отношений с гостем, параллельно journalKeys (индекс = тот же гость).
+        public List<int> journalRelXp = new List<int>();
+        // Мастерство рецептов: параллельные списки ключ=(int)CoffeeType → сколько раз хорошо подан.
+        public List<int> recipeKeys   = new List<int>();
+        public List<int> recipeServed = new List<int>();
+        // Забранные награды за завершённые коллекции альбома (ключи наборов).
+        public List<string> albumSetsClaimed = new List<string>();
+
+        // ─── Батч 15 (Фаза C): событие-турнир / колесо / сезонный пасс ───────────
+        public string eventWeek     = "";  // ISO-неделя активного события (yyyy-Www)
+        public int    eventProgress = 0;   // очки события за неделю (собранные звёзды)
+        public int    eventTierClaimed = 0; // сколько наградных вех события забрано
+        public string wheelLastSpin = "";  // дата последнего бесплатного спина (yyyyMMdd)
+        public int    passXp        = 0;   // опыт сезонного пасса
+        public List<int> passClaimed = new List<int>(); // забранные уровни пасса
+        public bool   passPremium   = false; // куплен ли премиум-трек
     }
 }

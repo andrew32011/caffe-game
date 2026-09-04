@@ -112,18 +112,11 @@ public class DayController : MonoBehaviour
                 Loc.T("Сегодня — Особый гость! Ставка выше, но заказ капризнее.",
                       "A Special Guest today! Higher pay, but a pickier order."), 2.6f));
 
-        // Батч 6: «Заказ дня» — квест на весь день, анонс игроку.
-        if (_dailyChallenge != null)
-        {
-            _dailyChallenge.BeginDay(dayData.dayNumber);
-            yield return StartCoroutine(Announce(_dailyChallenge.Description, 2.4f));
-
-            // Батч 6: при первом «Заказе дня» — пояснение механики.
-            if (GameManager.Instance != null && GameManager.Instance.MarkTipShown("tip_quest") && _dialogue != null)
-                yield return StartCoroutine(Announce(
-                    Loc.T("«Заказ дня» — квест на весь день. Он одинаков у всех игроков!",
-                          "The Daily Order is a full-day quest. It's the same for every player!"), 2.8f));
-        }
+        // Батч 15: доска задач дня (3 квеста) — вместо одиночного «заказа дня». Не баннер:
+        // задачи в постоянной панели (иконка «Задачи дня» слева), награды — по клику.
+        // Обучение задачам/обустройству — в конце дня 1 (ShowFirstDayLessons), не на старте.
+        DailyTaskBoard.BeginDay(dayData.dayNumber);
+        DailyTaskBoardUI.Ensure();
 
         // Батч 2: продолжаем день с того гостя, на котором игрока прервали.
         int startIndex = GameManager.Instance != null ? GameManager.Instance.ResumeCustomerIndex : 0;
@@ -166,17 +159,12 @@ public class DayController : MonoBehaviour
         UiEffects.Instance?.ShowCombo(0);
         RushHudUI.Instance?.EndRush();
 
-        // Батч 6: награда за выполненный «Заказ дня» (входит в дневную выручку).
-        int challengeBonus = _dailyChallenge != null ? _dailyChallenge.Claim() : 0;
-        if (challengeBonus > 0)
+        // Батч 15: награды за задачи дня забирает игрок из доски (DailyTaskBoardUI) — авто-клейм
+        // «заказа дня» больше не нужен. Если остались невзятые — подсказываем (без баннера-стены).
+        if (DailyTaskBoard.Claimable() > 0 && _dialogue != null)
         {
-            GameManager.Instance?.AddCoins(challengeBonus);
-            _coinsEarnedToday += challengeBonus;
-            UiEffects.Instance?.CoinBurst(challengeBonus);
-            AudioController.Instance?.PlayCoin();
-            _dialogue?.ShowMessage(
-                Loc.T($"Заказ дня выполнен! +{challengeBonus}", $"Daily order done! +{challengeBonus}"), 2.5f);
-            yield return new WaitForSeconds(1.5f);
+            _dialogue.ShowMessage(Loc.T("Есть награды за задачи — забери слева!", "Rewards await — claim tasks on the left!"), 2f);
+            yield return new WaitForSeconds(1f);
         }
 
         // Пункт 9: провала по «3 ошибкам» больше нет. День считается провальным
@@ -186,6 +174,31 @@ public class DayController : MonoBehaviour
         // Батч 12-C: «сундук дня» — гарантированная награда за успешный день (не на провале,
         // чтобы рестарт дня не выдавал сундук повторно).
         if (_daySuccess) LootSystem.GrantDayChest(_currentDayNumber);
+
+        // Батч 15: конец дня 1 — доп-обучение мета-системам (задачи + обустройство) + поощрение.
+        // Так стартовое обучение короткое, а глубина открывается, когда игрок уже втянулся.
+        if (dayData.dayNumber == 1 && !endless && _daySuccess) yield return StartCoroutine(ShowFirstDayLessons());
+    }
+
+    /// <summary>Батч 15: короткие уроки после первого дня — знакомим с задачами и обустройством,
+    /// и дарим стартовый подарок (крючок «вот на что копить»). Один раз (tip_meta).</summary>
+    private IEnumerator ShowFirstDayLessons()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null || _dialogue == null || !gm.MarkTipShown("tip_meta")) yield break;
+
+        yield return StartCoroutine(Announce(
+            Loc.T("Отличная смена! Слева — «Задачи дня»: выполняй и забирай награды монетами.",
+                  "Great shift! On the left — Daily Tasks: complete them and claim coin rewards."), 3f));
+        yield return StartCoroutine(Announce(
+            Loc.T("А главное — копи монеты и ОБУСТРАИВАЙ кофейню (виджет цели слева). Каждый шаг оживляет «Междумирье».",
+                  "Most of all — save coins and RENOVATE the café (goal widget on the left). Each step revives the Inbetween."), 3.4f));
+
+        // Стартовый подарок-крючок: немного монет на первый проект.
+        gm.AddCoins(150);
+        UiEffects.Instance?.CoinBurst(150);
+        AudioController.Instance?.PlayBonus();
+        yield return StartCoroutine(Announce(Loc.T("Подарок на обустройство: +150 монет!", "Renovation gift: +150 coins!"), 2.5f));
     }
 
     // ─── Батч 14: последовательные анонсы дня (без наложений) ──────────────────
@@ -304,6 +317,13 @@ public class DayController : MonoBehaviour
         if (stars == 3) AudioController.Instance?.PlayPerfect();
         UiEffects.Instance?.Celebrate(stars);
 
+        // Батч 15: «почти-победа» (near-miss) — подчёркиваем близость к лучшему, чтобы
+        // подпитать «ещё чашку» и желание улучшиться (без наказания).
+        if (result >= 0.68f && result < 0.8f)
+            UiEffects.Instance?.FloatingText(Loc.T("Так близко до трёх звёзд!", "So close to three stars!"), new Color(1f, 0.85f, 0.4f));
+        else if (result >= 0.4f && result < 0.5f)
+            UiEffects.Instance?.FloatingText(Loc.T("Чуть-чуть не хватило!", "Just a hair short!"), new Color(1f, 0.75f, 0.5f));
+
         // Батч 6: журнал гостей — фиксируем визит и лучшую оценку этого типа гостя.
         GameManager.Instance?.RecordVisit(entry.characterType, stars);
 
@@ -341,15 +361,21 @@ public class DayController : MonoBehaviour
         float dayBase = coinsPerOrder * _payScale * _specialDayMult; // Батч 6: ×1.3 в особый день
         float early   = Difficulty.EarlyEase(_currentDayNumber);
         float upgMult = GameManager.Instance != null ? GameManager.Instance.PriceMultiplier : 1f;
-        // Батч 6: «завсегдатай» (симпатия ≥90%) — пассивные +5% к настроению/чаевым.
+        // Батч 6: «завсегдатай» (симпатия ≥90%) — пассивные +5%; Батч 15: +бонус отношений.
         float regularBonus = newStored >= 0.9f ? 0.05f : 0f;
-        float tipMood = Mathf.Clamp01(newStored + regularBonus + (GameManager.Instance != null ? GameManager.Instance.MoodBonus : 0f));
+        float relBonus = GameManager.Instance != null ? GameManager.Instance.RelationshipTipBonus(entry.characterType) : 0f;
+        float tipMood = Mathf.Clamp01(newStored + regularBonus + relBonus + (GameManager.Instance != null ? GameManager.Instance.MoodBonus : 0f));
         float combo   = UpdateCombo(result);
         float precision = _craftingSystem.PrecisionBonus; // Батч 6: ×1.1 за идеальное попадание в центр
         float favoriteMult = _craftingSystem.FavoriteAdded ? 1.08f : 1f; // Батч 6: апселл любимого топпинга
         float speedMult = _rushDay ? RushController.SpeedMultiplier(craftElapsed) : 1f; // Батч 11: бонус за темп
-        int payment = Mathf.RoundToInt(dayBase * result * (0.5f + tipMood) * early * upgMult * combo * precision * favoriteMult * speedMult);
+        float masteryMult = RecipeBook.MasteryBonus(entry.order.type); // Батч 15: мастерство рецепта
+        int payment = Mathf.RoundToInt(dayBase * result * (0.5f + tipMood) * early * upgMult * combo * precision * favoriteMult * speedMult * masteryMult);
         GameManager.Instance?.AddCoins(payment);
+
+        // Батч 15: прогресс мастерства рецепта (по типу заказа) + очки события/сезона.
+        RecipeBook.ReportServe(entry.order.type, result);
+        if (result >= 0.5f) { EventManager.AddStars(stars); SeasonPass.AddXp(stars); }
 
         // Батч 11: похвала «Быстро!» за подачу в темп (только осмысленный бонус, без спама).
         if (_rushDay && RushController.InTime(craftElapsed) && speedMult > 1.02f)
@@ -363,9 +389,9 @@ public class DayController : MonoBehaviour
         // Батч 12-C: переменный лут-дроп за обслуженного гостя (гейтится разблокировкой).
         LootSystem.RollDrop(_currentDayNumber, stars);
 
-        // Батч 6: прогресс «Заказа дня» по этому напитку.
-        _dailyChallenge?.ReportDrink(payment, stars, _craftingSystem.ChosenToppingCount,
-                                     _craftingSystem.PrecisionBonus > 1f, result);
+        // Батч 15: прогресс задач дня по этому напитку (доска из 3 задач).
+        DailyTaskBoard.Report(payment, stars, _craftingSystem.ChosenToppingCount,
+                              _craftingSystem.PrecisionBonus > 1f, result);
 
         // 9. Реакция гостя — реплика зависит от отношений (пункт 4.3)
         yield return StartCoroutine(GoToStageAndWait(_stageReaction));

@@ -283,14 +283,9 @@ public class TutorialController : MonoBehaviour
                                        "When everything is ready — return to the counter and press \"Serve\". Guess the order right, and the guest will be pleased and share something interesting..."),
                 highlightObject= _counterObject,
                 stageIndex = 1
-            },
-            new TutorialStep
-            {
-                speakerName = master,
-                text        = Loc.T("Три ошибки за день — и день придётся начать заново. Будь внимательна! А со следующего дня, если что-то непонятно, тебе поможет кнопка подсказки.",
-                                    "Three mistakes in a day — and the day starts over. Stay sharp! And from the next day on, if something's unclear, the hint button will help you."),
-                stageIndex = 1
             }
+            // Батч 15: обучение НОВЫМ мета-системам (задачи дня, обустройство) вынесено на
+            // КОНЕЦ дня 1 (DayController), чтобы старт был коротким и быстро вводил в игру.
         };
     }
 }

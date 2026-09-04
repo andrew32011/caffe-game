@@ -167,6 +167,9 @@ public class GameManager : MonoBehaviour
             _sessionInitDone = true;
         }
 
+        RenovationGoalUI.Ensure(); // Батч 15: виджет цели обустройства (главный сток монет)
+        ProgressHubUI.Ensure();    // Батч 15: хаб (рецепты/альбом/событие/сезон/колесо)
+
         yield return StartCoroutine(RunGameDays());
     }
 
@@ -862,10 +865,11 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    // Множители эффектов апгрейдов (читают DayController / CoffeeCraftingSystem).
-    public float PriceMultiplier => 1f + GetUpgradeLevel(UpgradeType.Beans)   * 0.12f; // +12%/ур к оплате
-    public float ToleranceBonus  =>       GetUpgradeLevel(UpgradeType.Machine) * 0.04f; // шире допуск
-    public float MoodBonus       =>       GetUpgradeLevel(UpgradeType.Loyalty) * 0.06f; // лучше чаевые
+    // Множители эффектов апгрейдов + обустройства кофейни (Батч 15) — читают DayController /
+    // CoffeeCraftingSystem. Обустройство даёт скромные складывающиеся бонусы поверх апгрейдов.
+    public float PriceMultiplier => 1f + GetUpgradeLevel(UpgradeType.Beans)   * 0.12f + RenovationManager.PriceBonus;     // +оплата
+    public float ToleranceBonus  =>       GetUpgradeLevel(UpgradeType.Machine) * 0.04f + RenovationManager.ToleranceBonus; // шире допуск
+    public float MoodBonus       =>       GetUpgradeLevel(UpgradeType.Loyalty) * 0.06f + RenovationManager.TipBonus;       // лучше чаевые
 
     // ─── Батч 4: настройки громкости (хранятся в облачном сейве) ────────────────
 
@@ -934,7 +938,7 @@ public class GameManager : MonoBehaviour
 
     // ─── Батч 6: журнал гостей («Завсегдатаи») ────────────────────────────────
 
-    /// <summary>Записывает визит гостя и лучшую оценку (1..3). Сохраняет.</summary>
+    /// <summary>Записывает визит гостя и лучшую оценку (1..3). Копит опыт отношений. Сохраняет.</summary>
     public void RecordVisit(CharacterType type, int stars)
     {
         int key = (int)type;
@@ -944,6 +948,7 @@ public class GameManager : MonoBehaviour
             _saveData.journalKeys.Add(key);
             _saveData.journalVisits.Add(1);
             _saveData.journalBestStars.Add(Mathf.Clamp(stars, 1, 3));
+            _saveData.journalRelXp.Add(0);
         }
         else
         {
@@ -951,8 +956,33 @@ public class GameManager : MonoBehaviour
             if (stars > _saveData.journalBestStars[i])
                 _saveData.journalBestStars[i] = Mathf.Clamp(stars, 1, 3);
         }
+        AddRelationshipXp(type, 4 + stars * 4); // Батч 15: тёплая подача крепит отношения
         SaveGame();
     }
+
+    // ─── Батч 15: отношения с завсегдатаями ─────────────────────────────────────
+    public const int RelXpPerLevel = 60;
+    public const int RelMaxLevel   = 5;
+
+    private void AddRelationshipXp(CharacterType type, int amount)
+    {
+        int i = _saveData.journalKeys.IndexOf((int)type);
+        if (i < 0) return;
+        while (_saveData.journalRelXp.Count <= i) _saveData.journalRelXp.Add(0); // выравниваем со старыми сейвами
+        _saveData.journalRelXp[i] += Mathf.Max(0, amount);
+    }
+
+    public int GetRelationshipXp(CharacterType type)
+    {
+        int i = _saveData.journalKeys.IndexOf((int)type);
+        return (i >= 0 && i < _saveData.journalRelXp.Count) ? _saveData.journalRelXp[i] : 0;
+    }
+
+    public int GetRelationshipLevel(CharacterType type) =>
+        Mathf.Clamp(GetRelationshipXp(type) / RelXpPerLevel, 0, RelMaxLevel);
+
+    /// <summary>Прибавка к чаевым от отношений с этим гостем (+2%/уровень, до +10%).</summary>
+    public float RelationshipTipBonus(CharacterType type) => GetRelationshipLevel(type) * 0.02f;
 
     /// <summary>Список встреченных типов гостей (ключи журнала).</summary>
     public System.Collections.Generic.List<int> JournalKeys => _saveData.journalKeys;
