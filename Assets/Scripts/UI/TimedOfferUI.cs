@@ -46,6 +46,8 @@ public class TimedOfferUI : MonoBehaviour
     {
         if (_shownThisSession) return;
         if (YG.YG2.saves != null && YG.YG2.saves.adsDisabled) return; // стартовый набор бесполезен
+        // Батч 14: не поверх активного праздничного поп-апа (разблокировка/лут) — без наложений.
+        if (RewardPopupUI.Instance != null && RewardPopupUI.Instance.IsShowing) return;
         _shownThisSession = true;
 
         if (_panel == null) Build();

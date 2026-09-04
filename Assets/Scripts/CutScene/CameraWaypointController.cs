@@ -91,19 +91,14 @@ public class SmoothCameraWaypointController : MonoBehaviour
         StartCoroutine(BeginFlythroughOrSkip());
     }
 
-    /// <summary>Первый вход — запускаем кинематографический пролёт. Возвращающийся игрок
-    /// (интро уже просмотрено) НЕ переигрывает пролёт — сразу грузим основную сцену.
-    /// Это ключевой фикс first-impression: раньше пропуск срабатывал лишь ПОСЛЕ пролёта.</summary>
+    /// <summary>Батч 14: кинематографический пролёт камеры играет ВСЕГДА (в т.ч. на реплее) —
+    /// это заставка игры. Пропуск для вернувшегося игрока касается только длинного сюжетного
+    /// ТЕКСТА (IntroStoryUI при introSeen сразу грузит игру после пролёта). Раньше здесь
+    /// пролёт целиком пропускался при introSeen → «мгновенная загрузка», что и не нравилось.</summary>
     private System.Collections.IEnumerator BeginFlythroughOrSkip()
     {
         float wait = 0f;
         while (!YG.YG2.isSDKEnabled && wait < 2f) { wait += Time.unscaledDeltaTime; yield return null; }
-
-        if (YG.YG2.isSDKEnabled && YG.YG2.saves.introSeen)
-        {
-            SceneManager.LoadScene(1);
-            yield break;
-        }
 
         SetTargetWaypoint(currentWaypointIndex);
     }

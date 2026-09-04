@@ -70,6 +70,15 @@ public class SpeechMixer : MonoBehaviour
         }
     }
 
+    /// <summary>Батч 14: играет ли сейчас бубнёж (для синхронизации с печатью текста).</summary>
+    public bool IsPlaying => audioSource != null && audioSource.isPlaying;
+
+    /// <summary>Батч 14: остановить бубнёж (когда текст полностью показан/скрыт).</summary>
+    public void StopSpeech()
+    {
+        if (audioSource != null) audioSource.Stop();
+    }
+
     // ������������� ������������������ ����������
     public void PlaySequence(params string[] fragmentNames)
     {

@@ -101,34 +101,28 @@ public class DayController : MonoBehaviour
         _dialogue?.ShowDayIntro(dayData.dayNumber);
         yield return new WaitForSeconds(1.2f); // Батч 12-F: быстрее в геймплей (было 2s)
 
-        // Батч 12 (A): объявляем новую механику, если она открылась к этому дню
-        // (лут/кристаллы/кастомизация). В endless метод сам ничего не делает.
+        // Батч 12 (A): объявляем новую механику, если она открылась к этому дню (лут/кристаллы).
+        // Батч 14: ждём закрытия поп-апа разблокировки, прежде чем показывать центральные
+        // сообщения дня — иначе тексты наложатся (замечено с 3-го дня).
         ProgressionManager.CheckDayUnlocks(dayData.dayNumber);
-        CustomizationUI.Instance?.RefreshBadgeVisibility(); // Батч 13: показать бейдж аватара при разблокировке (D4)
+        yield return StartCoroutine(WaitForUnlockPopup());
 
         if (special)
-        {
-            _dialogue?.ShowMessage(
+            yield return StartCoroutine(Announce(
                 Loc.T("Сегодня — Особый гость! Ставка выше, но заказ капризнее.",
-                      "A Special Guest today! Higher pay, but a pickier order."), 2.8f);
-            yield return new WaitForSeconds(1.5f);
-        }
+                      "A Special Guest today! Higher pay, but a pickier order."), 2.6f));
 
         // Батч 6: «Заказ дня» — квест на весь день, анонс игроку.
         if (_dailyChallenge != null)
         {
             _dailyChallenge.BeginDay(dayData.dayNumber);
-            _dialogue?.ShowMessage(_dailyChallenge.Description, 2.5f);
-            yield return new WaitForSeconds(1f);
+            yield return StartCoroutine(Announce(_dailyChallenge.Description, 2.4f));
 
             // Батч 6: при первом «Заказе дня» — пояснение механики.
             if (GameManager.Instance != null && GameManager.Instance.MarkTipShown("tip_quest") && _dialogue != null)
-            {
-                _dialogue.ShowMessage(
+                yield return StartCoroutine(Announce(
                     Loc.T("«Заказ дня» — квест на весь день. Он одинаков у всех игроков!",
-                          "The Daily Order is a full-day quest. It's the same for every player!"), 3f);
-                yield return new WaitForSeconds(2f);
-            }
+                          "The Daily Order is a full-day quest. It's the same for every player!"), 2.8f));
         }
 
         // Батч 2: продолжаем день с того гостя, на котором игрока прервали.
@@ -143,21 +137,15 @@ public class DayController : MonoBehaviour
             // Анонс поп-апом — только в СЮЖЕТНЫЕ час-пик дни (там это событие). В endless
             // каждый день час-пиковый, поэтому полагаемся на постоянную плашку без спама.
             if (!endless)
-            {
-                _dialogue?.ShowMessage(
+                yield return StartCoroutine(Announce(
                     Loc.T("Час пик! Гости идут потоком — подавай быстрее ради прибавки к темпу.",
-                          "Rush hour! Guests keep coming — serve faster for a tempo bonus."), 2.8f);
-                yield return new WaitForSeconds(1.5f);
-            }
+                          "Rush hour! Guests keep coming — serve faster for a tempo bonus."), 2.6f));
 
             // Разъяснение механики — один раз за всё время (и в сюжете, и в endless).
             if (GameManager.Instance != null && GameManager.Instance.MarkTipShown("tip_rush") && _dialogue != null)
-            {
-                _dialogue.ShowMessage(
+                yield return StartCoroutine(Announce(
                     Loc.T("В час пик успевай подать быстро — это не штраф, а бонус к оплате за скорость.",
-                          "In rush hour, serve quickly — no penalty, just a speed bonus to your pay."), 3f);
-                yield return new WaitForSeconds(2f);
-            }
+                          "In rush hour, serve quickly — no penalty, just a speed bonus to your pay."), 2.8f));
         }
 
         for (int ci = startIndex; ci < dayData.customers.Count; ci++)
@@ -198,6 +186,26 @@ public class DayController : MonoBehaviour
         // Батч 12-C: «сундук дня» — гарантированная награда за успешный день (не на провале,
         // чтобы рестарт дня не выдавал сундук повторно).
         if (_daySuccess) LootSystem.GrantDayChest(_currentDayNumber);
+    }
+
+    // ─── Батч 14: последовательные анонсы дня (без наложений) ──────────────────
+
+    /// <summary>Показывает центральное сообщение и ждёт его полного показа + короткую паузу,
+    /// чтобы следующий анонс не наложился (создаёт ощущение потока, а не «стены баннеров»).</summary>
+    private IEnumerator Announce(string msg, float seconds)
+    {
+        if (_dialogue == null) yield break;
+        _dialogue.ShowMessage(msg, seconds);
+        yield return new WaitForSeconds(seconds + 0.35f);
+    }
+
+    /// <summary>Ждёт закрытия поп-апа разблокировки механики, прежде чем показывать
+    /// центральные сообщения дня (иначе тексты перекрываются).</summary>
+    private IEnumerator WaitForUnlockPopup()
+    {
+        yield return null; // дать поп-апу появиться
+        while (RewardPopupUI.Instance != null && RewardPopupUI.Instance.IsShowing)
+            yield return null;
     }
 
     // ─── Один гость ───────────────────────────────────────────────────────────

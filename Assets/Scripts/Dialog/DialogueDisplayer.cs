@@ -154,9 +154,11 @@ public class DialogueDisplayer : MonoBehaviour
         _isTyping      = true;
         _clickedToSkip = false;
 
-        // Бубнёж через существующий SpeechMixer
-        if (playSpeech && speechMixer != null)
-            speechMixer.PlayRandomFragment();
+        // Бубнёж через существующий SpeechMixer. Батч 14: играет НА ПРОТЯЖЕНИИ печати
+        // (ретригерим фрагменты, пока печатается) и глохнет ровно на полном показе текста —
+        // раньше один короткий фрагмент проигрывался раз и был рассинхронён с текстом.
+        bool murmur = playSpeech && speechMixer != null;
+        if (murmur) speechMixer.PlayRandomFragment();
 
         // Появление ПОСИМВОЛЬНО («печатная машинка») за ~revealDuration секунд, вне
         // зависимости от длины реплики. Кадрово накапливаем время и открываем ровно
@@ -179,10 +181,13 @@ public class DialogueDisplayer : MonoBehaviour
                 shown = target;
                 SetDialogueText(text.Substring(0, shown));
             }
+            // Пока печатается — поддерживаем бубнёж (фрагменты короткие, доигрывают → берём новый).
+            if (murmur && !speechMixer.IsPlaying) speechMixer.PlayRandomFragment();
             yield return null;
         }
         SetDialogueText(text);
         _isTyping = false;
+        if (murmur) speechMixer.StopSpeech(); // бубнёж кончается вместе с появлением всего текста
 
         // Защита от «быстрого проскока»: короткая пауза, пока клик «дальше» не принимается.
         if (continueHint != null) continueHint.SetActive(true);
@@ -229,16 +234,25 @@ public class DialogueDisplayer : MonoBehaviour
 
     // ─── Быстрое сообщение в центре экрана ───────────────────────────────────
 
-    /// <summary>Показывает сообщение и скрывает через displayTime (0 = ждать клика).</summary>
+    // Батч 14: единственная активная корутина сообщения — новый вызов отменяет прежний,
+    // иначе два текста наложатся друг на друга (замечено с 3-го дня при стеке анонсов).
+    private Coroutine _messageCo;
+
+    /// <summary>Показывает центральное сообщение и скрывает через displayTime (0 = ждать клика).
+    /// Предыдущее сообщение немедленно заменяется (без наложения текста).</summary>
     public void ShowMessage(string text, float displayTime = 2.5f)
     {
         if (messageText != null) messageText.text = text;
-        StartCoroutine(ShowMessageRoutine(displayTime));
+        if (_messageCo != null) StopCoroutine(_messageCo);
+        _messageCo = StartCoroutine(ShowMessageRoutine(displayTime));
     }
+
+    /// <summary>Показывается ли сейчас центральное сообщение (для секвенса анонсов дня).</summary>
+    public bool IsMessageShowing => _messageCo != null;
 
     private IEnumerator ShowMessageRoutine(float displayTime)
     {
-        if (messageGroup == null) yield break;
+        if (messageGroup == null) { _messageCo = null; yield break; }
 
         float t = 0;
         while (t < 1f)
@@ -273,6 +287,7 @@ public class DialogueDisplayer : MonoBehaviour
 
         messageGroup.alpha = 0f;
         messageGroup.blocksRaycasts = false;
+        _messageCo = null;
     }
 
     // ─── Вспомогательные ─────────────────────────────────────────────────────

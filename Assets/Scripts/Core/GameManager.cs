@@ -136,9 +136,7 @@ public class GameManager : MonoBehaviour
         // только потом читаем прогресс. Обновление страницы не теряет данные.
         yield return new WaitUntil(() => YG2.isSDKEnabled);
         LoadGame();
-        CurrencyHudUI.Ensure(); // Батч 12-B: HUD кристаллов/жетонов/ключей (по разблокировкам)
-        CustomizationUI.Instance?.ApplySaved(); // Батч 13: применить сохранённые аватар/тему
-        CustomizationUI.Instance?.RefreshBadgeVisibility();
+        CurrencyHudUI.Ensure(); // Батч 12-B: HUD кристаллов (по разблокировкам)
         TryGrantOfflineIncome(); // Батч 12-E: «кофейня работала, пока тебя не было» (крючок возврата)
         _audioController?.ApplySavedVolumes(_saveData.musicVolume, _saveData.sfxVolume, _saveData.voiceVolume); // Батч 4 + голоса
         if (!_sessionReadyCalled)            // 1.19.2: игрок может начинать (один раз за сессию)
@@ -339,11 +337,12 @@ public class GameManager : MonoBehaviour
             // После всплывающей рекламы на переходе к дню (в т.ч. из сцены сна) — короткое
             // ненавязчивое напоминание, что рекламу можно убрать за донат и поддержать
             // автора. Не показываем на самом первом дне и если реклама уже отключена.
-            // Батч 13: на дне 3 (кристаллы уже открыты) вместо напоминания — таймовый оффер
-            // «Стартовый набор» с отсчётом (один раз за сессию); в остальные дни — напоминание.
+            // Батч 13/14: таймовый оффер «Стартовый набор» — на дне 5 (день 3 уже занят
+            // разблокировкой кристаллов + заказом дня, чтобы не громоздить попапы). Один раз
+            // за сессию; в остальные дни — ненавязчивое напоминание «убрать рекламу».
             if (day > 1 && !_saveData.adsDisabled)
             {
-                if (day == 3 && ProgressionManager.IsUnlocked(ProgressionManager.Feature.Gems))
+                if (day == 5 && ProgressionManager.IsUnlocked(ProgressionManager.Feature.Gems))
                     TimedOfferUI.Ensure().ShowOffer();
                 else
                     AdRemovalPrompt.Instance?.ShowAfterAd();
@@ -468,6 +467,9 @@ public class GameManager : MonoBehaviour
             // Порядок (пункт 4): итоги+магазин здесь → сцена сна (эффекты+текст+ночной
             // звук) → реклама (в сцене сна) → возврат в MainScene на новый день.
             // MainScene перезагрузится и продолжит игру с сохранённого currentDay.
+            // Батч 14: сон — ТОЛЬКО отдельная сцена (единый сценарий). Раньше при ложном
+            // SleepSceneAvailable()==false включался старый оверлей-сон прямо в MainScene, и
+            // игрок видел «две реализации». Теперь запасного in-MainScene сна нет.
             if (day < 40 && SleepSceneAvailable())
             {
                 _saveData.sleepFromDay = day;   // для текста/эффекта сна
@@ -478,13 +480,7 @@ public class GameManager : MonoBehaviour
                 yield break; // управление уходит в сцену сна
             }
 
-            // Запасной путь, если сцена сна не добавлена в Build Settings: старый оверлей
-            // сна прямо в MainScene + реклама на переходе (порядок: сон → реклама → музыка).
-            if (day < 40 && _vfxController != null)
-            {
-                _currentPhase = GamePhase.StoryVignette;
-                yield return StartCoroutine(PlayDreamVignette(day));
-            }
+            // Запасной путь (сцена сна не в Build Settings): без оверлея-сна — просто затемнение+реклама.
             yield return StartCoroutine(Transition());
             _audioController?.ResumeMusic();
         }
@@ -712,11 +708,46 @@ public class GameManager : MonoBehaviour
     public void AddKeys(int n)    { _saveData.keys   = Mathf.Max(0, _saveData.keys   + n); SaveGame(); CurrencyHudUI.Instance?.Refresh(); }
     public bool SpendKeys(int n)  { if (_saveData.keys   < n) return false; _saveData.keys   -= n; SaveGame(); CurrencyHudUI.Instance?.Refresh(); return true; }
 
-    // ─── Батч 13: кастомизация (аватар/тема) ────────────────────────────────────
-    public int AvatarId => _saveData.avatarId;
-    public int ThemeId  => _saveData.themeId;
-    public void SetAvatar(int id) { _saveData.avatarId = Mathf.Max(0, id); SaveGame(); }
-    public void SetTheme(int id)  { _saveData.themeId  = Mathf.Max(0, id); SaveGame(); }
+    // ─── Батч 14: сток кристаллов — перки (мгновенно полезно) ───────────────────
+    public const int GemUpgradeCost  = 40;   // кристаллов за 1 уровень апгрейда кофейни
+    public const int GemRemoveAdsCost = 250;  // кристаллов за отключение рекламы
+
+    /// <summary>Первый ещё не прокачанный до максимума апгрейд (Beans→Machine→Loyalty), иначе -1.</summary>
+    public int NextUpgradableType()
+    {
+        for (int i = 0; i < 3; i++)
+            if (GetUpgradeLevel((UpgradeType)i) < UpgradeMaxLevel) return i;
+        return -1;
+    }
+
+    /// <summary>Мгновенно поднять уровень апгрейда за кристаллы (нетерпеливость → сток премиума).</summary>
+    public bool BuyUpgradeWithGems(UpgradeType type)
+    {
+        if (GetUpgradeLevel(type) >= UpgradeMaxLevel) return false;
+        if (_saveData.gems < GemUpgradeCost) return false;
+        _saveData.gems -= GemUpgradeCost;
+        switch (type)
+        {
+            case UpgradeType.Beans:   _saveData.upgBeans++;   break;
+            case UpgradeType.Machine: _saveData.upgMachine++; break;
+            default:                  _saveData.upgLoyalty++; break;
+        }
+        SaveGame();
+        CurrencyHudUI.Instance?.Refresh();
+        return true;
+    }
+
+    /// <summary>Отключить рекламу за кристаллы (альтернатива IAP no_ads).</summary>
+    public bool RemoveAdsWithGems()
+    {
+        if (_saveData.adsDisabled) return false;
+        if (_saveData.gems < GemRemoveAdsCost) return false;
+        _saveData.gems -= GemRemoveAdsCost;
+        _saveData.adsDisabled = true;
+        SaveGame();
+        CurrencyHudUI.Instance?.Refresh();
+        return true;
+    }
 
     /// <summary>Запустить покупку кристаллов (UI-кнопки магазина зовут это).</summary>
     public void BuyGems(string productId)

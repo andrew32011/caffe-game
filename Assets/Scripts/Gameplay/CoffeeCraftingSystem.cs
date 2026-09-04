@@ -446,7 +446,15 @@ public class CoffeeCraftingSystem : MonoBehaviour
 
         if (_stage == Stage.Ingredients && item.kind == IngredientItem.ItemKind.Ingredient)
         {
-            // Пункт 2: сначала выбираем (подсветка + «Выбрано» + подтвердить)
+            // Батч 14: двойной тап вместо кнопки «Подтвердить». Второй тап по ТОМУ ЖЕ
+            // предмету — наливаем; тап по другому — переключаем выбор. Первый тап только
+            // подсвечивает (пульс-масштаб, как в обучении), чтобы было понятно, что выбрано.
+            if (_pending == item)
+            {
+                OnConfirmIngredient();
+                return;
+            }
+
             if (_pending != null) _pending.SetPulsing(false);
             _pending = item;
             item.SetPulsing(true);
@@ -456,9 +464,11 @@ public class CoffeeCraftingSystem : MonoBehaviour
                 string nm = !string.IsNullOrEmpty(item.displayName)
                     ? item.displayName
                     : Loc.T("основа ", "base ") + (item.ingredientIndex + 1);
-                _selectedText.text = Loc.T("Выбрано: ", "Selected: ") + nm;
+                _selectedText.text = Loc.T($"{nm} — нажми ещё раз, чтобы налить",
+                                           $"{nm} — tap again to pour");
             }
-            ShowButton(_confirmButton);
+            AudioController.Instance?.PlayClick();
+            // Кнопку подтверждения на этом этапе НЕ показываем — подтверждает второй тап.
         }
         else if (_stage == Stage.Toppings && item.kind == IngredientItem.ItemKind.Topping)
         {

@@ -255,8 +255,8 @@ public class TutorialController : MonoBehaviour
             new TutorialStep
             {
                 speakerName    = master,
-                text           = Loc.T("Начало готовки — вот эта полка с ингредиентами. Нажми на напиток, который заказал гость.",
-                                       "Brewing starts at this ingredient shelf. Tap the drink the guest ordered."),
+                text           = Loc.T("Начало готовки — вот эта полка с ингредиентами. Нажми на нужный напиток (он подсветится), затем нажми по нему ещё раз, чтобы налить.",
+                                       "Brewing starts at this ingredient shelf. Tap the drink you need (it highlights), then tap it again to pour."),
                 highlightObject= _ingredientsZoneObject,
                 stageIndex = 2
             },

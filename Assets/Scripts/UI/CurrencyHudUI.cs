@@ -1,10 +1,10 @@
 /// <summary>
-/// Батч 12-B: компактный HUD новых валют — кристаллы, жетоны, ключи. Строит свой Canvas в КОДЕ
-/// (сборка сцены билдером не нужна). Монеты НЕ дублирует (их показывает существующий CoinsUI).
-/// Строки появляются по мере разблокировки (ProgressionManager): кристаллы — D3, жетоны/ключи — D2.
-/// Обновляется по требованию (GameManager.*.Refresh) после изменения валют.
-/// Иконки — цветные «пилюли» + число (спрайты Mini UI можно привязать позже билдером).
-/// Сцена: MainScene (создаётся в рантайме). Зависимости: GameManager, ProgressionManager, TMPro.
+/// Батч 12-B / упрощено в Батч 14: компактный HUD премиум-валюты — КРИСТАЛЛЫ (монеты
+/// показывает CoinsUI, отдельная строка). Строит свой Canvas в КОДЕ. Появляется по
+/// разблокировке кристаллов (ProgressionManager, D3). Строка кликабельна — открывает
+/// магазин кристаллов/перков (GemShopUI). Слева-сверху под кассой, чтобы не пересекать
+/// правый док (журнал/подсказка).
+/// Сцена: MainScene (рантайм). Зависимости: GameManager, ProgressionManager, GemShopUI, TMPro.
 /// </summary>
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,21 +14,19 @@ public class CurrencyHudUI : MonoBehaviour
 {
     public static CurrencyHudUI Instance { get; private set; }
 
-    // Батч 13: иконки валют (спрайты Mini UI). Задаёт билдер; если пусто — цветные «пилюли».
+    // Иконка кристаллов (спрайт Mini UI). Задаёт билдер; если пусто — цветная «пилюля».
     [SerializeField] private Sprite _gemIcon;
-    [SerializeField] private Sprite _tokenIcon;
-    [SerializeField] private Sprite _keyIcon;
 
     private TMP_FontAsset _font;
-    private GameObject _gemRow, _tokenRow, _keyRow;
-    private TextMeshProUGUI _gemText, _tokenText, _keyText;
+    private GameObject _gemRow;
+    private TextMeshProUGUI _gemText;
     private bool _built;
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        EnsureBuilt(); // самособирается и когда объект создан билдером (иконки уже привязаны)
+        EnsureBuilt();
     }
 
     private void EnsureBuilt()
@@ -43,28 +41,21 @@ public class CurrencyHudUI : MonoBehaviour
         if (Instance == null)
         {
             var go = new GameObject("CurrencyHud");
-            Instance = go.AddComponent<CurrencyHudUI>(); // Awake построит
+            Instance = go.AddComponent<CurrencyHudUI>();
         }
         Instance.EnsureBuilt();
         return Instance;
     }
 
-    /// <summary>Обновляет числа и видимость строк по текущим значениям и разблокировкам.</summary>
+    /// <summary>Обновляет число кристаллов и видимость строки (по разблокировке).</summary>
     public void Refresh()
     {
         var gm = GameManager.Instance;
         if (gm == null) return;
 
-        bool gemsOn  = ProgressionManager.IsUnlocked(ProgressionManager.Feature.Gems);
-        bool lootOn  = ProgressionManager.IsUnlocked(ProgressionManager.Feature.LootChests);
-
-        if (_gemRow   != null) _gemRow.SetActive(gemsOn);
-        if (_tokenRow != null) _tokenRow.SetActive(lootOn);
-        if (_keyRow   != null) _keyRow.SetActive(lootOn);
-
-        if (_gemText   != null) _gemText.text   = gm.Gems.ToString();
-        if (_tokenText != null) _tokenText.text = gm.Tokens.ToString();
-        if (_keyText   != null) _keyText.text   = gm.Keys.ToString();
+        bool gemsOn = ProgressionManager.IsUnlocked(ProgressionManager.Feature.Gems);
+        if (_gemRow  != null) _gemRow.SetActive(gemsOn);
+        if (_gemText != null) _gemText.text = gm.Gems.ToString();
     }
 
     private void Build()
@@ -82,58 +73,32 @@ public class CurrencyHudUI : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920, 1080);
         scaler.matchWidthOrHeight = 0.5f;
 
-        // Вертикальная колонка справа сверху (под возможной кнопкой настроек).
-        var col = new GameObject("Column", typeof(RectTransform), typeof(VerticalLayoutGroup));
-        col.transform.SetParent(canvasGo.transform, false);
-        var crt = (RectTransform)col.transform;
-        crt.anchorMin = new Vector2(0.82f, 0.74f);
-        crt.anchorMax = new Vector2(0.995f, 0.90f);
-        crt.offsetMin = crt.offsetMax = Vector2.zero;
-        var vlg = col.GetComponent<VerticalLayoutGroup>();
-        vlg.spacing = 6f; vlg.childControlHeight = true; vlg.childControlWidth = true;
-        vlg.childForceExpandHeight = true; vlg.childForceExpandWidth = true;
+        // Слева-сверху, ПОД строкой кассы (CoinsText 0.9–0.96) — не пересекает правый док.
+        _gemRow = new GameObject("GemRow", typeof(RectTransform), typeof(Image), typeof(Button));
+        _gemRow.transform.SetParent(canvasGo.transform, false);
+        var rt = (RectTransform)_gemRow.transform;
+        rt.anchorMin = new Vector2(0.02f, 0.835f);
+        rt.anchorMax = new Vector2(0.20f, 0.895f);
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        _gemRow.GetComponent<Image>().color = new Color(0.20f, 0.35f, 0.55f, 0.92f);
+        _gemRow.GetComponent<Button>().onClick.AddListener(() => GemShopUI.Ensure().Open());
 
-        // Строка «Кристаллы» — кликабельна: открывает магазин кристаллов (Батч 13).
-        _gemRow   = MakeRow(col.transform, new Color(0.20f, 0.35f, 0.55f, 0.92f), Loc.T("Кристаллы", "Gems"),  _gemIcon,   out _gemText, () => GemShopUI.Ensure().Open());
-        _tokenRow = MakeRow(col.transform, new Color(0.45f, 0.35f, 0.15f, 0.92f), Loc.T("Жетоны", "Tokens"),   _tokenIcon, out _tokenText, null);
-        _keyRow   = MakeRow(col.transform, new Color(0.40f, 0.28f, 0.12f, 0.92f), Loc.T("Ключи", "Keys"),      _keyIcon,   out _keyText, null);
-
-        Refresh();
-    }
-
-    private GameObject MakeRow(Transform parent, Color bg, string caption, Sprite icon, out TextMeshProUGUI amount, System.Action onClick)
-    {
-        var row = new GameObject("Row", typeof(RectTransform), typeof(Image));
-        row.transform.SetParent(parent, false);
-        row.GetComponent<Image>().color = bg;
-
-        // Иконка слева (если задана билдером), иначе подпись занимает её место.
-        bool hasIcon = icon != null;
-        if (hasIcon)
+        if (_gemIcon != null)
         {
             var ic = new GameObject("Icon", typeof(RectTransform), typeof(Image));
-            ic.transform.SetParent(row.transform, false);
+            ic.transform.SetParent(_gemRow.transform, false);
             var irt = (RectTransform)ic.transform;
-            irt.anchorMin = new Vector2(0.03f, 0.12f); irt.anchorMax = new Vector2(0.24f, 0.88f);
+            irt.anchorMin = new Vector2(0.04f, 0.12f); irt.anchorMax = new Vector2(0.30f, 0.88f);
             irt.offsetMin = irt.offsetMax = Vector2.zero;
             var iimg = ic.GetComponent<Image>();
-            iimg.sprite = icon; iimg.preserveAspect = true; iimg.raycastTarget = false;
+            iimg.sprite = _gemIcon; iimg.preserveAspect = true; iimg.raycastTarget = false;
         }
 
-        float capLeft = hasIcon ? 0.27f : 0.06f;
-        var cap = MakeText("Caption", row.transform, new Vector2(capLeft, 0f), new Vector2(0.66f, 1f), 20, TextAlignmentOptions.Left);
-        cap.text = caption;
+        _gemText = MakeText("Amount", _gemRow.transform, new Vector2(0.34f, 0f), new Vector2(0.96f, 1f), 26, TextAlignmentOptions.Left);
+        _gemText.text = "0";
+        _gemText.fontStyle = FontStyles.Bold;
 
-        amount = MakeText("Amount", row.transform, new Vector2(0.66f, 0f), new Vector2(0.96f, 1f), 24, TextAlignmentOptions.Right);
-        amount.text = "0";
-        amount.fontStyle = FontStyles.Bold;
-
-        if (onClick != null)
-        {
-            var btn = row.AddComponent<Button>();
-            btn.onClick.AddListener(() => onClick());
-        }
-        return row;
+        Refresh();
     }
 
     private TextMeshProUGUI MakeText(string name, Transform parent, Vector2 aMin, Vector2 aMax, int size, TextAlignmentOptions align)

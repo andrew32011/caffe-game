@@ -119,6 +119,7 @@ public class CustomerController : MonoBehaviour
             // Запоминаем исходный контроллер модели — это запасная анимация ходьбы.
             _spawnDefaultController = _animator.runtimeAnimatorController;
             if (_botAvatar != null) _animator.avatar = _botAvatar;
+            _animator.speed = 1.15f; // Батч 14: гости двигаются чуть живее (анимация)
             // Гость только появился и стоит — начинаем с покоя (idle), пункт 2.
             _appliedWalking = null;
             ApplyLocomotion(false);

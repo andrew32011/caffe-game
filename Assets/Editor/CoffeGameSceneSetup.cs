@@ -63,6 +63,7 @@ public static class CoffeGameSceneSetup
 
         if (stages == null) Debug.LogWarning("CoffeGameSetup: в сцене не найден объект с компонентом Stages (StagesScripts).");
         if (pv == null)     Debug.LogWarning("CoffeGameSetup: в сцене не найден ProcessVisitor (ProcessVisitorManager).");
+        if (pv != null)     pv.moveSpeed = 2.6f; // Батч 14: гости ходят чуть быстрее (движение)
         if (visitorRoot == null) Debug.LogWarning("CoffeGameSetup: не найден VisitorBasis.");
 
         // ── Ассеты ──────────────────────────────────────────────────────────
@@ -513,53 +514,12 @@ public static class CoffeGameSceneSetup
             .Ref("_endlessLbCloseButton", elbClose)
             .Apply();
 
-        // ── Валютный HUD с иконками (Батч 13) ────────────────────────────────
-        // CurrencyHudUI строит свой Canvas в рантайме; здесь лишь привязываем иконки Mini UI.
+        // ── Валютный HUD (Батч 14): только кристаллы, слева под кассой ───────────
+        // CurrencyHudUI строит свой Canvas в рантайме; здесь лишь привязываем иконку.
         var currencyHudGO = Child(root, "CurrencyHud");
         var currencyHud = currencyHudGO.AddComponent<CurrencyHudUI>();
         new W(currencyHud)
-            .Ref("_gemIcon",   Spr("Assets/Mini UI/Icons/Blue Gem.png"))
-            .Ref("_tokenIcon", Spr("Assets/Mini UI/Icons/Bronze Ticket.png"))
-            .Ref("_keyIcon",   Spr("Assets/Mini UI/Icons/Golden Key.png"))
-            .Apply();
-
-        // ── Экран оформления (аватар + тема) + бейдж аватара на HUD (Батч 13) ──
-        var custPanel = Panel("CustomizationPanel", ct, new Vector2(0.15f, 0.12f), new Vector2(0.85f, 0.88f), new Color(0.05f, 0.05f, 0.12f, 0.98f));
-        var custClose = Btn("BtnCustomizationClose", custPanel.transform, "Закрыть");
-        SetRect(custClose.GetComponent<RectTransform>(), new Vector2(0.35f, 0.035f), new Vector2(0.65f, 0.12f));
-        ApplyPanelSprite(custPanel);
-        custPanel.SetActive(false);
-
-        // Бейдж аватара (левый верх HUD), тап открывает оформление; виден лишь после D4.
-        var avatarBadgeGO = new GameObject("AvatarBadge", typeof(RectTransform), typeof(Image), typeof(Button));
-        avatarBadgeGO.transform.SetParent(ct, false);
-        SetRect((RectTransform)avatarBadgeGO.transform, new Vector2(0.012f, 0.875f), new Vector2(0.075f, 0.975f));
-        var avatarImg = avatarBadgeGO.GetComponent<Image>();
-        avatarImg.sprite = Spr("Assets/Mini UI/Avatars/Avatar 1.png");
-        avatarImg.preserveAspect = true;
-        var avatarBtn = avatarBadgeGO.GetComponent<Button>();
-        avatarBtn.targetGraphic = avatarImg;
-        avatarBadgeGO.AddComponent<ButtonClickSound>();
-
-        // Спрайты: первые 8 аватаров + набор тем (DARK — дефолт, совпадает с базовой панелью).
-        var avatarSprites = new Sprite[8];
-        for (int i = 0; i < avatarSprites.Length; i++)
-            avatarSprites[i] = Spr($"Assets/Mini UI/Avatars/Avatar {i + 1}.png");
-        const string themeDir = "Assets/Mini UI/9 Splice Panels/Dark Theme RoundEdge Panels/Dark Theme RoundEdge ";
-        var themeNames = new[] { "DARK", "BLUE", "GREEN", "PURPLE", "RED", "CYAN", "ORANGE", "PINK" };
-        var themeSprites = new Sprite[themeNames.Length];
-        for (int i = 0; i < themeNames.Length; i++)
-            themeSprites[i] = Spr(themeDir + themeNames[i] + ".png");
-
-        // На ВСЕГДА АКТИВНЫЙ Canvas (панель скрыта — иначе Awake не подпишет бейдж/не применит тему).
-        var customization = canvasGO.AddComponent<CustomizationUI>();
-        new W(customization)
-            .Ref("_panel", custPanel)
-            .Ref("_closeButton", custClose)
-            .Ref("_avatarBadge", avatarImg)
-            .Ref("_avatarBadgeButton", avatarBtn)
-            .Arr("_avatarSprites", avatarSprites)
-            .Arr("_themeSprites", themeSprites)
+            .Ref("_gemIcon", Spr("Assets/Mini UI/Icons/Blue Gem.png"))
             .Apply();
 
         // ── Журнал гостей «Завсегдатаи» (Батч 6) ────────────────────────────
@@ -1189,8 +1149,6 @@ public static class CoffeGameSceneSetup
             img.color = Color.white;
             img.pixelsPerUnitMultiplier = 8f; // пункт 5
         }
-        // Батч 13: помечаем панель темизируемой — сменит спрайт под выбранную тему (UiTheme).
-        if (panel.GetComponent<ThemedPanel>() == null) panel.AddComponent<ThemedPanel>();
     }
 
     // Применяет спрайт-кнопку Mini UI (пункт 4) с pixelsPerUnitMultiplier = 4 (пункт 5).

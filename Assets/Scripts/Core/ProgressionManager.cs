@@ -15,7 +15,7 @@ using YG;
 
 public static class ProgressionManager
 {
-    public enum Feature { LootChests, Gems, Customization }
+    public enum Feature { LootChests, Gems }
 
     /// <summary>На каком дне открывается фича (раннее расписание для насыщенного старта).</summary>
     public static int UnlockDay(Feature f)
@@ -24,7 +24,6 @@ public static class ProgressionManager
         {
             case Feature.LootChests:    return 2;
             case Feature.Gems:          return 3;
-            case Feature.Customization: return 4;
             default:                    return 1;
         }
     }
@@ -64,8 +63,7 @@ public static class ProgressionManager
         switch (f)
         {
             case Feature.LootChests:    return Loc.T("сундуки и подарки", "chests & gifts");
-            case Feature.Gems:          return Loc.T("кристаллы", "gems");
-            default:                    return Loc.T("кастомизация кофейни", "café customization");
+            default:                    return Loc.T("кристаллы", "gems");
         }
     }
 
@@ -91,15 +89,10 @@ public static class ProgressionManager
                              "Chests & gifts! Guests sometimes leave a reward — open a chest each day.");
                 accent = new Color(0.95f, 0.75f, 0.25f);
                 break;
-            case Feature.Gems:
-                body = Loc.T("Кристаллы — редкая валюта. Копи их за достижения и трать на особое.",
-                             "Gems — a rare currency. Earn them from achievements and spend on special things.");
+            default: // Gems
+                body = Loc.T("Кристаллы! Трать их в магазине: мгновенное улучшение кофейни или «убрать рекламу».",
+                             "Gems! Spend them in the shop: instantly upgrade the café or remove ads.");
                 accent = new Color(0.35f, 0.7f, 0.95f);
-                break;
-            default: // Customization
-                body = Loc.T("Кастомизация! Меняй аватар и оформление кофейни — сделай её своей.",
-                             "Customization! Change your avatar and café look — make it yours.");
-                accent = new Color(0.75f, 0.5f, 0.95f);
                 break;
         }
         RewardPopupUI.Ensure().Show(title, body, accent, 4f);

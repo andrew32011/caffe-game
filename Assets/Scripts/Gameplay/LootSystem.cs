@@ -52,22 +52,17 @@ public static class LootSystem
 
     private static void GiveWeightedDrop(int day, bool big)
     {
-        var gm = GameManager.Instance;
         bool gemsOn = ProgressionManager.IsUnlocked(ProgressionManager.Feature.Gems);
 
-        // Веса: монеты(частые) / жетоны / ключ / кристалл(редко) / мистери(крупный).
-        int wCoins   = big ? 30 : 50;
-        int wTokens  = 28;
-        int wKey     = big ? 16 : 12;
-        int wGem     = gemsOn ? (big ? 8 : 4) : 0;
-        int wMystery = big ? 18 : 6;
-        int total = wCoins + wTokens + wKey + wGem + wMystery;
+        // Батч 14: две валюты — монеты(частые) / кристаллы(редко) / мистери(крупный, монеты+кристаллы).
+        int wCoins   = big ? 40 : 62;
+        int wGem     = gemsOn ? (big ? 12 : 6) : 0;
+        int wMystery = big ? 24 : 8;
+        int total = wCoins + wGem + wMystery;
         int r = Random.Range(0, total);
 
-        if ((r -= wCoins) < 0)      { DropCoins(day, big); return; }
-        if ((r -= wTokens) < 0)     { DropTokens(big); return; }
-        if ((r -= wKey) < 0)        { DropKey(big); return; }
-        if ((r -= wGem) < 0)        { DropGems(big); return; }
+        if ((r -= wCoins) < 0) { DropCoins(day, big); return; }
+        if ((r -= wGem) < 0)   { DropGems(big); return; }
         DropMystery(day);
     }
 
@@ -83,27 +78,6 @@ public static class LootSystem
             UiEffects.Instance?.FloatingText("+" + amount, new Color(1f, 0.85f, 0.25f));
     }
 
-    private static void DropTokens(bool big)
-    {
-        int amount = big ? Random.Range(3, 7) : Random.Range(1, 4);
-        GameManager.Instance.AddTokens(amount);
-        Analytics.Send("loot_drop", "type", "tokens");
-        if (big)
-            RewardPopupUI.Ensure().Show(Loc.T("Сундук дня!", "Daily chest!"),
-                Loc.T($"+{amount} жетонов", $"+{amount} tokens"), new Color(0.85f, 0.7f, 0.35f), 3.2f);
-        else
-            UiEffects.Instance?.FloatingText(Loc.T($"+{amount} жетон.", $"+{amount} tok."), new Color(0.9f, 0.75f, 0.4f));
-    }
-
-    private static void DropKey(bool big)
-    {
-        GameManager.Instance.AddKeys(1);
-        Analytics.Send("loot_drop", "type", "key");
-        RewardPopupUI.Ensure().Show(Loc.T("Ключ!", "A key!"),
-            Loc.T("+1 ключ — пригодится для сундуков.", "+1 key — handy for chests."),
-            new Color(0.75f, 0.55f, 0.25f), 3.2f);
-    }
-
     private static void DropGems(bool big)
     {
         int amount = big ? Random.Range(2, 5) : 1;
@@ -117,12 +91,15 @@ public static class LootSystem
     private static void DropMystery(int day)
     {
         int coins = Random.Range(day * 6, day * 12 + 25);
-        int tokens = Random.Range(2, 5);
+        bool gemsOn = ProgressionManager.IsUnlocked(ProgressionManager.Feature.Gems);
+        int gems = gemsOn ? Random.Range(1, 4) : 0;
         GameManager.Instance.AddCoins(coins);
-        GameManager.Instance.AddTokens(tokens);
+        if (gems > 0) GameManager.Instance.AddGems(gems);
         Analytics.Send("loot_drop", "type", "mystery");
+        string body = gems > 0
+            ? Loc.T($"+{coins} монет и +{gems} кристаллов", $"+{coins} coins and +{gems} gems")
+            : Loc.T($"+{coins} монет", $"+{coins} coins");
         RewardPopupUI.Ensure().Show(Loc.T("Таинственный подарок!", "Mystery gift!"),
-            Loc.T($"+{coins} монет и +{tokens} жетонов", $"+{coins} coins and +{tokens} tokens"),
-            new Color(0.6f, 0.4f, 0.85f), 3.5f);
+            body, new Color(0.6f, 0.4f, 0.85f), 3.5f);
     }
 }
