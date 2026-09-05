@@ -110,9 +110,17 @@ public static class DailyTaskBoard
         return t;
     }
 
+    /// <summary>Батч 16: срабатывает, когда задача i только что стала выполненной (для авто-показа).</summary>
+    public static event System.Action<int> OnTaskCompleted;
+
     public static void Report(int payment, int stars, int toppingsSold, bool perfect, float result)
     {
-        for (int i = 0; i < _tasks.Count; i++) _tasks[i].Report(payment, stars, toppingsSold, perfect, result);
+        for (int i = 0; i < _tasks.Count; i++)
+        {
+            bool was = _tasks[i].Complete;
+            _tasks[i].Report(payment, stars, toppingsSold, perfect, result);
+            if (!was && _tasks[i].Complete) OnTaskCompleted?.Invoke(i);
+        }
     }
 
     public static bool IsClaimed(int i) =>

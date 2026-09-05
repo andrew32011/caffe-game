@@ -26,11 +26,21 @@ public class RushHudUI : MonoBehaviour
     private Image _barFill;
     private Coroutine _timerCo;
     private int _queue;
+    private bool _rushActive;   // Батч 16: активен ли час пик (для скрытия на паузе)
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(this); return; }
         Instance = this;
+    }
+
+    // Батч 16: на паузе (открыты настройки — там регулируют музыку) прячем плашку часа пик,
+    // иначе её Canvas (order 250) наслаивается на панель настроек → «наслоение текста».
+    private void Update()
+    {
+        if (!_rushActive || _panel == null) return;
+        bool show = Time.timeScale > 0f;
+        if (_panel.activeSelf != show) _panel.SetActive(show);
     }
 
     // ─── Публичное API (вызывает DayController) ───────────────────────────────
@@ -40,6 +50,7 @@ public class RushHudUI : MonoBehaviour
     {
         if (_panel == null) Build();
         _queue = Mathf.Max(0, queueLeft);
+        _rushActive = true;
         _panel.SetActive(true);
         if (_barFill != null) _barFill.fillAmount = 1f;
         UpdateLabel();
@@ -70,6 +81,7 @@ public class RushHudUI : MonoBehaviour
     /// <summary>Выключает плашку (день закончился / день не час-пиковый).</summary>
     public void EndRush()
     {
+        _rushActive = false;
         StopTimer();
         if (_panel != null) _panel.SetActive(false);
     }
@@ -116,10 +128,19 @@ public class RushHudUI : MonoBehaviour
         _panel = new GameObject("Panel", typeof(RectTransform), typeof(Image));
         _panel.transform.SetParent(canvasGo.transform, false);
         var prt = (RectTransform)_panel.transform;
-        prt.anchorMin = new Vector2(0.35f, 0.855f);
-        prt.anchorMax = new Vector2(0.65f, 0.925f);
+        // Батч 16: полоса в свободном зазоре — НИЖЕ шкалы удовлетворённости (0.93–0.97) и ВЫШЕ
+        // центрального текста (комментарии/ачивки ≤0.855); слева касса, справа меню — без наложений.
+        prt.anchorMin = new Vector2(0.38f, 0.865f);
+        prt.anchorMax = new Vector2(0.62f, 0.925f);
         prt.offsetMin = prt.offsetMax = Vector2.zero;
-        _panel.GetComponent<Image>().color = new Color(0.10f, 0.09f, 0.16f, 0.92f);
+        var panelImg = _panel.GetComponent<Image>();
+        var skin = UiSkin.Get();
+        if (skin != null && skin.panelSprite != null)
+        {
+            panelImg.sprite = skin.panelSprite; panelImg.type = Image.Type.Sliced;
+            panelImg.color = Color.white; panelImg.pixelsPerUnitMultiplier = 8f;
+        }
+        else panelImg.color = new Color(0.10f, 0.09f, 0.16f, 0.92f);
 
         // Надпись «Час пик · очередь: N».
         var txtGo = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));

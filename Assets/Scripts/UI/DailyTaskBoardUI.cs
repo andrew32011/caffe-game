@@ -22,14 +22,30 @@ public class DailyTaskBoardUI : MonoBehaviour
     private readonly TextMeshProUGUI[] _rowProg = new TextMeshProUGUI[3];
     private readonly Button[] _rowClaim = new Button[3];
     private readonly TextMeshProUGUI[] _rowClaimLbl = new TextMeshProUGUI[3];
+    private readonly Image[] _rowBg = new Image[3];
     private Button _bonusBtn; private TextMeshProUGUI _bonusLbl;
     private int _shownClaimable = -1;
+
+    // Батч 16: авто-показ выполненной задачи (через UiQueue), чтобы игрок сразу забрал бонус.
+    private bool _autoOpenQueued;
+    private int _highlight = -1;
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         EnsureBuilt();
+        DailyTaskBoard.OnTaskCompleted += OnTaskCompleted;
+    }
+
+    private void OnDestroy() { DailyTaskBoard.OnTaskCompleted -= OnTaskCompleted; }
+
+    private void OnTaskCompleted(int i)
+    {
+        if (_autoOpenQueued) return;         // одно авто-открытие за раз
+        _autoOpenQueued = true;
+        _highlight = i;
+        UiQueue.Enqueue(Open, () => _panel != null && _panel.activeSelf);
     }
 
     private void EnsureBuilt() { if (_built) return; _built = true; Build(); }
@@ -65,6 +81,8 @@ public class DailyTaskBoardUI : MonoBehaviour
         AudioController.Instance?.PlayUiClose();
         if (_panel != null) _panel.SetActive(false);
         if (_dim != null) _dim.SetActive(false);
+        _autoOpenQueued = false;   // разрешаем следующее авто-открытие
+        _highlight = -1;
     }
 
     private void RefreshPanel()
@@ -82,6 +100,11 @@ public class DailyTaskBoardUI : MonoBehaviour
                     DailyTaskBoard.IsClaimed(i) ? Loc.T("Забрано", "Claimed")
                     : tasks[i].Complete ? Loc.T($"Забрать +{tasks[i].Reward}", $"Claim +{tasks[i].Reward}")
                     : Loc.T("В процессе", "In progress");
+            // Батч 16: подсветка только что выполненной задачи при авто-показе.
+            if (_rowBg[i] != null)
+                _rowBg[i].color = (i == _highlight && canClaim)
+                    ? new Color(0.95f, 0.8f, 0.35f, 0.28f)
+                    : new Color(1f, 1f, 1f, 0.05f);
         }
         bool bonusReady = DailyTaskBoard.AllClaimed && !DailyTaskBoard.BonusClaimed;
         if (_bonusBtn != null) _bonusBtn.interactable = bonusReady;
@@ -166,7 +189,8 @@ public class DailyTaskBoardUI : MonoBehaviour
             var row = new GameObject($"Row{i}", typeof(RectTransform), typeof(Image));
             row.transform.SetParent(_panel.transform, false);
             var rrt = (RectTransform)row.transform; rrt.anchorMin = new Vector2(0.05f, bot); rrt.anchorMax = new Vector2(0.95f, top); rrt.offsetMin = rrt.offsetMax = Vector2.zero;
-            row.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.05f);
+            _rowBg[i] = row.GetComponent<Image>();
+            _rowBg[i].color = new Color(1f, 1f, 1f, 0.05f);
             _rowGoal[i] = MakeText("Goal", row.transform, new Vector2(0.03f, 0.45f), new Vector2(0.62f, 0.97f), 20, "", Color.white, FontStyles.Normal, TextAlignmentOptions.Left);
             _rowProg[i] = MakeText("Prog", row.transform, new Vector2(0.03f, 0.05f), new Vector2(0.62f, 0.45f), 18, "", new Color(0.8f, 0.85f, 0.95f), FontStyles.Normal, TextAlignmentOptions.Left);
             int idx = i;

@@ -123,8 +123,21 @@ public class CoffeeCraftingSystem : MonoBehaviour
     public void SetFavorite(Topping fav, bool eligible)
     {
         _favoriteTopping  = fav;
-        _favoriteEligible = eligible;
         _favoriteAdded    = false;
+        // Батч 16: не рекламируем топпинг, которого нет на полке (иначе игрок не может его
+        // добавить, а «любит X» сбивает с толку).
+        bool onShelf = fav != Topping.None && ToppingOnShelf(fav);
+        _favoriteEligible = eligible && onShelf;
+
+        // Единый источник правды: если завсегдатай просит любимый топпинг — делаем его
+        // ТРЕБУЕМЫМ топпингом заказа, чтобы показанное «любит X», намёк и засчёт совпадали
+        // (раньше игрок клал показанный топпинг, а игра писала «не то»).
+        if (_favoriteEligible && _target != null)
+        {
+            _target.topping = fav;
+            if (_orderDisplayText != null)
+                _orderDisplayText.text = _hintRevealed ? DescribeTarget() : VagueHint();
+        }
     }
 
     /// <summary>Пункт 3: в обучении гостя нет — не показываем оценку «правильно/неправильно»

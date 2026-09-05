@@ -125,3 +125,14 @@ MainScene: YandexManager→SDK ▶ GameManager.StartGameFlow
   → день 40: JourneyGate(10000) → финал
 UI-слой (Canvas, всегда активен): Settings/Journal/Hint/Shop/DailyBonus/Coins/UiEffects
 ```
+
+## Батч 16 (полировка UI/потока)
+- Новые: UI/UiSkin.cs, UI/UiKit.cs, UI/UiQueue.cs, UI/CurrencyWidget.cs, UI/DayChestUI.cs,
+  UI/RenovationShopUI.cs.
+- Стиль Mini UI: все новые окна строятся через UiKit из спрайтов UiSkin (заполняет билдер).
+- Валюты: готовые префабы Mini UI Coin Count/Gem Count + CurrencyWidget (единый вид, плюс→магазин).
+- Последовательность: UiQueue (сундук→задачи→преображение→результат дня).
+- Обустройство: RenovationShopUI (кнопка+«!» на HUD, облёт камерой RenoStages, покупка на месте);
+  RenovationGoalUI/CurrencyHudUI — заглушки.
+- Фиксы: топпинг завсегдатая, RushHud (перенос+скрытие на паузе), интро globalSpeedMultiplier,
+  герой не на мебели, колесо реально крутится (5052447), сток gems→coins.

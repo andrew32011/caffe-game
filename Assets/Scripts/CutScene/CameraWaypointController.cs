@@ -57,6 +57,11 @@ public class SmoothCameraWaypointController : MonoBehaviour
     public bool isEnabled = true;
     public bool isAtFinalWaypoint = false;
 
+    // Батч 16: общий множитель скорости интро-пролёта (~1.35× по просьбе). Подстраивается
+    // в инспекторе, ускоряет весь облёт без правки каждого waypoint.
+    [Range(0.5f, 3f)]
+    public float globalSpeedMultiplier = 1.35f;
+
     private Camera cam;
     private float currentHoldTime = 0f;
     private bool isMoving = false;
@@ -161,8 +166,9 @@ public class SmoothCameraWaypointController : MonoBehaviour
         rotationMultiplier = Mathf.Lerp(0.1f, 1f, Mathf.Pow(rotationMultiplier, currentSettings.smoothness));
 
         // ���������� ������� ���������
-        float effectiveMoveSpeed = currentMoveSpeed * speedMultiplier;
-        float effectiveRotationSpeed = currentRotationSpeed * rotationMultiplier;
+        float gsm = Mathf.Max(0.1f, globalSpeedMultiplier);
+        float effectiveMoveSpeed = currentMoveSpeed * speedMultiplier * gsm;
+        float effectiveRotationSpeed = currentRotationSpeed * rotationMultiplier * gsm;
 
         // ������� ����������� � �������������� SmoothDamp
         Vector3 smoothedPosition = Vector3.SmoothDamp(

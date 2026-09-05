@@ -20,8 +20,12 @@ public class GemShopUI : MonoBehaviour
     private TMP_FontAsset _font;
 
     // Перки — обновляем подписи/доступность при открытии.
-    private Button _upgradeBtn, _adsBtn;
-    private TextMeshProUGUI _upgradeLabel, _adsLabel;
+    private Button _upgradeBtn, _adsBtn, _exchangeBtn;
+    private TextMeshProUGUI _upgradeLabel, _adsLabel, _exchangeLabel;
+
+    // Батч 16: универсальный сток — обмен кристаллов на монеты (кормит обустройство).
+    public const int GemExchangeCost   = 10;
+    public const int GemExchangeCoins  = 600;
 
     private void Awake()
     {
@@ -76,6 +80,26 @@ public class GemShopUI : MonoBehaviour
             _adsLabel.text = adsGone
                 ? Loc.T("Реклама отключена", "Ads disabled")
                 : Loc.T($"Убрать рекламу (−{GameManager.GemRemoveAdsCost})", $"Remove ads (−{GameManager.GemRemoveAdsCost})");
+
+        bool canExch = gm.Gems >= GemExchangeCost;
+        if (_exchangeBtn != null) _exchangeBtn.interactable = canExch;
+        if (_exchangeLabel != null)
+            _exchangeLabel.text = Loc.T($"{GemExchangeCost} крист. → {GemExchangeCoins} монет",
+                                        $"{GemExchangeCost} gems → {GemExchangeCoins} coins");
+    }
+
+    private void OnExchange()
+    {
+        var gm = GameManager.Instance;
+        if (gm != null && gm.SpendGems(GemExchangeCost))
+        {
+            gm.AddCoins(GemExchangeCoins);
+            UiEffects.Instance?.CoinBurst(GemExchangeCoins);
+            AudioController.Instance?.PlayCoin();
+            Analytics.Send("gems_to_coins", "gems", GemExchangeCost.ToString());
+        }
+        else AudioController.Instance?.PlayWrongOrder();
+        RefreshPerks();
     }
 
     private void OnBuyUpgrade()
@@ -140,40 +164,37 @@ public class GemShopUI : MonoBehaviour
         dim.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.55f);
         dim.GetComponent<Button>().onClick.AddListener(Close);
 
-        _panel = new GameObject("Panel", typeof(RectTransform), typeof(Image));
-        _panel.transform.SetParent(canvasGo.transform, false);
-        var prt = (RectTransform)_panel.transform;
-        prt.anchorMin = new Vector2(0.27f, 0.12f);
-        prt.anchorMax = new Vector2(0.73f, 0.88f);
-        prt.offsetMin = prt.offsetMax = Vector2.zero;
-        _panel.GetComponent<Image>().color = new Color(0.05f, 0.05f, 0.12f, 0.98f); // тон как у панелей игры
+        var panelImg = UiKit.Panel(canvasGo.transform, new Vector2(0.27f, 0.10f), new Vector2(0.73f, 0.90f), false, "Panel");
+        _panel = panelImg.gameObject;
 
-        MakeText("Title", _panel.transform, new Vector2(0.05f, 0.91f), new Vector2(0.95f, 0.99f), 34,
+        MakeText("Title", _panel.transform, new Vector2(0.05f, 0.92f), new Vector2(0.95f, 1.0f), 34,
             Loc.T("Кристаллы", "Gems"), new Color(0.6f, 0.85f, 1f), FontStyles.Bold, TextAlignmentOptions.Center);
 
-        // Секция «Потратить» (перки).
-        MakeText("SpendHdr", _panel.transform, new Vector2(0.06f, 0.85f), new Vector2(0.94f, 0.90f), 20,
+        // Секция «Потратить» (перки — главный сток кристаллов).
+        MakeText("SpendHdr", _panel.transform, new Vector2(0.06f, 0.865f), new Vector2(0.94f, 0.915f), 20,
             Loc.T("Потратить", "Spend"), new Color(0.8f, 0.85f, 0.95f), FontStyles.Normal, TextAlignmentOptions.Left);
-        _upgradeBtn = MakePerk(new Vector2(0.06f, 0.735f), new Vector2(0.94f, 0.835f),
+        _upgradeBtn = MakePerk(new Vector2(0.06f, 0.775f), new Vector2(0.94f, 0.86f),
             new Color(0.22f, 0.42f, 0.28f, 1f), OnBuyUpgrade, out _upgradeLabel);
-        _adsBtn = MakePerk(new Vector2(0.06f, 0.625f), new Vector2(0.94f, 0.725f),
+        _exchangeBtn = MakePerk(new Vector2(0.06f, 0.685f), new Vector2(0.94f, 0.77f),
+            new Color(0.42f, 0.36f, 0.22f, 1f), OnExchange, out _exchangeLabel);
+        _adsBtn = MakePerk(new Vector2(0.06f, 0.595f), new Vector2(0.94f, 0.68f),
             new Color(0.22f, 0.38f, 0.5f, 1f), OnRemoveAds, out _adsLabel);
 
         // Секция «Пополнить» (IAP).
-        MakeText("BuyHdr", _panel.transform, new Vector2(0.06f, 0.555f), new Vector2(0.94f, 0.605f), 20,
+        MakeText("BuyHdr", _panel.transform, new Vector2(0.06f, 0.535f), new Vector2(0.94f, 0.585f), 20,
             Loc.T("Пополнить", "Get more"), new Color(0.8f, 0.85f, 0.95f), FontStyles.Normal, TextAlignmentOptions.Left);
-        MakeOffer(new Vector2(0.06f, 0.44f), new Vector2(0.94f, 0.545f), new Color(0.22f, 0.40f, 0.55f, 1f),
+        MakeOffer(new Vector2(0.06f, 0.44f), new Vector2(0.94f, 0.53f), new Color(0.22f, 0.40f, 0.55f, 1f),
             Loc.T("Стартовый набор", "Starter pack"),
             Loc.T("100 кристаллов + 2000 монет + без рекламы", "100 gems + 2000 coins + no ads"),
             GameManager.StarterPackId);
-        MakeOffer(new Vector2(0.06f, 0.335f), new Vector2(0.94f, 0.43f), new Color(0.18f, 0.30f, 0.45f, 1f),
+        MakeOffer(new Vector2(0.06f, 0.35f), new Vector2(0.94f, 0.435f), new Color(0.18f, 0.30f, 0.45f, 1f),
             Loc.T("Горсть кристаллов", "Handful of gems"), Loc.T("50 кристаллов", "50 gems"), GameManager.GemsSmallId);
-        MakeOffer(new Vector2(0.06f, 0.23f), new Vector2(0.94f, 0.325f), new Color(0.18f, 0.30f, 0.45f, 1f),
+        MakeOffer(new Vector2(0.06f, 0.26f), new Vector2(0.94f, 0.345f), new Color(0.18f, 0.30f, 0.45f, 1f),
             Loc.T("Мешочек кристаллов", "Sack of gems"), Loc.T("170 кристаллов", "170 gems"), GameManager.GemsMediumId);
-        MakeOffer(new Vector2(0.06f, 0.125f), new Vector2(0.94f, 0.22f), new Color(0.18f, 0.30f, 0.45f, 1f),
+        MakeOffer(new Vector2(0.06f, 0.17f), new Vector2(0.94f, 0.255f), new Color(0.18f, 0.30f, 0.45f, 1f),
             Loc.T("Сундук кристаллов", "Chest of gems"), Loc.T("500 кристаллов", "500 gems"), GameManager.GemsLargeId);
 
-        var closeLabel = MakeButton("CloseBtn", _panel.transform, new Vector2(0.34f, 0.03f), new Vector2(0.66f, 0.11f),
+        var closeLabel = MakeButton("CloseBtn", _panel.transform, new Vector2(0.34f, 0.03f), new Vector2(0.66f, 0.12f),
             new Color(0.28f, 0.24f, 0.30f, 1f), Close);
         closeLabel.text = Loc.T("Закрыть", "Close");
 
@@ -192,7 +213,7 @@ public class GemShopUI : MonoBehaviour
         go.transform.SetParent(_panel.transform, false);
         var rt = (RectTransform)go.transform;
         rt.anchorMin = aMin; rt.anchorMax = aMax; rt.offsetMin = rt.offsetMax = Vector2.zero;
-        go.GetComponent<Image>().color = bg;
+        ApplyButtonSkin(go.GetComponent<Image>(), bg);
         go.GetComponent<Button>().onClick.AddListener(() => Buy(productId));
 
         var t = MakeText("Title", go.transform, new Vector2(0.04f, 0.5f), new Vector2(0.96f, 0.98f), 24, title, Color.white, FontStyles.Bold, TextAlignmentOptions.Left);
@@ -220,9 +241,22 @@ public class GemShopUI : MonoBehaviour
         go.transform.SetParent(parent, false);
         var rt = (RectTransform)go.transform;
         rt.anchorMin = aMin; rt.anchorMax = aMax; rt.offsetMin = rt.offsetMax = Vector2.zero;
-        go.GetComponent<Image>().color = bg;
+        ApplyButtonSkin(go.GetComponent<Image>(), bg);
         go.GetComponent<Button>().onClick.AddListener(() => onClick());
         return MakeText("Label", go.transform, Vector2.zero, Vector2.one, 22, "", Color.white, FontStyles.Normal, TextAlignmentOptions.Center);
+    }
+
+    // Батч 16: кнопка в стиле Mini UI (спрайт из UiSkin), с откатом на плоский цвет.
+    private static void ApplyButtonSkin(Image img, Color fallback)
+    {
+        if (img == null) return;
+        var s = UiSkin.Get();
+        if (s != null && s.buttonSprite != null)
+        {
+            img.sprite = s.buttonSprite; img.type = Image.Type.Sliced;
+            img.color = Color.white; img.pixelsPerUnitMultiplier = 8f;
+        }
+        else img.color = fallback;
     }
 
     private static void SetFull(RectTransform rt)

@@ -247,13 +247,14 @@ public static class CoffeGameSceneSetup
         commentText.color = new Color(1f, 0.95f, 0.6f);
         commentText.gameObject.SetActive(false);
 
-        // ── Деньги кофейни (сверху слева, пункт 5) с иконкой монеты (пункт 7) ─
-        var coinIcon = IconImage("CoinIcon", ct, "Assets/Mini UI/Icons/Bronze Coin.png",
-            new Vector2(0.02f, 0.9f), new Vector2(0.05f, 0.96f));
-        var coinsText = Text("CoinsText", ct, "Касса: 0", 28, TextAlignmentOptions.Left, new Vector2(0.055f, 0.9f), new Vector2(0.28f, 0.96f));
-        coinsText.color = new Color(1f, 0.9f, 0.4f);
-        var coinsUI = coinsText.gameObject.AddComponent<CoinsUI>();
-        new W(coinsUI).Ref("_text", coinsText).Apply();
+        // ── Скин Mini UI для всех код-построенных окон (Батч 16) ────────────────
+        SetupUiSkin();
+
+        // ── Деньги и кристаллы (Батч 16): единые готовые виджеты Mini UI ─────────
+        // Coin Count / Gem Count — одна семья (рамка + иконка + число + «＋»), поэтому монеты и
+        // кристаллы в едином стиле. CurrencyWidget обновляет число и вешает магазин на «＋».
+        MakeCurrencyWidget(ct, "Assets/Mini UI/Prefabs/Coin Count.prefab", CurrencyWidget.Kind.Coins, new Vector2(16f, -16f));
+        MakeCurrencyWidget(ct, "Assets/Mini UI/Prefabs/Gem Count.prefab",  CurrencyWidget.Kind.Gems,  new Vector2(16f, -140f));
 
         // ── Выбор ингредиента + кнопка «Подтвердить» (пункт 2) ──────────────
         var selectedText = Text("SelectedText", ct, "Выбрано: …", 28, TextAlignmentOptions.Center, new Vector2(0.3f, 0.18f), new Vector2(0.7f, 0.24f));
@@ -1080,6 +1081,14 @@ public static class CoffeGameSceneSetup
     //      (создай такой объект там, где должна стоять хозяйка — это точная ручная настройка);
     //   2) иначе — точка кассира (PointCashier) по X/Z + рейкаст вниз до пола;
     //   3) герой разворачивается лицом к гостю (VisitorBasis).
+    // Батч 16: коллайдер принадлежит мебели обустройства (лежит под объектом RenoStages)?
+    static bool IsUnderRenoStages(Transform t)
+    {
+        for (var p = t; p != null; p = p.parent)
+            if (p.name == "RenoStages") return true;
+        return false;
+    }
+
     static void PlaceHeroBehindCounter(GameObject hero)
     {
         if (hero == null) return;
@@ -1105,6 +1114,9 @@ public static class CoffeGameSceneSetup
         foreach (var h in hits)
         {
             if (h.collider != null && h.collider.transform.IsChildOf(hero.transform)) continue;
+            // Батч 16: не приземляем героя на мебель обустройства (RenoStages), иначе он
+            // «встаёт» на предмет и оказывается приподнят — только пол.
+            if (h.collider != null && IsUnderRenoStages(h.collider.transform)) continue;
             pos.y = h.point.y;
             break;
         }
@@ -1230,6 +1242,58 @@ public static class CoffeGameSceneSetup
 
     // Загрузка префаба по пути (Батч 15: мебель обустройства).
     static GameObject Pref(string path) => AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+    // ── Батч 16: единый скин Mini UI для рантайм-окон (UiKit читает его из UiSkin) ──
+    static void SetupUiSkin()
+    {
+        // Колесо 5052447 по умолчанию импортировано как Texture — переводим в Sprite,
+        // иначе LoadAssetAtPath<Sprite> вернёт null.
+        EnsureSprite("Assets/5052447.png");
+
+        var go = GameObject.Find("UiSkin") ?? new GameObject("UiSkin");
+        var skin = go.GetComponent<UiSkin>() ?? go.AddComponent<UiSkin>();
+        skin.panelSprite       = Spr("Assets/Mini UI/9 Splice Panels/Dark Theme RoundEdge Panels/Dark Theme RoundEdge DARK.png");
+        skin.panelAccentSprite = Spr("Assets/Mini UI/9 Splice Panels/Dark Theme RoundEdge Panels/Dark Theme RoundEdge PURPLE.png");
+        skin.buttonSprite       = Spr("Assets/Mini UI/Buttons/Dark Theme Border Buttons/256Px Rectangle DarkBorder/Dark Long Btn DARK.png");
+        skin.buttonAccentSprite = Spr("Assets/Mini UI/Buttons/Dark Theme Border Buttons/256Px Rectangle DarkBorder/Dark Long Btn GREEN.png");
+        skin.coinIcon   = Spr("Assets/Mini UI/Icons/Bronze Coin.png");
+        skin.gemIcon    = Spr("Assets/Mini UI/Icons/Blue Gem.png");
+        skin.heartIcon  = Spr("Assets/Mini UI/Icons/Heart.png");
+        skin.chestSprite = Spr("Assets/Mini UI/Icons/Chest Of Coin.png");
+        skin.wheelSprite = Spr("Assets/5052447.png");
+        skin.coinCountPrefab = Pref("Assets/Mini UI/Prefabs/Coin Count.prefab");
+        skin.gemCountPrefab  = Pref("Assets/Mini UI/Prefabs/Gem Count.prefab");
+        skin.font = UiFont();
+        EditorUtility.SetDirty(skin);
+        Debug.Log("CoffeGameSetup: UiSkin настроен (Mini UI спрайты/префабы для рантайм-окон).");
+    }
+
+    static void EnsureSprite(string path)
+    {
+        var ti = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (ti != null && ti.textureType != TextureImporterType.Sprite)
+        {
+            ti.textureType = TextureImporterType.Sprite;
+            ti.spriteImportMode = SpriteImportMode.Single;
+            ti.SaveAndReimport();
+        }
+    }
+
+    // Инстанцирует готовый виджет валюты Mini UI (Coin Count / Gem Count) в HUD и вешает
+    // CurrencyWidget. Масштабируем целиком (localScale), чтобы не ломать внутреннюю раскладку.
+    static void MakeCurrencyWidget(Transform parent, string prefabPath, CurrencyWidget.Kind kind, Vector2 anchoredPos)
+    {
+        var prefab = Pref(prefabPath);
+        if (prefab == null) { Debug.LogWarning("CoffeGameSetup: не найден " + prefabPath + " — виджет валюты пропущен."); return; }
+        var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
+        var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
+        rt.pivot = new Vector2(0f, 1f);
+        rt.localScale = Vector3.one * 0.42f;
+        rt.anchoredPosition = anchoredPos;
+        var w = go.AddComponent<CurrencyWidget>();
+        w.SetKind(kind);
+    }
 
     static Image IconImage(string name, Transform parent, string assetPath, Vector2 aMin, Vector2 aMax)
     {

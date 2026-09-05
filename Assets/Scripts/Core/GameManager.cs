@@ -167,7 +167,7 @@ public class GameManager : MonoBehaviour
             _sessionInitDone = true;
         }
 
-        RenovationGoalUI.Ensure(); // Батч 15: виджет цели обустройства (главный сток монет)
+        RenovationShopUI.Ensure(); // Батч 16: магазин-обустройство камерой (главный сток монет)
         ProgressHubUI.Ensure();    // Батч 15: хаб (рецепты/альбом/событие/сезон/колесо)
 
         yield return StartCoroutine(RunGameDays());
@@ -415,6 +415,10 @@ public class GameManager : MonoBehaviour
             AudioController.Instance?.PlayDayClear();
             UiEffects.Instance?.DayEndBanner(Loc.T($"День {day} завершён", $"Day {day} complete"));
 
+            // Батч 16: сначала сундук дня (и любые окна в очереди), потом экран результатов —
+            // строго по одному, без наложений.
+            yield return new WaitWhile(() => UiQueue.IsBusy);
+
             if (_dayResultUI != null)
             {
                 _dayResultUI.Show(day, _dayController.CoinsEarnedToday, dayData.GetDayEndText(), _dayController.CurrentComboCount);
@@ -565,6 +569,9 @@ public class GameManager : MonoBehaviour
             AudioController.Instance?.PlayDayClear();
             UiEffects.Instance?.DayEndBanner(
                 Loc.T($"Бесконечный день {eDay}", $"Endless day {eDay}"));
+
+            // Батч 16: сундук/окна очереди — сначала, потом результаты.
+            yield return new WaitWhile(() => UiQueue.IsBusy);
 
             if (_dayResultUI != null)
             {
